@@ -2,7 +2,12 @@ import subprocess
 import os
 import re
 
+#tracert ADRESSE
+#route add
+
 def manipulate_ip_address():
+    #prio net:  route add 0.0.0.0 mask 0.0.0.0 (10.0.96.254) `change gateway` metric 1
+    #delete prio : route delete 0.0.0.0
     """
     This function allows the user to configure network settings by changing the IP address, subnet mask, and gateway of a selected network interface.
 
@@ -17,22 +22,22 @@ def manipulate_ip_address():
     """
     # Split the output into lines and remove any leading or trailing whitespace
     network_names = subprocess.run(["powershell", "Get-NetAdapter | Select-Object -Property Name"], capture_output=True, text=True).stdout.strip().split('\n')
-
     print("zu verfügung stehen folgende Netzwerken zur Verfügung:")
 
     # create a list of network names from the output with IP-Addresses
     powershell_command = r'''
     Get-NetAdapter | ForEach-Object {
-        $Interface = $_
-        $IPConfiguration = Get-NetIPConfiguration -InterfaceIndex $Interface.InterfaceIndex
-        [PSCustomObject]@{
-            Name = $Interface.Name
-            Status = $Interface.Status
-            IPAddress = $IPConfiguration.IPv4Address.IPAddress
-            SubnetMask = $IPConfiguration.IPv4Address
-            Gateway = $IPConfiguration.IPv4DefaultGateway.NextHop
-        }
-    } | Format-Table -AutoSize | Out-String -Width 4096
+    $Interface = $_
+    $IPConfiguration = Get-NetIPConfiguration -InterfaceIndex $Interface.InterfaceIndex
+    [PSCustomObject]@{
+        InterfaceIndex = $Interface.InterfaceIndex
+        InterfaceAlias = $Interface.InterfaceAlias
+        Status = $Interface.Status
+        IPAddress = $IPConfiguration.IPv4Address.IPAddress
+        SubnetMask = $IPConfiguration.IPv4Address.PrefixLength
+        Gateway = $IPConfiguration.IPv4DefaultGateway.NextHop
+    }
+} | Format-Table -AutoSize | Out-String -Width 4096
     '''
 
     result = subprocess.run(["powershell", "-Command", powershell_command], capture_output=True, text=True)
