@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\ConsoleApp1\\",
+  "WorkspaceRootPath": "C:\\Users\\yYoussef\\source\\repos\\Kardex-NetworkTool\\NetzwerkTool_C#\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{0A6C22E6-732E-45E7-9138-14904D2C81C7}|ConsoleApp1\\ConsoleApp1.csproj|d:\\consoleapp1\\consoleapp1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{0A6C22E6-732E-45E7-9138-14904D2C81C7}|ConsoleApp1\\ConsoleApp1.csproj|c:\\users\\yyoussef\\source\\repos\\kardex-networktool\\netzwerktool_c#\\consoleapp1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0A6C22E6-732E-45E7-9138-14904D2C81C7}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -14,15 +14,19 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Program.cs",
-              "DocumentMoniker": "D:\\ConsoleApp1\\ConsoleApp1\\Program.cs",
+              "DocumentMoniker": "C:\\Users\\yYoussef\\source\\repos\\Kardex-NetworkTool\\NetzwerkTool_C#\\ConsoleApp1\\Program.cs",
               "RelativeDocumentMoniker": "ConsoleApp1\\Program.cs",
-              "ToolTip": "D:\\ConsoleApp1\\ConsoleApp1\\Program.cs",
+              "ToolTip": "C:\\Users\\yYoussef\\source\\repos\\Kardex-NetworkTool\\NetzwerkTool_C#\\ConsoleApp1\\Program.cs",
               "RelativeToolTip": "ConsoleApp1\\Program.cs",
               "ViewState": "AQIAAAcAAAAAAAAAAAAQwFUAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
