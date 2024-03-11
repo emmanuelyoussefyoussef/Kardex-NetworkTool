@@ -15,7 +15,6 @@ class Main_Programy
     static void ManipulateIPAddress()
     {
         
-        Console.WriteLine(AddedRoutes);
 
         Console.WriteLine("Available network interfaces:");
 
