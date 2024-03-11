@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Frontend_Application",
+    "\\Frontend_Application\\Network_Window"
   ],
-  "SelectedNode": "\\ConsoleApp1.sln",
+  "SelectedNode": "\\Frontend_Application\\Network_Window\\MainWindow.xaml",
   "PreviewInSolutionExplorer": false
 }
