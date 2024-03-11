@@ -1,10 +1,10 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\yYoussef\\source\\repos\\Kardex-NetworkTool\\NetzwerkTool_C#\\",
+  "WorkspaceRootPath": "C:\\Users\\yYoussef\\OneDrive - Kardex Holding AG\\Kardex Semester 1 Praxis\\Netzwerk-Tool\\NetzwerkTool_C#\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{0A6C22E6-732E-45E7-9138-14904D2C81C7}|ConsoleApp1\\ConsoleApp1.csproj|c:\\users\\yyoussef\\source\\repos\\kardex-networktool\\netzwerktool_c#\\consoleapp1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0A6C22E6-732E-45E7-9138-14904D2C81C7}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0A6C22E6-732E-45E7-9138-14904D2C81C7}|ConsoleApp1\\ConsoleApp1.csproj|c:\\users\\yyoussef\\onedrive - kardex holding ag\\kardex semester 1 praxis\\netzwerk-tool\\netzwerktool_c#\\consoleapp1\\main_programy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0A6C22E6-732E-45E7-9138-14904D2C81C7}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\main_programy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,12 +23,12 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\yYoussef\\source\\repos\\Kardex-NetworkTool\\NetzwerkTool_C#\\ConsoleApp1\\Program.cs",
-              "RelativeDocumentMoniker": "ConsoleApp1\\Program.cs",
-              "ToolTip": "C:\\Users\\yYoussef\\source\\repos\\Kardex-NetworkTool\\NetzwerkTool_C#\\ConsoleApp1\\Program.cs",
-              "RelativeToolTip": "ConsoleApp1\\Program.cs",
-              "ViewState": "AQIAAAcAAAAAAAAAAAAQwFUAAAAAAAAA",
+              "Title": "Main_Programy.cs",
+              "DocumentMoniker": "C:\\Users\\yYoussef\\OneDrive - Kardex Holding AG\\Kardex Semester 1 Praxis\\Netzwerk-Tool\\NetzwerkTool_C#\\ConsoleApp1\\Main_Programy.cs",
+              "RelativeDocumentMoniker": "ConsoleApp1\\Main_Programy.cs",
+              "ToolTip": "C:\\Users\\yYoussef\\OneDrive - Kardex Holding AG\\Kardex Semester 1 Praxis\\Netzwerk-Tool\\NetzwerkTool_C#\\ConsoleApp1\\Main_Programy.cs",
+              "RelativeToolTip": "ConsoleApp1\\Main_Programy.cs",
+              "ViewState": "AQIAAAoAAAAAAAAAAAAgwAwAAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-03-08T07:03:34.858Z",
               "EditorCaption": ""
