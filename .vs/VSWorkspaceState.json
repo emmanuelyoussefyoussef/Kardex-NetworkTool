@@ -2,7 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\Frontend_Application",
-    "\\Frontend_Application\\Network_Window"
+    "\\Frontend_Application\\Network_Window",
+    "\\NetzwerkTool_C#",
+    "\\NetzwerkTool_C#\\ConsoleApp1"
   ],
   "SelectedNode": "\\Frontend_Application\\Network_Window\\MainWindow.xaml",
   "PreviewInSolutionExplorer": false

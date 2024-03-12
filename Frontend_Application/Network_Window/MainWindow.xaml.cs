@@ -17,6 +17,10 @@ namespace Network_Window
     /// </summary>
     public partial class MainWindow : Window
     {
+        private string impIP;
+        private string impMask;
+        private string impGateway;
+        private string impIndex;
         public MainWindow()
         {
             InitializeComponent();
@@ -28,6 +32,18 @@ namespace Network_Window
             this.Visibility = Visibility.Visible;
             objInfo_Fenster.Show();
         }
-        
+
+        private void Eingabe_Button_Click(object sender, RoutedEventArgs e)
+        {
+            impIP = IP_Adresse_Block.Text;
+            impMask = Mask_Block.Text;
+            impGateway = Gate_Block.Text;
+            impIndex = Index_Block.Text;
+            MessageBox.Show(" your Ip " + impIP +" your mask " + impMask + " your gateway " + impGateway +" your index " + impIndex);
+            IP_Adresse_Block.Clear();
+            Mask_Block.Clear();
+            Gate_Block.Clear();
+            Index_Block.Clear();
+        }
     }
 }

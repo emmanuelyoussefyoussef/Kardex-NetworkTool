@@ -8,7 +8,7 @@
         Title="MainWindow" Height="600" Width="1200">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="240"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -18,7 +18,7 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" Grid.Column="0" Width="45" HorizontalAlignment="Left">
-            <MenuItem Header="Hilfe" FontSize="16" Click="MenuItem_Click">
+            <MenuItem Header="Hilfe" FontSize="16" Click="MenuItem_Click" Height="30">
             </MenuItem>
         </Menu>
 
@@ -41,6 +41,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
             <!--Das ist für die IP Adresse-->
@@ -85,6 +86,14 @@
                        Grid.Row="3" Padding="0" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Stretch"
                        Background="Transparent" 
                        FontFamily="Courier New" Text="Index"/>
+            
+            <Button Name="Eingabe_Button" 
+                    Grid.Column="2" Grid.Row="3" 
+                    HorizontalAlignment="Left" Margin="158,0,0,0"  VerticalAlignment="Center" Height="25" Width="46" 
+                    FontSize="9"
+                    Content="Route add"
+                    Click="Eingabe_Button_Click"/>
+
 
         </Grid>
 
