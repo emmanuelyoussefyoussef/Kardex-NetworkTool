@@ -5,8 +5,89 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Network_Window"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="600" Width="1200">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0" Grid.Column="0" Width="45" HorizontalAlignment="Left">
+            <MenuItem Header="Hilfe" FontSize="16" Click="MenuItem_Click">
+            </MenuItem>
+        </Menu>
+
+        <Image Grid.Row="1" 
+           Grid.Column="1" 
+           Source="/Images/laptop.png"
+           VerticalAlignment="Top"
+           HorizontalAlignment="Left" 
+           Height="98" 
+           Width="106" 
+           Margin="347,164,0,0"
+           />
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!--Das ist für die IP Adresse-->
+            <TextBox Name="IP_Adresse_Block" 
+                     Grid.Row="0" Grid.Column="1" 
+                     Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,-158,0"
+                     FontSize="15" FontWeight="Bold" FontFamily="Courier New"/>
+
+            <TextBlock Name="IP_Adresse_Block_Beschreibung" 
+                       Grid.Row="0" Padding="0" FontWeight="Bold" VerticalAlignment="Center"
+                       Background="Transparent" 
+                       FontFamily="Courier New" Text="Ipv4"/>
+
+            <!--Das ist für die Maske-->
+            <TextBox Name="Mask_Block" 
+                     Grid.Row="1" Grid.Column="1" 
+                     Width="Auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,-158,0"
+                     FontSize="15" FontWeight="Bold" FontFamily="Courier New" />
+
+            <TextBlock Name="Mask_Block_Beschreibung" 
+                       Grid.Row="1" Padding="0" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                       Background="Transparent" 
+                       FontFamily="Courier New" Text="Maske"/>
+            <!--Das ist für die Gateway-->
+            <TextBox Name="Gate_Block" 
+                     Grid.Row="2" Grid.Column="1" 
+                     Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,-158,0"
+                     FontSize="15" FontWeight="Bold" FontFamily="Courier New"/>
+
+            <TextBlock Name="Gate_Block_Beschreibung" 
+                       Grid.Row="2" Padding="0" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                       Background="Transparent" 
+                       FontFamily="Courier New" Text="Gate"/>
+
+            <!--Das ist für die Gateway-->
+            <TextBox Name="Index_Block" 
+                     Grid.Row="3" Grid.Column="1" 
+                     Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,-158,0"
+                     FontSize="15" FontWeight="Bold" FontFamily="Courier New"/>
+
+            <TextBlock Name="Index_Block_Beschreibung" 
+                       Grid.Row="3" Padding="0" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                       Background="Transparent" 
+                       FontFamily="Courier New" Text="Index"/>
+
+        </Grid>
+
 
     </Grid>
 </Window>

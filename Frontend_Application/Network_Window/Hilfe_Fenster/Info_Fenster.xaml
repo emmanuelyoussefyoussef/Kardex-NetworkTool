@@ -1,0 +1,14 @@
+﻿<Window x:Class="Network_Window.Info_button.Info_Fenster"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Network_Window.Info_button"
+        mc:Ignorable="d"
+        Title="Info_Fenster" Height="450" Width="800">
+    <Grid>
+        <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="Das ist ein Beispiel" FontSize="25" VerticalAlignment="Center" Height="90" Width="280"/>
+        <Button Content="Zurück" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26" Width="64" Click="btn_zurück"/>
+
+    </Grid>
+</Window>

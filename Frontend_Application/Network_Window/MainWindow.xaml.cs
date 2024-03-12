@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Network_Window.Info_button;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,5 +21,13 @@ namespace Network_Window
         {
             InitializeComponent();
         }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Info_Fenster objInfo_Fenster = new Info_Fenster();
+            this.Visibility = Visibility.Visible;
+            objInfo_Fenster.Show();
+        }
+        
     }
 }

@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
 C:\Users\yYoussef\OneDrive - Kardex Holding AG\Kardex Semester 1 Praxis\Netzwerk-Tool\Frontend_Application\Network_Window\App.xaml
-11407045341
+2390887768
 
-61183521919
+771201382
 1981451641563
-MainWindow.xaml;
+Hilfe_Fenster\Info_Fenster.xaml;MainWindow.xaml;
 
-True
+False
 
