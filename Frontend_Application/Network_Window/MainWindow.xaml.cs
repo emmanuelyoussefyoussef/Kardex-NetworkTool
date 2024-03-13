@@ -1,4 +1,5 @@
 ﻿using Network_Window.Info_button;
+using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
@@ -28,6 +29,7 @@ namespace Network_Window
         private string impMask;
         private string impGateway;
         private string impIndex;
+        private string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
         public MainWindow()
         {
             //ManipulateIPAddress();
@@ -49,11 +51,88 @@ namespace Network_Window
             impMask = Mask_Block.Text;
             impGateway = Gate_Block.Text;
             impIndex = Index_Block.Text;
-            MessageBox.Show(" your Ip " + impIP + " your mask " + impMask + " your gateway " + impGateway + " your index " + impIndex);
-            IP_Adresse_Block.Clear();
-            Mask_Block.Clear();
-            Gate_Block.Clear();
-            Index_Block.Clear();
+
+
+            if (!Regex.IsMatch(impIP, pattern))
+            {
+                MessageBox.Show("IP Adresse ist ungültig");
+            }
+            else if (!Regex.IsMatch(impMask, pattern))
+            {
+                MessageBox.Show("Subnetzmaske ist ungültig");
+            }
+            else if (!Regex.IsMatch(impGateway, pattern))
+            {
+                MessageBox.Show("Subnetzmaske ist ungültig");
+            }
+            else
+            {
+                IP_Adresse_Block.Clear();
+                Mask_Block.Clear();
+                Gate_Block.Clear();
+                Index_Block.Clear();
+
+                Process route_delete = new Process();
+
+                string command_route_delete = ("route delete 0.0.0.0 mask 0.0.0.0 "+impGateway+" if "+impIndex);
+
+                // Set up the process start info
+                ProcessStartInfo startInfo_route_delete = new ProcessStartInfo
+                {
+                    FileName = "powershell.exe",  // Specify PowerShell executable
+                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete}\"", // Pass the command as argument
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                route_delete.StartInfo = startInfo_route_delete;
+
+                // Start the process
+                route_delete.Start();
+
+                route_delete.WaitForExit();
+
+                string output_route_delete = route_delete.StandardOutput.ReadToEnd();
+
+                route_delete.WaitForExit();
+
+                MessageBox.Show(output_route_delete);
+
+
+
+
+                Process route_add = new Process();
+
+                string command_route_add = ("route add "+impIP+" mask "+impMask+" "+impGateway+" if "+impIndex);
+
+                // Set up the process start info
+                ProcessStartInfo startInfo_route_add = new ProcessStartInfo
+                {
+                    FileName = "powershell.exe",  // Specify PowerShell executable
+                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_add}\"", // Pass the command as argument
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                route_add.StartInfo = startInfo_route_add;
+
+                // Start the process
+                route_add.Start();
+
+                route_add.WaitForExit();
+
+                string output_route_add = route_add.StandardOutput.ReadToEnd();
+
+                route_add.WaitForExit();
+
+                MessageBox.Show(output_route_add);
+            }
+            
+
+            
+            
         }
 
 
@@ -83,32 +162,7 @@ namespace Network_Window
                     DNS = $DNS
                 }
             } | Format-Table -AutoSize | Out-String -Width 4096;pause";
-            //Alernative
-             //           Get - NetAdapter | ForEach - Object {
-             //    $Interface = $_
-             //               >>     $IPConfiguration = Get - NetIPConfiguration - InterfaceIndex $Interface.InterfaceIndex
-             //   $DNS = ($IPConfiguration.DNSServer.ServerAddresses | Where - Object { $_ - like '*.*.*.*' })
-             //    if (-not $DNS) {
-             //        $DNS = 'NaN'
-             //    }
-             //[PSCustomObject]@{
-             //InterfaceIndex = $Interface.InterfaceIndex.ToString().PadRight(8)
-             //InterfaceAlias = $Interface.InterfaceAlias.Substring(0, [Math]::Min(30, $Interface.InterfaceAlias.Length)).PadRight(15)
-             //                    Status = $Interface.Status.Substring(0, [Math]::Min(10, $Interface.Status.Length)).PadRight(15)
-             //                    IPAddress = ($IPConfiguration.IPv4Address.IPAddress - join ', ').Substring(0, [Math]::Min(15, ($IPConfiguration.IPv4Address.IPAddress - join ', ').Length)).PadRight(20)
-             //                   SubnetMask = ($IPConfiguration.IPv4Address.PrefixLength - join ', ').Substring(0, [Math]::Min(3, ($IPConfiguration.IPv4Address.PrefixLength - join ', ').Length)).PadRight(3)
-             //                    Gateway = ($IPConfiguration.IPv4DefaultGateway.NextHop - join ', ').Substring(0, [Math]::Min(11, ($IPConfiguration.IPv4DefaultGateway.NextHop - join ', ').Length)).PadRight(16)
-             //                    DNS = ($DNS - join ', ').Substring(0, [Math]::Min(30, ($DNS - join ', ').Length)).PadRight(20)
-             //    }
-             //} | Format - Table @{ Expression ={$_.InterfaceIndex}; Label = 'Index'; width = 8; align = 'left'},
-             //                @{ Expression ={$_.InterfaceAlias}; Label = 'Alias'; width = 30; align = 'left'},
-             //                @{ Expression ={$_.Status}; Label = 'Status'; width = 15; align = 'left'},
-             //                @{ Expression ={$_.IPAddress}; Label = 'IPAddress'; width = 20; align = 'left'},
-             //                @{ Expression ={$_.SubnetMask}; Label = 'SubnetMask'; width = 10; align = 'left'},
-             //                @{ Expression ={$_.Gateway}; Label = 'Gateway'; width = 16; align = 'left'},
-             //                @{ Expression ={$_.DNS}; Label = 'DNS'; width = 30; align = 'left'}; pause
-            
-            
+           
             // Set up the process start info
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
