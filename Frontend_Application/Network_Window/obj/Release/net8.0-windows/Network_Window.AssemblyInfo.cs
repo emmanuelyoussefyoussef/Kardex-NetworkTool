@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Network_Window")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ea456ba31ec91de632268932b8fbac12fbff1281")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c8fe12bdd45df97e61fa359349958c64465043dd")]
 [assembly: System.Reflection.AssemblyProductAttribute("Network_Window")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Network_Window")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

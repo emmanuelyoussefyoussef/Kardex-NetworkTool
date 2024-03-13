@@ -16,12 +16,22 @@
             <RowDefinition/>
             <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
+        
+        <!--Menü tasten -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Menu Grid.Column="0" Background="Transparent">
+                <MenuItem Header="Hilfe" FontSize="16" Click="MenuItem_Click" Height="30" Background="LightGray"/>
+            </Menu>
+            <Menu Grid.Column="1" Background="Transparent">
+                <MenuItem Header="Netzwerk" FontSize="16" Click="Netzwerk_Button" Height="30" Background="LightGray"/>
+            </Menu>
+        </Grid>
 
-        <Menu Grid.Row="0" Grid.Column="0" Width="45" HorizontalAlignment="Left">
-            <MenuItem Header="Hilfe" FontSize="16" Click="MenuItem_Click" Height="30">
-            </MenuItem>
-        </Menu>
-
+        
         <Image Grid.Row="1" 
            Grid.Column="1" 
            Source="/Images/laptop.png"
@@ -47,7 +57,7 @@
             <!--Das ist für die IP Adresse-->
             <TextBox Name="IP_Adresse_Block" 
                      Grid.Row="0" Grid.Column="1" 
-                     Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,-158,0"
+                     Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Margin="0,0,-158,0"
                      FontSize="15" FontWeight="Bold" FontFamily="Courier New"/>
 
             <TextBlock Name="IP_Adresse_Block_Beschreibung" 
@@ -58,7 +68,7 @@
             <!--Das ist für die Maske-->
             <TextBox Name="Mask_Block" 
                      Grid.Row="1" Grid.Column="1" 
-                     Width="Auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,-158,0"
+                     Width="Auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Margin="0,0,-158,0"
                      FontSize="15" FontWeight="Bold" FontFamily="Courier New" />
 
             <TextBlock Name="Mask_Block_Beschreibung" 
@@ -68,7 +78,7 @@
             <!--Das ist für die Gateway-->
             <TextBox Name="Gate_Block" 
                      Grid.Row="2" Grid.Column="1" 
-                     Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,-158,0"
+                     Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Margin="0,0,-158,0"
                      FontSize="15" FontWeight="Bold" FontFamily="Courier New"/>
 
             <TextBlock Name="Gate_Block_Beschreibung" 
@@ -79,14 +89,14 @@
             <!--Das ist für die Gateway-->
             <TextBox Name="Index_Block" 
                      Grid.Row="3" Grid.Column="1" 
-                     Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,-158,0"
+                     Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Margin="0,0,-158,0"
                      FontSize="15" FontWeight="Bold" FontFamily="Courier New"/>
 
             <TextBlock Name="Index_Block_Beschreibung" 
                        Grid.Row="3" Padding="0" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Stretch"
                        Background="Transparent" 
                        FontFamily="Courier New" Text="Index"/>
-            
+
             <Button Name="Eingabe_Button" 
                     Grid.Column="2" Grid.Row="3" 
                     HorizontalAlignment="Left" Margin="158,0,0,0"  VerticalAlignment="Center" Height="25" Width="46" 
