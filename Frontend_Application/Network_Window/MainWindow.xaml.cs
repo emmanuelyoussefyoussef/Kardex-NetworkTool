@@ -17,6 +17,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Collections.Generic;
+using System.Data;
 
 namespace Network_Window
 {
@@ -30,6 +32,9 @@ namespace Network_Window
         private string impGateway;
         private string impIndex;
         private string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+        Dictionary<int,Tuple<string,string,string,string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>();
+        int counter = 1;
+
         public MainWindow()
         {
             //ManipulateIPAddress();
@@ -63,7 +68,7 @@ namespace Network_Window
             }
             else if (!Regex.IsMatch(impGateway, pattern))
             {
-                MessageBox.Show("Subnetzmaske ist ungültig");
+                MessageBox.Show("Gateway ist ungültig");
             }
             else
             {
@@ -72,62 +77,85 @@ namespace Network_Window
                 Gate_Block.Clear();
                 Index_Block.Clear();
 
-                Process route_delete = new Process();
+                Added_Routes.Add(counter,Tuple.Create(impIP,impMask,impGateway,impIndex));
 
-                string command_route_delete = ("route delete 0.0.0.0 mask 0.0.0.0 "+impGateway+" if "+impIndex);
+                //Process route_delete = new Process();
 
-                // Set up the process start info
-                ProcessStartInfo startInfo_route_delete = new ProcessStartInfo
-                {
-                    FileName = "powershell.exe",  // Specify PowerShell executable
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete}\"", // Pass the command as argument
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
+                //string command_route_delete = ("route delete 0.0.0.0 mask 0.0.0.0 "+impGateway+" if "+impIndex);
 
-                route_delete.StartInfo = startInfo_route_delete;
+                //// Set up the process start info
+                //ProcessStartInfo startInfo_route_delete = new ProcessStartInfo
+                //{
+                //    FileName = "powershell.exe",  // Specify PowerShell executable
+                //    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete}\"", // Pass the command as argument
+                //    RedirectStandardOutput = true,
+                //    UseShellExecute = false,
+                //    CreateNoWindow = true
+                //};
 
-                // Start the process
-                route_delete.Start();
+                //route_delete.StartInfo = startInfo_route_delete;
 
-                route_delete.WaitForExit();
+                //// Start the process
+                //route_delete.Start();
 
-                string output_route_delete = route_delete.StandardOutput.ReadToEnd();
+                //route_delete.WaitForExit();
 
-                route_delete.WaitForExit();
+                //string output_route_delete = route_delete.StandardOutput.ReadToEnd();
 
-                MessageBox.Show(output_route_delete);
+                //route_delete.WaitForExit();
+
+                //MessageBox.Show(output_route_delete);
+                MessageBox.Show($"IP Adresse : {Added_Routes[counter].Item1}\n SubnetMaske : {Added_Routes[counter].Item2}\n Gateway: {Added_Routes[counter].Item3}\n Schnittstellenindex: {Added_Routes[counter].Item4}\n");
+                
+                
+                    string text = $"IP Adresse : {Added_Routes[counter].Item1}\nSubnetMaske : {Added_Routes[counter].Item2}\nGateway: {Added_Routes[counter].Item3}\n Schnittstellenindex: {Added_Routes[counter].Item4}\n";
+
+                    switch (counter)
+                    {
+                        case 1:
+                            Route_1.Text = text;
+                            break;
+                        case 2:
+                            Route_2.Text = text;
+                            break;
+                        case 3:
+                            Route_3.Text = text;
+                            break;
+                        case 4:
+                            Route_4.Text = text;
+                            break;
+                    }
+                
 
 
+                //Process route_add = new Process();
 
+                //string command_route_add = ("route add "+impIP+" mask "+impMask+" "+impGateway+" if "+impIndex);
 
-                Process route_add = new Process();
+                //// Set up the process start info
+                //ProcessStartInfo startInfo_route_add = new ProcessStartInfo
+                //{
+                //    FileName = "powershell.exe",  // Specify PowerShell executable
+                //    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_add}\"", // Pass the command as argument
+                //    RedirectStandardOutput = true,
+                //    UseShellExecute = false,
+                //    CreateNoWindow = true
+                //};
 
-                string command_route_add = ("route add "+impIP+" mask "+impMask+" "+impGateway+" if "+impIndex);
+                //route_add.StartInfo = startInfo_route_add;
 
-                // Set up the process start info
-                ProcessStartInfo startInfo_route_add = new ProcessStartInfo
-                {
-                    FileName = "powershell.exe",  // Specify PowerShell executable
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_add}\"", // Pass the command as argument
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
+                //// Start the process
+                //route_add.Start();
 
-                route_add.StartInfo = startInfo_route_add;
+                //route_add.WaitForExit();
 
-                // Start the process
-                route_add.Start();
+                //string output_route_add = route_add.StandardOutput.ReadToEnd();
 
-                route_add.WaitForExit();
+                //route_add.WaitForExit();
 
-                string output_route_add = route_add.StandardOutput.ReadToEnd();
+                //MessageBox.Show(output_route_add);
 
-                route_add.WaitForExit();
-
-                MessageBox.Show(output_route_add);
+                counter = counter + 1;
             }
             
 

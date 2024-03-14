@@ -16,7 +16,7 @@
             <RowDefinition/>
             <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
-        
+
         <!--Menü tasten -->
         <Grid>
             <Grid.ColumnDefinitions>
@@ -31,7 +31,33 @@
             </Menu>
         </Grid>
 
-        
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            
+            
+            
+            <TextBlock Name="Route_1" Grid.Row="0" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+            <Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="1" Content="Löschen"  HorizontalAlignment="Right" Background="OrangeRed"/>
+
+            <TextBlock Name="Route_2" Grid.Row="1" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+            <Button Name="Route_2_Delete" Grid.Row="1" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed"/>
+
+            <TextBlock Name="Route_3" Grid.Row="2" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+            <Button Name="Route_3_Delete" Grid.Row="2" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed"/>
+
+            <TextBlock Name="Route_4" Grid.Row="3" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+            <Button Name="Route_4_Delete" Grid.Row="3" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed"/>
+        </Grid>
+
         <Image Grid.Row="1" 
            Grid.Column="1" 
            Source="/Images/laptop.png"
