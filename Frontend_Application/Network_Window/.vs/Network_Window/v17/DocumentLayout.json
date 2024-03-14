@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\yYoussef\\OneDrive - Kardex Holding AG\\Kardex Semester 1 Praxis\\Netzwerk-Tool\\Frontend_Application\\Network_Window\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{3571D2D5-0155-4377-9D11-EB2C822DAAC3}|Network_Window.csproj|c:\\users\\yyoussef\\onedrive - kardex holding ag\\kardex semester 1 praxis\\netzwerk-tool\\frontend_application\\network_window\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3571D2D5-0155-4377-9D11-EB2C822DAAC3}|Network_Window.csproj|solutionrelative:mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{3571D2D5-0155-4377-9D11-EB2C822DAAC3}|Network_Window.csproj|c:\\users\\yyoussef\\onedrive - kardex holding ag\\kardex semester 1 praxis\\netzwerk-tool\\frontend_application\\network_window\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{3571D2D5-0155-4377-9D11-EB2C822DAAC3}|Network_Window.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{3571D2D5-0155-4377-9D11-EB2C822DAAC3}|Network_Window.csproj|c:\\users\\yyoussef\\onedrive - kardex holding ag\\kardex semester 1 praxis\\netzwerk-tool\\frontend_application\\network_window\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3571D2D5-0155-4377-9D11-EB2C822DAAC3}|Network_Window.csproj|solutionrelative:mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3571D2D5-0155-4377-9D11-EB2C822DAAC3}|Network_Window.csproj|c:\\users\\yyoussef\\onedrive - kardex holding ag\\kardex semester 1 praxis\\netzwerk-tool\\frontend_application\\network_window\\hilfe_fenster\\info_fenster.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{3571D2D5-0155-4377-9D11-EB2C822DAAC3}|Network_Window.csproj|solutionrelative:hilfe_fenster\\info_fenster.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,20 +30,32 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
+              "Title": "Info_Fenster.xaml",
+              "DocumentMoniker": "C:\\Users\\yYoussef\\OneDrive - Kardex Holding AG\\Kardex Semester 1 Praxis\\Netzwerk-Tool\\Frontend_Application\\Network_Window\\Hilfe_Fenster\\Info_Fenster.xaml",
+              "RelativeDocumentMoniker": "Hilfe_Fenster\\Info_Fenster.xaml",
+              "ToolTip": "C:\\Users\\yYoussef\\OneDrive - Kardex Holding AG\\Kardex Semester 1 Praxis\\Netzwerk-Tool\\Frontend_Application\\Network_Window\\Hilfe_Fenster\\Info_Fenster.xaml",
+              "RelativeToolTip": "Hilfe_Fenster\\Info_Fenster.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2024-03-14T10:20:28.989Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "C:\\Users\\yYoussef\\OneDrive - Kardex Holding AG\\Kardex Semester 1 Praxis\\Netzwerk-Tool\\Frontend_Application\\Network_Window\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "MainWindow.xaml.cs",
               "ToolTip": "C:\\Users\\yYoussef\\OneDrive - Kardex Holding AG\\Kardex Semester 1 Praxis\\Netzwerk-Tool\\Frontend_Application\\Network_Window\\MainWindow.xaml.cs",
               "RelativeToolTip": "MainWindow.xaml.cs",
-              "ViewState": "AQIAADsAAAAAAAAAAAAqwH0AAAAiAAAA",
+              "ViewState": "AQIAAF0AAAAAAAAAAAAwwH4AAABSAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-03-13T11:36:38.249Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "C:\\Users\\yYoussef\\OneDrive - Kardex Holding AG\\Kardex Semester 1 Praxis\\Netzwerk-Tool\\Frontend_Application\\Network_Window\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MainWindow.xaml",

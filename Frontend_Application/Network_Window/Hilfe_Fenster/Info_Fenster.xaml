@@ -7,7 +7,11 @@
         mc:Ignorable="d"
         Title="Info_Fenster" Height="450" Width="800">
     <Grid>
-        <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="Das ist ein Beispiel" FontSize="25" VerticalAlignment="Center" Height="90" Width="280"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap"  VerticalAlignment="Top"  Height="auto" Width="auto" Margin="0,41,0,0" FontSize="15" FontWeight="Bold"
+                   Text="Dieses Netzwerk-Tool wurde entwickelt, um Ihnen dabei zu helfen, Routen mühelos hinzuzufügen und zu entfernen. Es wurde speziell für den Einsatz auf Baustellen konzipiert, um Ihnen dabei zu helfen, Ihre Arbeit effizienter zu gestalten. Durch die Nutzung dieses Tools können Sie Ihre Arbeitsabläufe optimieren und Zeit sparen, indem Sie Routen einfach verwalten und anpassen können. Es bietet eine benutzerfreundliche Oberfläche, die es Ihnen ermöglicht, Routen schnell zu erstellen und bei Bedarf zu bearbeiten. Mit diesem Tool haben Sie die Möglichkeit, Ihre Baustellenaktivitäten effektiv zu organisieren und die Effizienz Ihrer Arbeit zu steigern."/>
+        <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  VerticalAlignment="Bottom"  Height="auto" Width="auto" Margin="0,41,0,0" FontSize="15" FontWeight="Bold"
+            Text="Sie haben die Möglichkeit, bis zu vier verschiedene Routen hinzuzufügen. Mithilfe der Netzwerktaste können Sie sämtliche benötigten Informationen abrufen.Somit bietet Ihnen das System eine benutzerfreundliche und umfassende Lösung zur Kontrolle und Verwaltung Ihrer Netzwerkverbindungen."/>
+        
         <Button Content="Zurück" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26" Width="64" Click="btn_zurück"/>
 
     </Grid>

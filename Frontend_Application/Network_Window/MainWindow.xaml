@@ -46,16 +46,16 @@
             
             
             <TextBlock Name="Route_1" Grid.Row="0" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-            <Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="1" Content="Löschen"  HorizontalAlignment="Right" Background="OrangeRed"/>
+            <Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="1" Content="Löschen"  HorizontalAlignment="Right" Background="OrangeRed" Click="Route_1_Delete_Click"/>
 
             <TextBlock Name="Route_2" Grid.Row="1" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-            <Button Name="Route_2_Delete" Grid.Row="1" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed"/>
+            <Button Name="Route_2_Delete" Grid.Row="1" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed" Click="Route_2_Delete_Click"/>
 
             <TextBlock Name="Route_3" Grid.Row="2" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-            <Button Name="Route_3_Delete" Grid.Row="2" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed"/>
+            <Button Name="Route_3_Delete" Grid.Row="2" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed" Click="Route_3_Delete_Click"/>
 
             <TextBlock Name="Route_4" Grid.Row="3" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-            <Button Name="Route_4_Delete" Grid.Row="3" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed"/>
+            <Button Name="Route_4_Delete" Grid.Row="3" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed" Click="Route_4_Delete_Click"/>
         </Grid>
 
         <Image Grid.Row="1" 
