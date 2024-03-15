@@ -60,15 +60,15 @@ namespace Network_Window
 
             if (!Regex.IsMatch(impIP, pattern))
             {
-                MessageBox.Show("IP Adresse ist ungültig");
+                output.Text = "IP Adresse ist ungültig";
             }
             else if (!Regex.IsMatch(impMask, pattern))
             {
-                MessageBox.Show("Subnetzmaske ist ungültig");
+                output.Text = "Subnetzmaske ist ungültig";
             }
             else if (!Regex.IsMatch(impGateway, pattern))
             {
-                MessageBox.Show("Gateway ist ungültig");
+                output.Text = "Gateway ist ungültig";
             }
             else
             {
@@ -81,13 +81,13 @@ namespace Network_Window
 
                 Process route_delete = new Process();
 
-                string command_route_delete = ("route delete 0.0.0.0 mask 0.0.0.0 " + impGateway + " if " + impIndex);
+                string command_route_delete = ("route delete 0.0.0.0 mask 0.0.0.0 " + impGateway);
 
                 // Set up the process start info
                 ProcessStartInfo startInfo_route_delete = new ProcessStartInfo
                 {
                     FileName = "powershell.exe",  // Specify PowerShell executable
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete};route delete {impIP} mask {impMask} {impGateway} if {impIndex}\"", // Pass the command as argument
+                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete};route delete {impIP} mask {impMask} {impGateway}\"", // Pass the command as argument
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
@@ -109,11 +109,11 @@ namespace Network_Window
                 
                 if (!string.IsNullOrWhiteSpace(error_route_delete))
                 {
-                    MessageBox.Show($"Error: {error_route_delete}");
+                    output.Text = $"Error: {error_route_delete}";
                 }
                 else
                 {
-                    MessageBox.Show(output_route_delete);
+                    output.Text = output_route_delete;
                 }
 
 
@@ -147,12 +147,12 @@ namespace Network_Window
 
                 if (!string.IsNullOrWhiteSpace(error_route_add))
                 {
-                    MessageBox.Show($"Error: {error_route_add}");
+                    output.Text = $"Error: {error_route_add}";
                 }
                 else
                 {
                     Added_Routes.Add(counter, Tuple.Create(impIP, impMask, impGateway, impIndex));
-                    MessageBox.Show(output_route_add);
+                    output.Text = output_route_add;
 
                     string text = $"IP Adresse : {Added_Routes[counter].Item1}\nSubnetMaske : {Added_Routes[counter].Item2}\nGateway: {Added_Routes[counter].Item3}\n Schnittstellenindex: {Added_Routes[counter].Item4}\n";
 
@@ -171,7 +171,7 @@ namespace Network_Window
                             Route_4.Text = text;
                             break;
                     }
-                    counter = counter + 1;
+                    counter++;
                 }
             }
         }
@@ -204,7 +204,7 @@ namespace Network_Window
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command}\"", // Pass the command as argument
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"[Console]::SetWindowSize(120, 15);{command}\"", // Pass the command as argument
                 RedirectStandardOutput = false,
                 UseShellExecute = true,
                 CreateNoWindow = true
@@ -214,237 +214,193 @@ namespace Network_Window
 
             // Start the process
             process.Start();
+
         }
 
         private void Route_1_Delete_Click(object sender, RoutedEventArgs e)
         {
-
-            Process route_delete_box1 = new Process();
-
-            string command_route_delete_box1 = ($"route delete {Added_Routes[1].Item1} mask {Added_Routes[1].Item2} {Added_Routes[1].Item3} if {Added_Routes[1].Item4}");
-
-            //Set up the process start info
-            ProcessStartInfo startInfo_route_delete_box_1 = new ProcessStartInfo
-            {
-                FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete_box1};route delete 0.0.0.0 mask 0.0.0.0 {Added_Routes[1].Item3}\"", // Pass the command as argument
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            route_delete_box1.StartInfo = startInfo_route_delete_box_1;
-
-            // Start the process
-            route_delete_box1.Start();
-
-            route_delete_box1.WaitForExit();
-
-            string output_route_delete_box1 = route_delete_box1.StandardOutput.ReadToEnd();
-            string error_route_delete_box1 = route_delete_box1.StandardError.ReadToEnd();
-
-            route_delete_box1.WaitForExit();
-
-            if (!string.IsNullOrWhiteSpace(error_route_delete_box1))
-            {
-                MessageBox.Show($"Error: {error_route_delete_box1}");
-            }
-            else
-            {
-                MessageBox.Show(output_route_delete_box1);
-                Added_Routes.Remove(1);
-                Route_1.Text = "";
-            }
+            deleteRoute(1,Route_1.Text);
         }
-
         private void Route_2_Delete_Click(object sender, RoutedEventArgs e)
         {
-            Process route_delete_box2 = new Process();
-
-            string command_route_delete_box2 = ($"route delete {Added_Routes[2].Item1} mask {Added_Routes[2].Item2} {Added_Routes[2].Item3} if {Added_Routes[2].Item4}");
-
-            //Set up the process start info
-            ProcessStartInfo startInfo_route_delete_box_2 = new ProcessStartInfo
-            {
-                FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete_box2};route delete 0.0.0.0 mask 0.0.0.0 {Added_Routes[2].Item3}\"", // Pass the command as argument
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            route_delete_box2.StartInfo = startInfo_route_delete_box_2;
-
-            // Start the process
-            route_delete_box2.Start();
-
-            route_delete_box2.WaitForExit();
-
-            string output_route_delete_box2 = route_delete_box2.StandardOutput.ReadToEnd();
-            string error_route_delete_box2 = route_delete_box2.StandardError.ReadToEnd();
-
-            route_delete_box2.WaitForExit();
-
-
-
-            if (!string.IsNullOrWhiteSpace(error_route_delete_box2))
-            {
-                MessageBox.Show($"Error: {error_route_delete_box2}");
-            }
-            else
-            {
-                MessageBox.Show(output_route_delete_box2);
-                Added_Routes.Remove(2);
-                Route_2.Text = "";
-            }
+            deleteRoute(2,Route_2.Text);
         }
-
         private void Route_3_Delete_Click(object sender, RoutedEventArgs e)
         {
-            Process route_delete_box3 = new Process();
+            deleteRoute(3,Route_3.Text);
+        }
+        private void Route_4_Delete_Click(object sender, RoutedEventArgs e)
+        {
+            deleteRoute(4,Route_4.Text);
+        }
+        private void deleteRoute(int index, string boxnr)
+        {
 
-            string command_route_delete_box3 = ($"route delete {Added_Routes[3].Item1} mask {Added_Routes[3].Item2} {Added_Routes[3].Item3} if {Added_Routes[3].Item4}");
-
-            //Set up the process start info
-            ProcessStartInfo startInfo_route_delete_box_3 = new ProcessStartInfo
+            if (string.IsNullOrWhiteSpace(boxnr))
             {
-                FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete_box3};route delete 0.0.0.0 mask 0.0.0.0 {Added_Routes[3].Item3}\"", // Pass the command as argument
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            route_delete_box3.StartInfo = startInfo_route_delete_box_3;
-
-            // Start the process
-            route_delete_box3.Start();
-
-            route_delete_box3.WaitForExit();
-
-            string output_route_delete_box3 = route_delete_box3.StandardOutput.ReadToEnd();
-            string error_route_delete_box3 = route_delete_box3.StandardError.ReadToEnd();
-
-            route_delete_box3.WaitForExit();
-
-            if (!string.IsNullOrWhiteSpace(error_route_delete_box3))
-            {
-                MessageBox.Show($"Error: {error_route_delete_box3}");
+                output.Text = "keine route";
             }
             else
             {
-                MessageBox.Show(output_route_delete_box3);
-                Added_Routes.Remove(3);
-                Route_3.Text = "";
+                Process route_delete_box1 = new Process();
+
+                string command_route_delete_box1 = ($"route delete {Added_Routes[index].Item1} mask {Added_Routes[index].Item2} {Added_Routes[index].Item3} if {Added_Routes[index].Item4}");
+
+                //Set up the process start info
+                ProcessStartInfo startInfo_route_delete_box_1 = new ProcessStartInfo
+                {
+                    FileName = "powershell.exe",  // Specify PowerShell executable
+                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete_box1}\"", // Pass the command as argument
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                route_delete_box1.StartInfo = startInfo_route_delete_box_1;
+
+                // Start the process
+                route_delete_box1.Start();
+
+                route_delete_box1.WaitForExit();
+
+                string output_route_delete_box1 = route_delete_box1.StandardOutput.ReadToEnd();
+                string error_route_delete_box1 = route_delete_box1.StandardError.ReadToEnd();
+
+                route_delete_box1.WaitForExit();
+
+                if (!string.IsNullOrWhiteSpace(error_route_delete_box1))
+                {
+                    output.Text = error_route_delete_box1;
+                }
+                else
+                {
+                    output.Text = output_route_delete_box1;
+                    Added_Routes.Remove(index);
+                    switch (index)
+                    {
+                        case 1:
+                            Route_1.Text = "";
+                            break;
+                        case 2:
+                            Route_2.Text = "";
+                            break;
+                        case 3:
+                            Route_3.Text = "";
+                            break;
+                        case 4:
+                            Route_4.Text = "";
+                            break;
+                        default:
+                            break;
+                    }
+                    counter = index;
+
+                }
             }
         }
 
-        private void Route_4_Delete_Click(object sender, RoutedEventArgs e)
+        
+        private void Routen_Button(object sender, RoutedEventArgs e)
         {
-            Process route_delete_box4 = new Process();
+            Process process = new Process();
 
-            string command_route_delete_box4 = ($"route delete {Added_Routes[4].Item1} mask {Added_Routes[4].Item2} {Added_Routes[4].Item3} if {Added_Routes[4].Item4}");
+            // Specify the PowerShell command to execute
+            string command = "route print -4;pause";
 
-            //Set up the process start info
-            ProcessStartInfo startInfo_route_delete_box_4 = new ProcessStartInfo
+            // Set up the process start info
+            ProcessStartInfo startInfo_routen_button = new ProcessStartInfo
             {
                 FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete_box4};route delete 0.0.0.0 mask 0.0.0.0 {Added_Routes[4].Item3}\"", // Pass the command as argument
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"[Console]::SetWindowSize(100, 30);{command}\"", // Pass the command as argument
+                RedirectStandardOutput = false,
+                UseShellExecute = true,
                 CreateNoWindow = true
             };
 
-            route_delete_box4.StartInfo = startInfo_route_delete_box_4;
+            process.StartInfo = startInfo_routen_button;
 
             // Start the process
-            route_delete_box4.Start();
+            process.Start();
+        }
 
-            route_delete_box4.WaitForExit();
+        private void Löschen_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Process process = new Process();
 
-            string output_route_delete_box4 = route_delete_box4.StandardOutput.ReadToEnd();
-            string error_route_delete_box4 = route_delete_box4.StandardError.ReadToEnd();
+            // Specify the PowerShell command to execute
+            string command_no_index = $"route delete {impIP} mask {impMask} {impGateway}";
+            string command_with_index = $"route delete {impIP} mask {impMask} {impGateway} if {impIndex}";
 
-            route_delete_box4.WaitForExit();
-
-            if (!string.IsNullOrWhiteSpace(error_route_delete_box4))
+            if (string.IsNullOrEmpty(impIndex))
             {
-                MessageBox.Show($"Error: {error_route_delete_box4}");
+                ProcessStartInfo startInfo_routen_delete_no_index = new ProcessStartInfo
+                {
+                    FileName = "powershell.exe",  // Specify PowerShell executable
+                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_no_index}\"", // Pass the command as argument
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8
+                };
+
+                process.StartInfo = startInfo_routen_delete_no_index;
+
+                // Start the process
+                process.Start();
+
+                process.WaitForExit();
+
+                string error_route_delete_no_index = process.StandardError.ReadToEnd();
+                string output_route_delete_button_no_index = process.StandardOutput.ReadToEnd();
+
+                process.WaitForExit();
+
+                if (!string.IsNullOrWhiteSpace(error_route_delete_no_index))
+                {
+                    output.Text = error_route_delete_no_index;
+                }
+                else
+                {
+                    output.Text = output_route_delete_button_no_index;
+                }
+
             }
             else
             {
-                MessageBox.Show(output_route_delete_box4);
-                Added_Routes.Remove(4);
-                Route_4.Text = "";
+                ProcessStartInfo startInfo_routen_delete_index = new ProcessStartInfo
+                {
+                    FileName = "powershell.exe",  // Specify PowerShell executable
+                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_with_index}\"", // Pass the command as argument
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                process.StartInfo = startInfo_routen_delete_index;
+
+                // Start the process
+                process.Start();
+
+                process.WaitForExit();
+
+                string error_route_delete_index = process.StandardError.ReadToEnd();
+                string output_route_delete_button_index = process.StandardOutput.ReadToEnd();
+
+                process.WaitForExit();
+
+                if (!string.IsNullOrWhiteSpace(error_route_delete_index))
+                {
+                    output.Text = $"Error: {error_route_delete_index}";
+                }
+                else
+                {
+                    output.Text = output_route_delete_button_index;
+                }
             }
         }
     }
 }
-            //process.WaitForExit();
-
-            //Console.WriteLine(output);
-
-            //// Prompt user for network interface name
-            //Console.Write("Enter the name of the network interface you want to configure: ");
-            //string interfaceName = Console.ReadLine();
-
-            // Prompt user for new IP address
-            //Console.Write("Which IP_Address do you want to add? ");
-            //string newIP = Console.ReadLine();
-
-            //// Validate IP address format using regex
-            //string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
-            //if (!Regex.IsMatch(newIP, pattern))
-            //{
-            //    Console.WriteLine("Invalid IP address format.");
-            //    return;
-            //}
-
-            //// Prompt user for new subnet mask
-            //Console.Write("Which Subnetmask do you want to use? ");
-            //string newSubnetMask = Console.ReadLine();
-
-            //if (!Regex.IsMatch(newSubnetMask, pattern))
-            //{
-            //    Console.WriteLine("Invalid SubnetMask format.");
-            //    return;
-            //}
-
-
-            //// Prompt user for new gateway
-            //Console.Write("Which Gateway do you want to use? ");
-            //string newGateway = Console.ReadLine();
-            //if (!Regex.IsMatch(newGateway, pattern))
-            //{
-            //    Console.WriteLine("Invalid Gateway format.");
-            //    return;
-            //}
-
-            //// Prompt user for the InterfaceIndex
-            //Console.WriteLine("Which interface do you want to use?");
-            //string interfaceIndex = Console.ReadLine();
-
-
-
-            //Process process2 = Process.Start("route", $"delete 0.0.0.0 mask 0.0.0.0 {newGateway} if {interfaceIndex}");
-            //Process process3 = Process.Start("route", $"add {newIP} mask {newSubnetMask} {newGateway} if {interfaceIndex}");
-            //process2.WaitForExit();
-            //process3.WaitForExit();
-
-
-
-            //Console.WriteLine("Do you want to add another Route? (y/n)");
-            //string answer = Console.ReadLine();
-            //if (answer == "y")
-            //{
-            //    Main();
-            //}
-            //else
-            //{
-            //    return;
-            //}
-        

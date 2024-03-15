@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Network_Window"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1200">
-    <Grid>
+        Title="MainWindow" Height="600" Width="1000">
+    <Grid Background="#FF06373D">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240"/>
             <ColumnDefinition/>
+
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -22,12 +23,16 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <Menu Grid.Column="0" Background="Transparent">
-                <MenuItem Header="Hilfe" FontSize="16" Click="MenuItem_Click" Height="30" Background="LightGray"/>
+                <MenuItem Header="Hilfe" FontSize="16" Click="MenuItem_Click" Height="30" Background="#FFB9B9A8" FontFamily="Consolas"/>
             </Menu>
             <Menu Grid.Column="1" Background="Transparent">
-                <MenuItem Header="Netzwerk" FontSize="16" Click="Netzwerk_Button" Height="30" Background="LightGray"/>
+                <MenuItem Header="Netzwerk" FontSize="16" Click="Netzwerk_Button" Height="30" Background="#FFB9B9A8" FontFamily="Consolas"/>
+            </Menu>
+            <Menu Grid.Column="2" Background="Transparent">
+                <MenuItem Header="Routen" FontSize="16" Click="Routen_Button" Height="30" Background="#FFB9B9A8" FontFamily="Consolas"/>
             </Menu>
         </Grid>
 
@@ -42,31 +47,78 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            
-            
-            
-            <TextBlock Name="Route_1" Grid.Row="0" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-            <Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="1" Content="Löschen"  HorizontalAlignment="Right" Background="OrangeRed" Click="Route_1_Delete_Click"/>
 
-            <TextBlock Name="Route_2" Grid.Row="1" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-            <Button Name="Route_2_Delete" Grid.Row="1" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed" Click="Route_2_Delete_Click"/>
 
-            <TextBlock Name="Route_3" Grid.Row="2" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-            <Button Name="Route_3_Delete" Grid.Row="2" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed" Click="Route_3_Delete_Click"/>
 
-            <TextBlock Name="Route_4" Grid.Row="3" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-            <Button Name="Route_4_Delete" Grid.Row="3" Grid.Column="1" Content="Löschen" HorizontalAlignment="Right" Background="OrangeRed" Click="Route_4_Delete_Click"/>
+            <TextBlock Name="Route_1" Grid.Row="0" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+            <Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="1" Content="Löschen" Height="50"  HorizontalAlignment="Right" Background="#FFA52019" Click="Route_1_Delete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold">
+                <Button.Resources>
+                    <Style TargetType="Border" >
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+
+            <TextBlock Name="Route_2" Grid.Row="1" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+            <Button Name="Route_2_Delete" Grid.Row="1" Grid.Column="1" Content="Löschen" Height="50" HorizontalAlignment="Right" Background="#FFA52019" Click="Route_2_Delete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold">
+                <Button.Resources>
+                    <Style TargetType="Border" >
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+
+
+            <TextBlock Name="Route_3" Grid.Row="2" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+            <Button Name="Route_3_Delete" Grid.Row="2" Grid.Column="1" Content="Löschen" Height="50" HorizontalAlignment="Right" Background="#FFA52019" Click="Route_3_Delete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold">
+                <Button.Resources>
+                    <Style TargetType="Border" >
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+
+            <TextBlock Name="Route_4" Grid.Row="3" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+            <Button Name="Route_4_Delete" Grid.Row="3" Grid.Column="1" Content="Löschen" Height="50" HorizontalAlignment="Right" Click="Route_4_Delete_Click" FontFamily="Consolas" Background="#FFA52019" BorderBrush="#FFB9B9A8" FontWeight="Bold">
+                <Button.Resources>
+                    <Style TargetType="Border" >
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+
         </Grid>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
 
+            <!--Das ist der textblock für mein output-->
+
+            <TextBlock Name="output" Grid.Row="0" Text="" FontSize="20" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8"/>
+
+            <!--Das ist der textblock für meine warnung-->
+            <TextBlock Name="Warnungstext" Grid.Row="2" Text="Die Entfernen-Taste sollte nur dann verwendet werden, wenn die Route nicht hinzugefügt wurde, das heißt, sie ist ausschließlich dazu gedacht, Routen aufzuräumen oder bei Fehlern einzugreifen!!!" FontSize="20" FontWeight="Bold" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8"/>
+
+
+        </Grid>
         <Image Grid.Row="1" 
-           Grid.Column="1" 
+           Grid.ColumnSpan="2"
            Source="/Images/laptop.png"
-           VerticalAlignment="Top"
-           HorizontalAlignment="Left" 
+           VerticalAlignment="Center"
+           HorizontalAlignment="Center" 
            Height="98" 
            Width="106" 
-           Margin="347,164,0,0"
+           
            />
+
+
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -84,51 +136,99 @@
             <TextBox Name="IP_Adresse_Block" 
                      Grid.Row="0" Grid.Column="1" 
                      Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Margin="0,0,-158,0"
-                     FontSize="15" FontWeight="Bold" FontFamily="Courier New"/>
-
+                     FontSize="15" FontWeight="Bold" FontFamily="Consolas">
+                <TextBox.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </TextBox.Resources>
+                <TextBox.Background>
+                    <SolidColorBrush Opacity="1" Color="#FFB9B9A8"/>
+                </TextBox.Background>
+            </TextBox>
+            
+            
             <TextBlock Name="IP_Adresse_Block_Beschreibung" 
                        Grid.Row="0" Padding="0" FontWeight="Bold" VerticalAlignment="Center"
                        Background="Transparent" 
-                       FontFamily="Courier New" Text="Ipv4"/>
+                       FontFamily="Consolas" Text="Ipv4" Foreground="#FFB9B9A8"/>
 
             <!--Das ist für die Maske-->
             <TextBox Name="Mask_Block" 
                      Grid.Row="1" Grid.Column="1" 
                      Width="Auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Margin="0,0,-158,0"
-                     FontSize="15" FontWeight="Bold" FontFamily="Courier New" />
+                     FontSize="15" FontWeight="Bold" FontFamily="Consolas" Background="#b9b9a8">
+                <TextBox.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </TextBox.Resources>
+            </TextBox>
 
             <TextBlock Name="Mask_Block_Beschreibung" 
                        Grid.Row="1" Padding="0" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Stretch"
                        Background="Transparent" 
-                       FontFamily="Courier New" Text="Maske"/>
+                       FontFamily="Consolas" Text="Maske" Foreground="#FFB9B9A8"/>
             <!--Das ist für die Gateway-->
             <TextBox Name="Gate_Block" 
                      Grid.Row="2" Grid.Column="1" 
                      Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Margin="0,0,-158,0"
-                     FontSize="15" FontWeight="Bold" FontFamily="Courier New"/>
+                     FontSize="15" FontWeight="Bold" FontFamily="Consolas" Background="#FFB9B9A8">
+                <TextBox.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </TextBox.Resources>
+            </TextBox>
 
             <TextBlock Name="Gate_Block_Beschreibung" 
                        Grid.Row="2" Padding="0" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Stretch"
                        Background="Transparent" 
-                       FontFamily="Courier New" Text="Gate"/>
+                       FontFamily="Consolas" Text="Gate" Foreground="#FFB9B9A8"/>
 
-            <!--Das ist für die Gateway-->
+            <!--Das ist für den Index-->
             <TextBox Name="Index_Block" 
                      Grid.Row="3" Grid.Column="1" 
                      Width="auto" Padding="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Margin="0,0,-158,0"
-                     FontSize="15" FontWeight="Bold" FontFamily="Courier New"/>
+                     FontSize="15" FontWeight="Bold" FontFamily="Consolas" Background="#FFB9B9A8">
+                <TextBox.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </TextBox.Resources>
+            </TextBox>
 
             <TextBlock Name="Index_Block_Beschreibung" 
                        Grid.Row="3" Padding="0" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Stretch"
                        Background="Transparent" 
-                       FontFamily="Courier New" Text="Index"/>
+                       FontFamily="Consolas" Text="Index" Foreground="#FFB9B9A8"/>
 
             <Button Name="Eingabe_Button" 
                     Grid.Column="2" Grid.Row="3" 
-                    HorizontalAlignment="Left" Margin="158,0,0,0"  VerticalAlignment="Center" Height="25" Width="46" 
+                    HorizontalAlignment="Left" Margin="158,0,0,0"  VerticalAlignment="Center" Height="25" Width="48" 
+                    FontSize="8"
+                    Content="Hinzufügen"
+                    Click="Eingabe_Button_Click" FontFamily="Consolas" Background="#FFD0AD00" BorderBrush="#FF317953" FontWeight="Bold">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+
+            </Button>
+
+            <Button Name="Löschen_Button" 
+                    Grid.Column="2" Grid.Row="0" 
+                    HorizontalAlignment="Left" Margin="158,0,0,0"  VerticalAlignment="Center" Height="25" Width="48" 
                     FontSize="9"
-                    Content="Route add"
-                    Click="Eingabe_Button_Click"/>
+                    Content="Entfernen"
+                    Click="Löschen_Button_Click" FontFamily="Consolas" Background="#FFA52019" BorderBrush="#FFB9B9A8" FontWeight="Bold">
+                <Button.Resources>
+                    <Style TargetType="Border" >
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
 
 
         </Grid>
