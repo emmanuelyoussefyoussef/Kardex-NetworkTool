@@ -37,10 +37,7 @@ namespace Network_Window
 
         public MainWindow()
         {
-            //ManipulateIPAddress();
             InitializeComponent();
-
-
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -401,6 +398,29 @@ namespace Network_Window
                     output.Text = output_route_delete_button_index;
                 }
             }
+        }
+
+        private void Alle_Routen_Löschen(object sender, RoutedEventArgs e)
+        {
+            Process route_delete = new Process();
+
+            string command_route_delete = ("route -f");
+
+            // Set up the process start info
+            ProcessStartInfo startInfo_route_delete = new ProcessStartInfo
+            {
+                FileName = "powershell.exe",  // Specify PowerShell executable
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete}\"", // Pass the command as argument
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            route_delete.StartInfo = startInfo_route_delete;
+
+            // Start the process
+            route_delete.Start();
         }
     }
 }

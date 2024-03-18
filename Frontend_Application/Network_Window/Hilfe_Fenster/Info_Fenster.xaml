@@ -7,6 +7,8 @@
         mc:Ignorable="d"
         Title="Info_Fenster" Height="450" Width="800">
     <Grid>
+        <TextBlock Name="output_netz" HorizontalAlignment="Left" TextWrapping="Wrap"  VerticalAlignment="Top"  Height="auto" Width="auto" FontSize="15" FontFamily="consolas" Text=""/>
+
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap"  VerticalAlignment="Top"  Height="auto" Width="auto" Margin="0,41,0,0" FontSize="15" FontWeight="Bold"
                    Text="Dieses Netzwerk-Tool wurde entwickelt, um Ihnen dabei zu helfen, Routen mühelos hinzuzufügen und zu entfernen. Es wurde speziell für den Einsatz auf Baustellen konzipiert, um Ihnen dabei zu helfen, Ihre Arbeit effizienter zu gestalten. Durch die Nutzung dieses Tools können Sie Ihre Arbeitsabläufe optimieren und Zeit sparen, indem Sie Routen einfach verwalten und anpassen können. Es bietet eine benutzerfreundliche Oberfläche, die es Ihnen ermöglicht, Routen schnell zu erstellen und bei Bedarf zu bearbeiten. Mit diesem Tool haben Sie die Möglichkeit, Ihre Baustellenaktivitäten effektiv zu organisieren und die Effizienz Ihrer Arbeit zu steigern."/>
         <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  VerticalAlignment="Bottom"  Height="auto" Width="auto" Margin="0,41,0,0" FontSize="15" FontWeight="Bold"
