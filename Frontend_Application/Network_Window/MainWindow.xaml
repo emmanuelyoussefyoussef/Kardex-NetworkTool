@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Network_Window"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1000">
+        Title="MainWindow" Height="600" Width="1200">
     <Grid Background="#FF06373D">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240"/>
@@ -30,9 +30,9 @@
 
             <Button Grid.Column="0" Content="Hilfe" FontSize="16" Click="MenuItem_Click" Background="#FFB9B9A8" FontFamily="Consolas" HorizontalContentAlignment="Left"/>
 
-            <Button Grid.Column="1" Content="Netzwerk" FontSize="16" Click="Netzwerk_Button" Background="#FFB9B9A8" FontFamily="Consolas" />
+            <Button Grid.Column="1" Content="Routen" FontSize="16" Click="Routen_Button" Background="#FFB9B9A8" HorizontalAlignment="Right" FontFamily="Consolas"/>
 
-            <Button Grid.Column="2" Content="Routen" FontSize="16" Click="Routen_Button" Background="#FFB9B9A8" HorizontalAlignment="Right" FontFamily="Consolas"/>
+            <Button Grid.Column="2" Content="Netzwerk-Tabelle Refresh" FontSize="16" Click="Netzwerk_Button" Background="#FFB9B9A8" FontFamily="Consolas"/>
 
             <Button Grid.Column="3" Content="Routen Löschen" FontSize="16" Click="Alle_Routen_Löschen" Background="#FFB9B9A8" HorizontalAlignment="Right" HorizontalContentAlignment="Right" FontFamily="Consolas"/>
         </Grid>
@@ -51,17 +51,20 @@
 
 
 
-            <TextBlock Name="Route_1" Grid.Row="0" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
-            <Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="1" Content="Löschen" Height="50"  HorizontalAlignment="Right" Background="#FFA52019" Click="Route_1_Delete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold">
+            <TextBlock Name="Route_1" Grid.Row="0" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" Width="auto" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+            <Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="1" Content="Löschen" Height="50"  HorizontalAlignment="Right" Click="Route_1_Delete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold" InputScope="PhraseList">
                 <Button.Resources>
                     <Style TargetType="Border" >
                         <Setter Property="CornerRadius" Value="10"/>
                     </Style>
                 </Button.Resources>
+                <Button.Background>
+                    <SolidColorBrush Color="#FFA52019" Opacity="1"/>
+                </Button.Background>
             </Button>
 
 
-            <TextBlock Name="Route_2" Grid.Row="1" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+            <TextBlock Name="Route_2" Grid.Row="1" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" Width="auto" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
             <Button Name="Route_2_Delete" Grid.Row="1" Grid.Column="1" Content="Löschen" Height="50" HorizontalAlignment="Right" Background="#FFA52019" Click="Route_2_Delete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold">
                 <Button.Resources>
                     <Style TargetType="Border" >
@@ -72,7 +75,7 @@
 
 
 
-            <TextBlock Name="Route_3" Grid.Row="2" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+            <TextBlock Name="Route_3" Grid.Row="2" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" Width="auto" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
             <Button Name="Route_3_Delete" Grid.Row="2" Grid.Column="1" Content="Löschen" Height="50" HorizontalAlignment="Right" Background="#FFA52019" Click="Route_3_Delete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold">
                 <Button.Resources>
                     <Style TargetType="Border" >
@@ -82,7 +85,7 @@
             </Button>
 
 
-            <TextBlock Name="Route_4" Grid.Row="3" Grid.Column="0" Text="" FontSize="15" Width="auto" HorizontalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+            <TextBlock Name="Route_4" Grid.Row="3" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" Width="auto" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
             <Button Name="Route_4_Delete" Grid.Row="3" Grid.Column="1" Content="Löschen" Height="50" HorizontalAlignment="Right" Click="Route_4_Delete_Click" FontFamily="Consolas" Background="#FFA52019" BorderBrush="#FFB9B9A8" FontWeight="Bold">
                 <Button.Resources>
                     <Style TargetType="Border" >
@@ -93,7 +96,7 @@
 
 
         </Grid>
-        <Grid Grid.Row="1" Grid.Column="1">
+        <Grid Grid.Row="1" Grid.Column="1" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
@@ -105,18 +108,23 @@
 
             <!--Das ist der textblock für mein output-->
 
-            <TextBlock Name="output" Grid.Row="0" Text="" FontSize="20" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" Grid.ColumnSpan="2" Margin="0,0,0,145" Grid.RowSpan="2" HorizontalAlignment="Right"/>
+            <TextBlock Name="output" Grid.Row="1" Text="" FontSize="20" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" HorizontalAlignment="Left"/>
 
             <!--Das ist der textblock für meine warnung-->
-            <TextBlock Name="Warnungstext" Width="760" Grid.Row="2" Text="Die Entfernen-Taste sollte nur dann verwendet werden, wenn die Route nicht hinzugefügt wurde, das heißt, sie ist ausschließlich dazu gedacht, Routen aufzuräumen oder bei Fehlern einzugreifen!!!" FontSize="20" FontWeight="Bold" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8"/>
+            <TextBlock Name="Warnungstext" Grid.Row="2"  FontSize="20" FontWeight="Bold" Width="960"
+                       TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8"
+                       Text="Beim Starten bitte, die Schaltfläche 'Routen löschen' betätigen, um sicherzustellen, dass keine vorherigen Einstellungen oder Routen bereits vorhanden sind. Für die Verbindung mit Ihrem WLAN(mit dem Internet) verwenden Sie bitte die IP-Adresse 0.0.0.0 und die Subnetzmaske 0.0.0.0."/>
 
+            <TextBlock Name="Netzwerk_Tabelle" Grid.Row="0" Text="" FontSize="15" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" Grid.ColumnSpan="2" HorizontalAlignment="Left"/>
 
         </Grid>
         <Image Grid.Row="1" 
-           Grid.ColumnSpan="2"
+           Grid.ColumnSpan="1"
+           Grid.Column="1"
+           
            Source="/Images/laptop.png"
            VerticalAlignment="Center"
-           HorizontalAlignment="Center" 
+           HorizontalAlignment="Right" 
            Height="98" 
            Width="106" 
            
