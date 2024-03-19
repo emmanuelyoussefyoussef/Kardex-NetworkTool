@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,5 +32,7 @@ namespace Network_Window.Info_button
             Application.Current.MainWindow.Show();
             this.Close();
         }
+
+        
     }
 }

@@ -6,14 +6,61 @@
         xmlns:local="clr-namespace:Network_Window.Info_button"
         mc:Ignorable="d"
         Title="Info_Fenster" Height="450" Width="800">
-    <Grid>
-        <TextBlock Name="output_netz" HorizontalAlignment="Left" TextWrapping="Wrap"  VerticalAlignment="Top"  Height="auto" Width="auto" FontSize="15" FontFamily="consolas" Text=""/>
+    <Grid Background="#FF06373D">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition/>
+                <RowDefinition Height="100"/>
+            </Grid.RowDefinitions>
 
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap"  VerticalAlignment="Top"  Height="auto" Width="auto" Margin="0,41,0,0" FontSize="15" FontWeight="Bold"
-                   Text="Dieses Netzwerk-Tool wurde entwickelt, um Ihnen dabei zu helfen, Routen mühelos hinzuzufügen und zu entfernen. Es wurde speziell für den Einsatz auf Baustellen konzipiert, um Ihnen dabei zu helfen, Ihre Arbeit effizienter zu gestalten. Durch die Nutzung dieses Tools können Sie Ihre Arbeitsabläufe optimieren und Zeit sparen, indem Sie Routen einfach verwalten und anpassen können. Es bietet eine benutzerfreundliche Oberfläche, die es Ihnen ermöglicht, Routen schnell zu erstellen und bei Bedarf zu bearbeiten. Mit diesem Tool haben Sie die Möglichkeit, Ihre Baustellenaktivitäten effektiv zu organisieren und die Effizienz Ihrer Arbeit zu steigern."/>
-        <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  VerticalAlignment="Bottom"  Height="auto" Width="auto" Margin="0,41,0,0" FontSize="15" FontWeight="Bold"
-            Text="Sie haben die Möglichkeit, bis zu vier verschiedene Routen hinzuzufügen. Mithilfe der Netzwerktaste können Sie sämtliche benötigten Informationen abrufen.Somit bietet Ihnen das System eine benutzerfreundliche und umfassende Lösung zur Kontrolle und Verwaltung Ihrer Netzwerkverbindungen."/>
-        <Button Content="Zurück" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26" Width="64" Click="btn_zurück"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+        <Button Grid.Column="0" Content="Hilfe" FontSize="16" Background="#FFB9B9A8" FontFamily="Consolas"/>
+
+        <Button Grid.Column="1" Content="Routen" FontSize="16" Background="#FFB9B9A8" FontFamily="Consolas"/>
+
+        <Button Grid.Column="2" Content="Netzwerk-Tabelle Refresh" FontSize="16" Background="#FFB9B9A8" FontFamily="Consolas"/>
+
+        <Button Grid.Column="3" Content="Routen Löschen" FontSize="16" Background="#FFB9B9A8" HorizontalAlignment="Right" FontFamily="Consolas"/>
+
+        <TextBlock Name="Routen_Löschen_Hilfe" Grid.Row="1" Grid.Column="3" TextAlignment="Center"
+           TextWrapping="Wrap" FontSize="15" FontWeight="Bold" Foreground="#FFB9B9A8" Width="130" HorizontalAlignment="Right"
+           Text="Mit der 'Routen Löschen' Button können Sie alle Routen auf ihrem System löschen."/>
+
+        <TextBlock  Grid.Row="1" Grid.Column="2" Width="215" TextAlignment="Center"
+            TextWrapping="Wrap" FontSize="15" FontWeight="Bold" Foreground="#FFB9B9A8"
+            Text="Mit dem 'Netzwerk-Tabelle Refresh' Button aktualisieren Sie die angezeigte Tabelle mit den Schnittstellen, IP-Adressen und weiteres"/>
+
+        <TextBlock  Grid.Row="1" Grid.Column="1" Width="150" TextAlignment="Center"
+            TextWrapping="Wrap" FontSize="15" FontWeight="Bold" Foreground="#FFB9B9A8"
+            Text="Mit dem 'Routen' Button werden Ihnen alle Routen angezeigt auf ihrem Gerät"/>
+
+        <TextBlock  Grid.Row="1" Grid.Column="0" Width="75" TextAlignment="Center"
+            TextWrapping="Wrap" FontSize="15" FontWeight="Bold" Foreground="#FFB9B9A8"
+            Text="Öffnet das Hilfe Fenster"/>
+
+        <TextBlock  Name="meintest" Grid.Row="2" Grid.ColumnSpan="4" TextAlignment="Left"
+            TextWrapping="Wrap" FontSize="5" FontWeight="Bold" Foreground="#FFB9B9A8"
+            Text="" FontFamily="Consolas"/>
+
+
+        <!--<Button Grid.Column="0" Content="Hilfe" FontSize="16" Click="MenuItem_Click" Background="#FFB9B9A8" FontFamily="Consolas" HorizontalContentAlignment="Left"/>
+
+            
+
+
+        
+        
+        
+        <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  VerticalAlignment="Bottom"  Height="auto" Width="auto" Margin="0,41,0,0" FontSize="15" FontWeight="Bold" Foreground="#FFB9B9A8"
+            Text="Sie haben die Möglichkeit, bis zu vier verschiedene Routen hinzuzufügen. Mithilfe der Netzwerktaste können Sie sämtliche benötigten Informationen abrufen.Somit bietet Ihnen das System eine benutzerfreundliche und umfassende Lösung zur Kontrolle und Verwaltung Ihrer Netzwerkverbindungen."/>-->
+        
+        <!--<Button Content="Zurück" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26" Width="64" Click="btn_zurück"/>-->
 
     </Grid>
 </Window>

@@ -40,15 +40,136 @@ namespace Network_Window
             { 3, Tuple.Create("", "", "", "") },
             { 4, Tuple.Create("", "", "", "") }
             };
+
+        
+        
         int counter = 1;
+        public string[] interfaces;
+
+        public Dictionary<int, Interface_Values> ValuesDict { get; set; }
+
+        public class Interface_Values
+        {
+            
+            
+            
+            
+            
+            
+            public string InterfaceAlias { get; set; }
+            public string InterfaceIndex { get; set; }
+            public string IPv4Address { get; set; }
+        }
+        
+
+
+
+
 
         public MainWindow()
         {
             InitializeComponent();
             Netzwerk_Button(null, null);
+            //Command();
+            FetchNetworkInterfaceInformation();
 
 
         }
+
+        private void FetchNetworkInterfaceInformation()
+        {
+            Process process = new Process();
+
+            // Specify the PowerShell command to execute
+            string command = @"
+        Get-NetAdapter | ForEach-Object {
+            $Interface = $_
+            $IPConfiguration = Get-NetIPConfiguration -InterfaceIndex $Interface.InterfaceIndex
+            $DNS = ($IPConfiguration.DNSServer.ServerAddresses | Where-Object { $_ -like '*.*.*.*' })
+            if (-not $DNS) {
+                $DNS = 'NaN'
+            }
+            [PSCustomObject]@{
+                Index = $Interface.InterfaceIndex
+                InterfaceAlias = $Interface.InterfaceAlias
+                Status = $Interface.Status
+                IPAddress = $IPConfiguration.IPv4Address.IPAddress
+                SubnetMask = $IPConfiguration.IPv4Address.PrefixLength
+                Gateway = $IPConfiguration.IPv4DefaultGateway.NextHop
+                DNS = $DNS
+            }
+        } | Format-Table -AutoSize | Out-String -Width 4096";
+
+            // Set up the process start info
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = "powershell.exe",  // Specify PowerShell executable
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command}\"", // Pass the command as argument
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            process.StartInfo = startInfo;
+
+            process.Start();
+
+            // Read the output and store it
+            string output = process.StandardOutput.ReadToEnd();
+
+            process.WaitForExit();
+
+            // Parse the output and store relevant information in ValuesDict
+            ParseNetworkInterfaceOutput(output);
+        }
+
+        private void ParseNetworkInterfaceOutput(string output)
+        {
+            // Split the output into rows
+            string[] rows = output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            ValuesDict = new Dictionary<int, Interface_Values>();
+
+            // Parse each row and extract relevant information
+            foreach (string row in rows)
+            {
+                // Split the row into columns
+                string[] columns = row.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                // Create a new Interface_Values object and populate its properties
+                Interface_Values interfaceValues = new Interface_Values
+                {
+                    InterfaceAlias = columns[1],
+                    InterfaceIndex = columns[0],
+                    IPv4Address = columns[3]
+                };
+
+                // Add the Interface_Values object to ValuesDict
+                ValuesDict.Add(ValuesDict.Count + 1, interfaceValues);
+            }
+
+            // Optionally, display the retrieved information in your application's UI
+            DisplayNetworkInterfaceInformation();
+        }
+
+        private void DisplayNetworkInterfaceInformation()
+        {
+            // Clear any existing content in your UI element (e.g., Netzwerk_Tabelle)
+
+            // Display the network interface information in your UI element
+            foreach (KeyValuePair<int, Interface_Values> kvp in ValuesDict)
+            {
+                // Build a string representation of the network interface information
+                string interfaceInfo = $"Index: {kvp.Value.InterfaceIndex}, " +
+                                       $"Alias: {kvp.Value.InterfaceAlias}, " +
+                                       $"IP Address: {kvp.Value.IPv4Address}";
+
+                // Display or append the interfaceInfo string in your UI element (e.g., Netzwerk_Tabelle)
+                // Netzwerk_Tabelle.AppendText(interfaceInfo + Environment.NewLine);
+                output.Text += interfaceInfo + Environment.NewLine;
+            }
+        }
+
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -207,7 +328,7 @@ namespace Network_Window
                         InterfaceAlias = $Interface.InterfaceAlias
                         Status = $Interface.Status
                         IPAddress = $IPConfiguration.IPv4Address.IPAddress
-                        SubnetMask = $IPConfiguration.IPv4Address.PrefixLength
+                        SubnetMask = $IPConfiguration.IPv4Address.PrefixLengt
                         Gateway = $IPConfiguration.IPv4DefaultGateway.NextHop
                         DNS = $DNS
                     }
@@ -234,7 +355,14 @@ namespace Network_Window
 
             process.WaitForExit();
 
+
+
+
         }
+
+
+
+
 
         private void Route_1_Delete_Click(object sender, RoutedEventArgs e)
         {
@@ -489,6 +617,84 @@ namespace Network_Window
             Route_2.Text = "";
             Route_3.Text = "";
             Route_4.Text = "";
+            counter = 1;
         }
+
+        private string Befehl(string var)
+        {
+            Process process = new Process();
+
+
+            ProcessStartInfo Netzwerke = new ProcessStartInfo
+            {
+                FileName = "powershell.exe",  // Specify PowerShell executable
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{var}\"", // Pass the command as argument
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            process.StartInfo = Netzwerke;
+
+            process.Start();
+
+            string Output = process.StandardOutput.ReadToEnd();
+
+            process.WaitForExit();
+
+            return Output;
+        }
+
+        //private void Command()
+        //{
+        //    Process process = new Process();
+
+        //    // Specify the PowerShell command to execute
+        //    string command = "Get-NetAdapter | Select-Object Name";
+
+        //    // Set up the process start info
+        //    ProcessStartInfo Netzwerke = new ProcessStartInfo
+        //    {
+        //        FileName = "powershell.exe",  // Specify PowerShell executable
+        //        Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command}\"", // Pass the command as argument
+        //        RedirectStandardOutput = true,
+        //        UseShellExecute = false,
+        //        CreateNoWindow = true
+        //    };
+
+        //    process.StartInfo = Netzwerke;
+
+        //    process.Start();
+
+        //    string Output = process.StandardOutput.ReadToEnd();
+
+        //    interfaces = Output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+        //    process.WaitForExit();
+
+        //    for (int i = 0; i < interfaces.Length; i++)
+        //    {
+        //        ValuesDict = new Dictionary<int, Interface_Values>();
+        //        string Alias = interfaces[1];
+        //        string Index = Befehl("Get-NetAdapter | Where-Object {$_.Name -eq 'WLAN'} | Select-Object InterfaceIndex");
+        //        string IP = Befehl("Get-NetIPConfiguration | Where-Object {$_.InterfaceAlias -eq 'WLAN'} | Select-Object IPv4Address");
+        //        ValuesDict.Add(1, new Interface_Values
+        //        {
+        //            InterfaceAlias = Alias,
+        //            InterfaceIndex = Index,
+        //            IPv4Address = IP,
+        //        });
+
+        //        output.Text = ValuesDict[1].InterfaceAlias + ValuesDict[1].InterfaceIndex + ValuesDict[1].IPv4Address;
+        //    }
+
+
+        //}
     }
 }
+
+//Mit Get-NetIPConfiguration | Select-Object  InterfaceAlias die namen bekommen
+
+
+//Näher angucken!!
+//Get - NetIPConfiguration | Where - Object { $_.InterfaceAlias - eq "WLAN" } | Select - Object InterfaceAlias, InterfaceIndex, IPv4Address

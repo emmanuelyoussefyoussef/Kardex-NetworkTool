@@ -108,7 +108,7 @@
 
             <!--Das ist der textblock für mein output-->
 
-            <TextBlock Name="output" Grid.Row="1" Text="" FontSize="20" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" HorizontalAlignment="Left"/>
+            <TextBlock Name="output" Grid.Row="1" Text="" FontSize="10" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" HorizontalAlignment="Left"/>
 
             <!--Das ist der textblock für meine warnung-->
             <TextBlock Name="Warnungstext" Grid.Row="2"  FontSize="20" FontWeight="Bold" Width="960"
