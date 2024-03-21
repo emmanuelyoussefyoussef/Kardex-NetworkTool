@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Network_Window"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1200">
+        Title="MainWindow" Height="auto" Width="1200">
     <Grid Background="#FF06373D">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240"/>
@@ -115,7 +115,31 @@
                        TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8"
                        Text="Beim Starten bitte, die Schaltfläche 'Routen löschen' betätigen, um sicherzustellen, dass keine vorherigen Einstellungen oder Routen bereits vorhanden sind. Für die Verbindung mit Ihrem WLAN(mit dem Internet) verwenden Sie bitte die IP-Adresse 0.0.0.0 und die Subnetzmaske 0.0.0.0."/>
 
-            <TextBlock Name="Netzwerk_Tabelle" Grid.Row="0" Text="" FontSize="15" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" Grid.ColumnSpan="2" HorizontalAlignment="Left"/>
+                    <!--<RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>-->
+                <!--<TextBlock Name="Netzwerk1" Grid.Row="0" Text="" FontSize="14"  TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" Grid.ColumnSpan="2" HorizontalAlignment="Left"/>-->
+
+            <!--<Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Name="Netzwerk1" Grid.Row="0" Grid.Column="0" Text="" FontSize="14"  TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" HorizontalAlignment="Left"/>
+            </Grid>-->
+            
 
         </Grid>
         <Image Grid.Row="1" 
