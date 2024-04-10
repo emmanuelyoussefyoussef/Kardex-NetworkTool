@@ -24,6 +24,7 @@ using System.Collections.ObjectModel;
 
 namespace Network_Window
 {
+    //j a 
     public partial class MainWindow : Window
     {
         private string impIP;
