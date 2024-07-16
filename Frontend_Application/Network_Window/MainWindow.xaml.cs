@@ -20,12 +20,10 @@ using System.Windows.Shapes;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+using System.Collections.ObjectModel;
 
 namespace Network_Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private string impIP;
@@ -33,21 +31,27 @@ namespace Network_Window
         private string impGateway;
         private string impIndex;
         private string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
-        Dictionary<int,Tuple<string,string,string,string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
+        Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
             {
             { 1, Tuple.Create("", "", "", "") },
             { 2, Tuple.Create("", "", "", "") },
             { 3, Tuple.Create("", "", "", "") },
             { 4, Tuple.Create("", "", "", "") }
             };
+
+
+        Dictionary<int, Tuple<string, string, string, string>> Netzwerke = new Dictionary<int, Tuple<string, string, string, string>>();
+
         int counter = 1;
+        public string[] interfaces;
+        Boolean Maschinennetz = false;
+        Boolean Internet = false;
+        int Current_Network = 0;
 
         public MainWindow()
         {
             InitializeComponent();
             Netzwerk_Button(null, null);
-
-
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -63,24 +67,24 @@ namespace Network_Window
             impMask = Mask_Block.Text;
             impGateway = Gate_Block.Text;
             impIndex = Index_Block.Text;
-            
+
 
 
             if (!Regex.IsMatch(impIP, pattern))
             {
-                output.Text = "IP Adresse ist ungültig";
+                output.Text = "IP Adresse ist ung ltig";
             }
             else if (!Regex.IsMatch(impMask, pattern))
             {
-                output.Text = "Subnetzmaske ist ungültig";
+                output.Text = "Subnetzmaske ist ung ltig";
             }
             else if (!Regex.IsMatch(impGateway, pattern))
             {
-                output.Text = "Gateway ist ungültig";
+                output.Text = "Gateway ist ung ltig";
             }
-            else if (counter==5)
+            else if (counter == 5)
             {
-                output.Text = "Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.";
+                output.Text = "Maximale Anzahl an Routen erreicht, bitte l schen sie Routen.";
             }
             else
             {
@@ -89,7 +93,8 @@ namespace Network_Window
                 Gate_Block.Clear();
                 Index_Block.Clear();
 
-                
+
+
 
                 Process route_delete = new Process();
 
@@ -117,8 +122,8 @@ namespace Network_Window
                 string error_route_delete = route_delete.StandardError.ReadToEnd();
 
                 route_delete.WaitForExit();
-                
-                
+
+
                 if (!string.IsNullOrWhiteSpace(error_route_delete))
                 {
                     output.Text = $"Error: {error_route_delete}";
@@ -163,7 +168,7 @@ namespace Network_Window
                 }
                 else
                 {
-                    Added_Routes[counter]=Tuple.Create(impIP, impMask, impGateway, impIndex);
+                    Added_Routes[counter] = Tuple.Create(impIP, impMask, impGateway, impIndex);
                     output.Text = output_route_add;
 
                     string text = $"IP Adresse: {Added_Routes[counter].Item1}\nSubnetMaske: {Added_Routes[counter].Item2}\nGateway: {Added_Routes[counter].Item3}\nSchnittstellenindex: {Added_Routes[counter].Item4}\n";
@@ -187,70 +192,158 @@ namespace Network_Window
                 }
             }
         }
-
         private void Netzwerk_Button(object sender, RoutedEventArgs e)
         {
-            
-            Process process = new Process();
-
-            // Specify the PowerShell command to execute
+            GridContainer.Children.Clear();
             string command = @"
                     Get-NetAdapter | ForEach-Object {
                     $Interface = $_
                     $IPConfiguration = Get-NetIPConfiguration -InterfaceIndex $Interface.InterfaceIndex
-                    $DNS = ($IPConfiguration.DNSServer.ServerAddresses | Where-Object { $_ -like '*.*.*.*' })
+                    $DNS = ($IPConfiguration.DNSServer.ServerAddresses | Where-Object { $_ -like '*.*.*.*' }) -join ','
                     if (-not $DNS) {
-                        $DNS = 'NaN'
+                        $DNS = 'EMPTY'
                     }
+                    $SubnetMaskCIDR = $IPConfiguration.IPv4Address.PrefixLength
+
+                    $SubnetMaskDottedDecimal = (([math]::pow(2, $SubnetMaskCIDR) - 1) -shl (32 - $SubnetMaskCIDR)) -band 0xFFFFFFFF
+                    if ($SubnetMaskDottedDecimal -lt 0) {
+                        $SubnetMaskDottedDecimal += [math]::pow(2, 32)
+                    }
+                    $SubnetMaskDottedDecimal = ([ipaddress]$SubnetMaskDottedDecimal).IPAddressToString
+
+                    $InterfaceAlias = $Interface.InterfaceAlias -replace ' ', '_'
+
                     [PSCustomObject]@{
                         Index = $Interface.InterfaceIndex
-                        InterfaceAlias = $Interface.InterfaceAlias
-                        Status = $Interface.Status
-                        IPAddress = $IPConfiguration.IPv4Address.IPAddress
-                        SubnetMask = $IPConfiguration.IPv4Address.PrefixLength
-                        Gateway = $IPConfiguration.IPv4DefaultGateway.NextHop
+                        InterfaceAlias = $InterfaceAlias
+                        Status = if ($Interface.Status) { $Interface.Status } else { 'EMPTY' }
+                        IPAddress = if ($IPConfiguration.IPv4Address.IPAddress) { $IPConfiguration.IPv4Address.IPAddress } else { 'EMPTY' }
+                        SubnetMask = if ($SubnetMaskDottedDecimal) { $SubnetMaskDottedDecimal } else { 'EMPTY' }
+                        Gateway = if ($IPConfiguration.IPv4DefaultGateway.NextHop) { $IPConfiguration.IPv4DefaultGateway.NextHop } else { 'EMPTY' }
                         DNS = $DNS
                     }
                 } | Format-Table -AutoSize | Out-String -Width 4096";
 
-            // Set up the process start info
-            ProcessStartInfo Netzwerke = new ProcessStartInfo
+            string output = ShellCommand(command);
+
+            //Unterteilt die Ausgabe in Zeilen
+            string[] rows = output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            List<string[]> rowVariables = new List<string[]>();
+
+            //Untereilt die Zeilen in Spalten
+            foreach (string row in rows)
             {
-                FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command}\"", // Pass the command as argument
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+                string[] columns = row.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                rowVariables.Add(columns);
+            }
 
-            process.StartInfo = Netzwerke;
+            string test = null;
 
-            // Start the process
-            process.Start();
+            int count = rowVariables.Count - 2;
 
-            // Read the output and display it in a TextBlock
-            string Tabelle = process.StandardOutput.ReadToEnd();
-            Netzwerk_Tabelle.Text = Tabelle;
 
-            process.WaitForExit();
+
+
+
+            //ButtonItems = new ObservableCollection<string>();
+
+
+            int x = 0; // Column index
+            int v = 0;
+
+
+            string column_value = null;
+            string index = "";
+            string ip = "";
+            string subnetMask = "";
+            string gateway = "";
+
+            for (int j = 2; j < rowVariables.Count; j++)
+            {
+                int runner = j - 1;
+                string[] testRow = rowVariables[j];
+
+
+
+                for (int i = 0; i < testRow.Length; i++)
+                {
+                    test += $"{testRow[i]} ";
+                    column_value = testRow[i];
+                    index = testRow[0];
+                    ip = testRow[3];
+                    subnetMask = testRow[4];
+                    gateway = testRow[5];
+                    CreateRows(column_value, v, x);
+                    x++;
+                    if (x >= 7)
+                    {
+                        CheckBox checkBox = new CheckBox();
+                        checkBox.Content = "Hinzuf gen";
+                        checkBox.FontSize = 12;
+                        checkBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
+                        checkBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
+                        checkBox.Checked += (sender, e) => CheckBox_Checked(runner);
+                        Grid.SetRow(checkBox, v);
+                        Grid.SetColumn(checkBox, x + 1);
+                        GridContainer.Children.Add(checkBox);
+                        x = 0;
+                        v++;
+
+                    }
+
+
+                }
+
+                Tuple<string, string, string, string> value = Tuple.Create($"{ip}", $"{subnetMask}", $"{gateway}", $"{index}");
+                Netzwerke[runner] = value;
+                //ButtonItems.Add(test);
+                test = null;
+            }
+
+            //ButtonContainer.ItemsSource = ButtonItems;
 
         }
+
+        private void CheckBox_Checked(int value)
+        {
+            MessageBox.Show($"{Netzwerke[value].Item1} mask {Netzwerke[value].Item2} {Netzwerke[value].Item3} if {Netzwerke[value].Item4}");
+            Current_Network = value;
+
+        }
+        private void CreateRows(string value, int row, int column)
+        {
+            int x = row;
+            int y = column;
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = $"{value}";
+            textBlock.FontSize = 12;
+            textBlock.TextWrapping = TextWrapping.Wrap;
+            textBlock.Width = 100;
+            textBlock.FontFamily = new System.Windows.Media.FontFamily("Consolas");
+            textBlock.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
+            textBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+
+            Grid.SetRow(textBlock, x);
+            Grid.SetColumn(textBlock, y);
+            GridContainer.Children.Add(textBlock);
+        }
+
 
         private void Route_1_Delete_Click(object sender, RoutedEventArgs e)
         {
-            deleteRoute(1,Route_1.Text);
+            deleteRoute(1, Route_1.Text);
         }
         private void Route_2_Delete_Click(object sender, RoutedEventArgs e)
         {
-            deleteRoute(2,Route_2.Text);
+            deleteRoute(2, Route_2.Text);
         }
         private void Route_3_Delete_Click(object sender, RoutedEventArgs e)
         {
-            deleteRoute(3,Route_3.Text);
+            deleteRoute(3, Route_3.Text);
         }
         private void Route_4_Delete_Click(object sender, RoutedEventArgs e)
         {
-            deleteRoute(4,Route_4.Text);
+            deleteRoute(4, Route_4.Text);
         }
         private void deleteRoute(int index, string boxnr)
         {
@@ -264,6 +357,7 @@ namespace Network_Window
                 Process route_delete_box1 = new Process();
 
                 string command_route_delete_box1 = ($"route delete {Added_Routes[index].Item1} mask {Added_Routes[index].Item2} {Added_Routes[index].Item3} if {Added_Routes[index].Item4}");
+
 
                 //Set up the process start info
                 ProcessStartInfo startInfo_route_delete_box_1 = new ProcessStartInfo
@@ -314,166 +408,142 @@ namespace Network_Window
                             break;
                     }
                     counter = index;
-                    
-
                 }
             }
         }
 
-        
+
         private void Routen_Button(object sender, RoutedEventArgs e)
         {
             Process process = new Process();
 
-            // Specify the PowerShell command to execute
             string command = "route print -4;pause";
 
-            // Set up the process start info
             ProcessStartInfo startInfo_routen_button = new ProcessStartInfo
             {
-                FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"[Console]::SetWindowSize(100, 30);{command}\"", // Pass the command as argument
+                FileName = "powershell.exe",
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"[Console]::SetWindowSize(100, 30);{command}\"",
                 RedirectStandardOutput = false,
                 UseShellExecute = true,
                 CreateNoWindow = true
             };
-
             process.StartInfo = startInfo_routen_button;
 
-            // Start the process
             process.Start();
         }
 
         private void Löschen_Button_Click(object sender, RoutedEventArgs e)
         {
-            Process process = new Process();
 
-            // Specify the PowerShell command to execute
             string command_only_IP = $"route delete {impIP}";
             string command_no_index = $"route delete {impIP} mask {impMask} {impGateway}";
             string command_with_index = $"route delete {impIP} mask {impMask} {impGateway} if {impIndex}";
 
-            
             //Wenn kein index angegeben wurde
             if (string.IsNullOrEmpty(impIndex))
             {
-                ProcessStartInfo startInfo_routen_delete_no_index = new ProcessStartInfo
-                {
-                    FileName = "powershell.exe",  // Specify PowerShell executable
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_no_index}\"", // Pass the command as argument
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    StandardOutputEncoding = Encoding.UTF8,
-                    StandardErrorEncoding = Encoding.UTF8
-                };
-
-                process.StartInfo = startInfo_routen_delete_no_index;
-
-                // Start the process
-                process.Start();
-
-                process.WaitForExit();
-
-                string error_route_delete_no_index = process.StandardError.ReadToEnd();
-                string output_route_delete_no_index = process.StandardOutput.ReadToEnd();
-
-                process.WaitForExit();
-
-                if (!string.IsNullOrWhiteSpace(error_route_delete_no_index))
-                {
-                    output.Text = error_route_delete_no_index;
-                }
-                else
-                {
-                    output.Text = output_route_delete_no_index;
-                }
-
+                output.Text = ShellCommand(command_no_index);
             }
             //Wenn keine Maske angegeben wurde
             else if (string.IsNullOrEmpty(impMask))
             {
-                ProcessStartInfo routen_delete_only_IP = new ProcessStartInfo
-                {
-                    FileName = "powershell.exe",
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_only_IP}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    StandardOutputEncoding = Encoding.UTF8,
-                    StandardErrorEncoding = Encoding.UTF8
-                };
-
-                process.StartInfo = routen_delete_only_IP;
-
-                // Start the process
-                process.Start();
-
-                process.WaitForExit();
-
-                string error_route_delete_only_IP = process.StandardError.ReadToEnd();
-                string output_route_delete_only_IP = process.StandardOutput.ReadToEnd();
-
-                process.WaitForExit();
-
-                if (!string.IsNullOrWhiteSpace(error_route_delete_only_IP))
-                {
-                    output.Text = error_route_delete_only_IP;
-                }
-                else
-                {
-                    output.Text = output_route_delete_only_IP;
-                }
+                output.Text = ShellCommand(command_only_IP);
             }
             else
             {
-                ProcessStartInfo startInfo_routen_delete_index = new ProcessStartInfo
-                {
-                    FileName = "powershell.exe",
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_with_index}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                process.StartInfo = startInfo_routen_delete_index;
-
-                // Start the process
-                process.Start();
-
-                process.WaitForExit();
-
-                string error_route_delete_index = process.StandardError.ReadToEnd();
-                string output_route_delete_index = process.StandardOutput.ReadToEnd();
-
-                process.WaitForExit();
-
-                if (!string.IsNullOrWhiteSpace(error_route_delete_index))
-                {
-                    output.Text = $"Error: {error_route_delete_index}";
-                }
-                else
-                {
-                    output.Text = output_route_delete_index;
-                }
+                output.Text = ShellCommand(command_with_index);
             }
         }
 
-        //Diese methode ist für die Routen Löschen, sie löscht alle einträge in den Routen vereichnis und setzt alle meine Routeboxes auf leer.
+        //Diese methode ist f r die Routen L schen, sie l scht alle eintr ge in den Routen vereichnis und setzt alle meine Routeboxes auf leer.
         private void Alle_Routen_Löschen(object sender, RoutedEventArgs e)
+        {
+            ShellCommand("route -f");
+            Route_1.Text = "";
+            Route_2.Text = "";
+            Route_3.Text = "";
+            Route_4.Text = "";
+            counter = 1;
+        }
+
+        private string ShellCommand(string command)
+        {
+            Process process = new Process();
+
+            ProcessStartInfo argument = new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                StandardOutputEncoding = Encoding.UTF8,
+                StandardErrorEncoding = Encoding.UTF8
+            };
+
+            process.StartInfo = argument;
+
+            process.Start();
+
+            process.WaitForExit();
+
+            string error = process.StandardError.ReadToEnd();
+            string response = process.StandardOutput.ReadToEnd();
+
+            if (!string.IsNullOrWhiteSpace(error))
+            {
+                string output = error;
+
+                return output;
+            }
+            else
+            {
+                string output = response;
+                return output;
+            }
+        }
+
+        private void Maschinen_netz_box_Click(object sender, RoutedEventArgs e)
+        {
+            Maschinennetz = !Maschinennetz;
+            if (Maschinennetz)
+            {
+                Internet_box.IsEnabled = false;
+                Internet = false;
+            }
+            else
+            {
+                Internet_box.IsEnabled = true;
+            }
+        }
+
+        private void Internet_box_Click(object sender, RoutedEventArgs e)
+        {
+            Internet = !Internet;
+            if (Internet)
+            {
+                Maschinen_netz_box.IsEnabled = false;
+                Maschinennetz = false;
+                Route_Add_Automatically(Current_Network);
+            }
+            else
+            {
+                Maschinen_netz_box.IsEnabled = true;
+            }
+        }
+
+        private void Route_Add_Automatically(int value)
         {
             Process route_delete = new Process();
 
-            string command_route_delete = ("route -f");
+            string command_route_delete = ("route delete 0.0.0.0 mask 0.0.0.0 " + Netzwerke[value].Item3);
 
             // Set up the process start info
             ProcessStartInfo startInfo_route_delete = new ProcessStartInfo
             {
-                FileName = "powershell.exe",
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete}\"",
+                FileName = "powershell.exe",  // Specify PowerShell executable
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete};route delete {Netzwerke[value].Item1} mask {Netzwerke[value].Item2} {Netzwerke[value].Item3}\"", // Pass the command as argument
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -485,10 +555,79 @@ namespace Network_Window
             // Start the process
             route_delete.Start();
 
-            Route_1.Text = "";
-            Route_2.Text = "";
-            Route_3.Text = "";
-            Route_4.Text = "";
+            route_delete.WaitForExit();
+
+            string output_route_delete = route_delete.StandardOutput.ReadToEnd();
+            string error_route_delete = route_delete.StandardError.ReadToEnd();
+
+            route_delete.WaitForExit();
+
+
+            if (!string.IsNullOrWhiteSpace(error_route_delete))
+            {
+                output.Text = $"Error: {error_route_delete}";
+            }
+            else
+            {
+                output.Text = output_route_delete;
+            }
+
+            Process route_add = new Process();
+
+            string command_route_add = ("route add " + Netzwerke[value].Item1 + " mask " + Netzwerke[value].Item2 + " " + Netzwerke[value].Item3 + " if " + Netzwerke[value].Item4);
+
+            // Set up the process start info
+            ProcessStartInfo startInfo_route_add = new ProcessStartInfo
+            {
+                FileName = "powershell.exe",  // Specify PowerShell executable
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_add}\"", // Pass the command as argument
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            route_add.StartInfo = startInfo_route_add;
+
+            // Start the process
+            route_add.Start();
+
+            route_add.WaitForExit();
+
+            string output_route_add = route_add.StandardOutput.ReadToEnd();
+            string error_route_add = route_add.StandardError.ReadToEnd();
+
+            route_add.WaitForExit();
+
+
+            if (!string.IsNullOrWhiteSpace(error_route_add))
+            {
+                output.Text = $"Error: {error_route_add}";
+            }
+            else
+            {
+                Added_Routes[counter] = Tuple.Create(Netzwerke[value].Item1, Netzwerke[value].Item2, Netzwerke[value].Item3, Netzwerke[value].Item4);
+                output.Text = output_route_add;
+
+                string text = $"IP Adresse: {Added_Routes[counter].Item1}\nSubnetMaske: {Added_Routes[counter].Item2}\nGateway: {Added_Routes[counter].Item3}\nSchnittstellenindex: {Added_Routes[counter].Item4}\n";
+
+                switch (counter)
+                {
+                    case 1:
+                        Route_1.Text = text;
+                        break;
+                    case 2:
+                        Route_2.Text = text;
+                        break;
+                    case 3:
+                        Route_3.Text = text;
+                        break;
+                    case 4:
+                        Route_4.Text = text;
+                        break;
+                }
+                counter++;
+            }
         }
     }
 }

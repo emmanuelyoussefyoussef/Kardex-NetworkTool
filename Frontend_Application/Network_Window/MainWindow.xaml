@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Network_Window"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1200">
+        Title="MainWindow" Height="800" Width="1200">
     <Grid Background="#FF06373D">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240"/>
@@ -98,7 +98,8 @@
         </Grid>
         <Grid Grid.Row="1" Grid.Column="1" >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="317.067"/>
+                <ColumnDefinition Width="642.933"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -107,15 +108,61 @@
             </Grid.RowDefinitions>
 
             <!--Das ist der textblock für mein output-->
+            <!--<TextBlock Name="Tabelle" Grid.Row="0" Text="" FontSize="14" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" HorizontalAlignment="Center"/>-->
+            <TextBlock Name="output" Text="" FontSize="20" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" HorizontalAlignment="Left" Margin="0,280,0,0" Grid.RowSpan="2"/>
 
-            <TextBlock Name="output" Grid.Row="1" Text="" FontSize="20" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" HorizontalAlignment="Left"/>
-
+            <Grid x:Name="GridContainer" Grid.Row="0" Width="auto" Grid.ColumnSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+            </Grid>
             <!--Das ist der textblock für meine warnung-->
-            <TextBlock Name="Warnungstext" Grid.Row="2"  FontSize="20" FontWeight="Bold" Width="960"
+            <TextBlock Name="Warnungstext" Grid.Row="1"  FontSize="20" FontWeight="Bold" Width="960"
                        TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8"
-                       Text="Beim Starten bitte, die Schaltfläche 'Routen löschen' betätigen, um sicherzustellen, dass keine vorherigen Einstellungen oder Routen bereits vorhanden sind. Für die Verbindung mit Ihrem WLAN(mit dem Internet) verwenden Sie bitte die IP-Adresse 0.0.0.0 und die Subnetzmaske 0.0.0.0."/>
+                       Text="Beim Starten bitte, die Schaltfläche 'Routen löschen' betätigen, um sicherzustellen, dass keine vorherigen Einstellungen oder Routen bereits vorhanden sind. Für die Verbindung mit Ihrem WLAN(mit dem Internet) verwenden Sie bitte die IP-Adresse 0.0.0.0 und die Subnetzmaske 0.0.0.0." Grid.ColumnSpan="2" Margin="0,280,0,0" Grid.RowSpan="2"/>
 
-            <TextBlock Name="Netzwerk_Tabelle" Grid.Row="0" Text="" FontSize="15" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" Grid.ColumnSpan="2" HorizontalAlignment="Left"/>
+            <!--<RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>-->
+            <!--<TextBlock Name="Netzwerk1" Grid.Row="0" Text="" FontSize="14"  TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" Grid.ColumnSpan="2" HorizontalAlignment="Left"/>-->
+
+            <!--<Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Name="Netzwerk1" Grid.Row="0" Grid.Column="0" Text="" FontSize="14"  TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" HorizontalAlignment="Left"/>
+            </Grid>-->
+
 
         </Grid>
         <Image Grid.Row="1" 
@@ -143,6 +190,8 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
+
+
 
             <!--Das ist für die IP Adresse-->
             <TextBox Name="IP_Adresse_Block" 
@@ -243,6 +292,15 @@
             </Button>
 
 
+
+        </Grid>
+        <Grid Grid.Row="2" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <CheckBox Name="Maschinen_netz_box" Grid.Column="0" Content="Maschinen Netz" Foreground="#FFB9B9A8" FontFamily="consolas" FontWeight="Bold" VerticalAlignment="Center" Click="Maschinen_netz_box_Click"/>
+            <CheckBox Name="Internet_box" Grid.Column="1" Content="Internet" Foreground="#FFB9B9A8" FontFamily="consolas" FontWeight="Bold" VerticalAlignment="Center" Click="Internet_box_Click"/>
         </Grid>
 
 
