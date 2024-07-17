@@ -18,7 +18,7 @@ namespace Network_Window
 
             ProcessStartInfo processStart = new ProcessStartInfo
             {
-                FileName = "powershell.exe",  // Specify PowerShell executable
+                FileName = "powershell.exe",
                 Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -28,13 +28,13 @@ namespace Network_Window
 
             process.StartInfo = processStart;
 
-            // Start the process
+
             process.Start();
 
             process.WaitForExit();
 
-            string output_route_delete = process.StandardOutput.ReadToEnd();
-            string error_route_delete = process.StandardError.ReadToEnd();
+            setOutput(process.StandardOutput.ReadToEnd());
+            setError(process.StandardError.ReadToEnd());
 
             process.WaitForExit();
 

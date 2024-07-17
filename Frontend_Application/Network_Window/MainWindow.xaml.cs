@@ -27,11 +27,12 @@ namespace Network_Window
 {
     public partial class MainWindow : Window
     {
-        private terminalCommand terminalCommand;
-        private string impIP;
-        private string impMask;
-        private string impGateway;
-        private string impIndex;
+        private terminalCommand terminalCommand = new terminalCommand();
+        
+        //private string impIP;
+        //private string impMask;
+        //private string impGateway;
+        //private string impIndex;
         private string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
         
         
@@ -44,15 +45,16 @@ namespace Network_Window
             };
         Dictionary<int, Tuple<string, string, string, string>> Netzwerke = new Dictionary<int, Tuple<string, string, string, string>>();
 
-        int counter = 1;
+        public int counter = 1;
         public string[] interfaces;
         Boolean Maschinennetz = false;
         Boolean Internet = false;
         int Current_Network = 0;
-
+        regularExpressions regularExpressions = new regularExpressions();
         public MainWindow()
         {
             InitializeComponent();
+            regularExpressions regex = new regularExpressions(this);
             Netzwerk_Button(null, null);
         }
 
@@ -65,116 +67,44 @@ namespace Network_Window
 
         private void Eingabe_Button_Click(object sender, RoutedEventArgs e)
         {
-            impIP = IP_Adresse_Block.Text;
-            impMask = Mask_Block.Text;
-            impGateway = Gate_Block.Text;
-            impIndex = Index_Block.Text;
+            regularExpressions.setImpIP(IP_Adresse_Block.Text);
+            regularExpressions.setImpMask(Mask_Block.Text);
+            regularExpressions.setImpGateway(Gate_Block.Text);
+            regularExpressions.setImpIndex(Index_Block.Text);
+
+            regularExpressions.patternValiduation();
+            
+            output.Text = regularExpressions.getOutput();
 
 
-
-            if (!Regex.IsMatch(impIP, pattern))
-            {
-                output.Text = "IP Adresse ist ungültig";
-            }
-            else if (!Regex.IsMatch(impMask, pattern))
-            {
-                output.Text = "Subnetzmaske ist ungültig";
-            }
-            else if (!Regex.IsMatch(impGateway, pattern))
-            {
-                output.Text = "Gateway ist ungültig";
-            }
-            else if (counter == 5)
-            {
-                output.Text = "Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.";
-            }
-            else
+            if (regularExpressions.getIsValid())
             {
                 IP_Adresse_Block.Clear();
                 Mask_Block.Clear();
                 Gate_Block.Clear();
                 Index_Block.Clear();
 
+                terminalCommand.setCommand("route delete 0.0.0.0 mask 0.0.0.0 " + regularExpressions.getImpGateway());
 
-
-                new terminalCommand();
-
-                terminalCommand.commandShell($"route print -4");
-
-                Process route_delete = new Process();
-
-                string command_route_delete = ("route delete 0.0.0.0 mask 0.0.0.0 " + impGateway);
-
-                // Set up the process start info
-                ProcessStartInfo startInfo_route_delete = new ProcessStartInfo
+                if (!string.IsNullOrWhiteSpace(terminalCommand.getError()))
                 {
-                    FileName = "powershell.exe",  // Specify PowerShell executable
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete};route delete {impIP} mask {impMask} {impGateway}\"", // Pass the command as argument
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                route_delete.StartInfo = startInfo_route_delete;
-
-                // Start the process
-                route_delete.Start();
-
-                route_delete.WaitForExit();
-
-                string output_route_delete = route_delete.StandardOutput.ReadToEnd();
-                string error_route_delete = route_delete.StandardError.ReadToEnd();
-
-                route_delete.WaitForExit();
+                    output.Text = $"Error: {terminalCommand.getError()}";
+                }
+                else output.Text = terminalCommand.getOutput();
 
 
-                if (!string.IsNullOrWhiteSpace(error_route_delete))
+
+                terminalCommand.setCommand("route add " + regularExpressions.getImpIP() + " mask " + regularExpressions.getImpMask() + " " + regularExpressions.getImpGateway() + " if " + regularExpressions.getImpIndex());
+
+
+                if (!string.IsNullOrWhiteSpace(terminalCommand.getError()))
                 {
-                    output.Text = $"Error: {error_route_delete}";
+                    output.Text = $"Error: {terminalCommand.getError()}";
                 }
                 else
                 {
-                    output.Text = output_route_delete;
-                }
-
-
-                Process route_add = new Process();
-
-                string command_route_add = ("route add " + impIP + " mask " + impMask + " " + impGateway + " if " + impIndex);
-
-                // Set up the process start info
-                ProcessStartInfo startInfo_route_add = new ProcessStartInfo
-                {
-                    FileName = "powershell.exe",  // Specify PowerShell executable
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_add}\"", // Pass the command as argument
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                route_add.StartInfo = startInfo_route_add;
-
-                // Start the process
-                route_add.Start();
-
-                route_add.WaitForExit();
-
-                string output_route_add = route_add.StandardOutput.ReadToEnd();
-                string error_route_add = route_add.StandardError.ReadToEnd();
-
-                route_add.WaitForExit();
-
-
-                if (!string.IsNullOrWhiteSpace(error_route_add))
-                {
-                    output.Text = $"Error: {error_route_add}";
-                }
-                else
-                {
-                    Added_Routes[counter] = Tuple.Create(impIP, impMask, impGateway, impIndex);
-                    output.Text = output_route_add;
+                    Added_Routes[counter] = Tuple.Create(regularExpressions.getImpIP(), regularExpressions.getImpMask(), regularExpressions.getImpGateway(), regularExpressions.getImpIndex());
+                    output.Text = terminalCommand.getOutput();
 
                     string text = $"IP Adresse: {Added_Routes[counter].Item1}\nSubnetMaske: {Added_Routes[counter].Item2}\nGateway: {Added_Routes[counter].Item3}\nSchnittstellenindex: {Added_Routes[counter].Item4}\n";
 
@@ -195,7 +125,8 @@ namespace Network_Window
                     }
                     counter++;
                 }
-            }
+            }else output.Text = regularExpressions.getOutput();
+            
         }
         private void Netzwerk_Button(object sender, RoutedEventArgs e)
         {
@@ -440,17 +371,17 @@ namespace Network_Window
         private void Löschen_Button_Click(object sender, RoutedEventArgs e)
         {
 
-            string command_only_IP = $"route delete {impIP}";
-            string command_no_index = $"route delete {impIP} mask {impMask} {impGateway}";
-            string command_with_index = $"route delete {impIP} mask {impMask} {impGateway} if {impIndex}";
+            string command_only_IP = $"route delete {regularExpressions.getImpIP()}";
+            string command_no_index = $"route delete {regularExpressions.getImpIP()} mask {regularExpressions.getImpMask()} {regularExpressions.getImpGateway()}";
+            string command_with_index = $"route delete {regularExpressions.getImpIP()} mask {regularExpressions.getImpMask()} {regularExpressions.getImpGateway()} if {regularExpressions.getImpIndex()}";
 
             //Wenn kein index angegeben wurde
-            if (string.IsNullOrEmpty(impIndex))
+            if (string.IsNullOrEmpty(regularExpressions.getImpIndex()))
             {
                 output.Text = ShellCommand(command_no_index);
             }
             //Wenn keine Maske angegeben wurde
-            else if (string.IsNullOrEmpty(impMask))
+            else if (string.IsNullOrEmpty(regularExpressions.getImpMask()))
             {
                 output.Text = ShellCommand(command_only_IP);
             }
