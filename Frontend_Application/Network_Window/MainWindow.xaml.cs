@@ -27,11 +27,14 @@ namespace Network_Window
 {
     public partial class MainWindow : Window
     {
+        private terminalCommand terminalCommand;
         private string impIP;
         private string impMask;
         private string impGateway;
         private string impIndex;
         private string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+        
+        
         Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
             {
             { 1, Tuple.Create("", "", "", "") },
@@ -39,8 +42,6 @@ namespace Network_Window
             { 3, Tuple.Create("", "", "", "") },
             { 4, Tuple.Create("", "", "", "") }
             };
-
-
         Dictionary<int, Tuple<string, string, string, string>> Netzwerke = new Dictionary<int, Tuple<string, string, string, string>>();
 
         int counter = 1;
@@ -73,19 +74,19 @@ namespace Network_Window
 
             if (!Regex.IsMatch(impIP, pattern))
             {
-                output.Text = "IP Adresse ist ung ltig";
+                output.Text = "IP Adresse ist ungültig";
             }
             else if (!Regex.IsMatch(impMask, pattern))
             {
-                output.Text = "Subnetzmaske ist ung ltig";
+                output.Text = "Subnetzmaske ist ungültig";
             }
             else if (!Regex.IsMatch(impGateway, pattern))
             {
-                output.Text = "Gateway ist ung ltig";
+                output.Text = "Gateway ist ungültig";
             }
             else if (counter == 5)
             {
-                output.Text = "Maximale Anzahl an Routen erreicht, bitte l schen sie Routen.";
+                output.Text = "Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.";
             }
             else
             {
@@ -96,6 +97,9 @@ namespace Network_Window
 
 
 
+                new terminalCommand();
+
+                terminalCommand.commandShell($"route print -4");
 
                 Process route_delete = new Process();
 

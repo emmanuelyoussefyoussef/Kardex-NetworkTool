@@ -108,10 +108,9 @@
             </Grid.RowDefinitions>
 
             <!--Das ist der textblock für mein output-->
-            <!--<TextBlock Name="Tabelle" Grid.Row="0" Text="" FontSize="14" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" HorizontalAlignment="Center"/>-->
             <TextBlock Name="output" Text="" FontSize="20" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" HorizontalAlignment="Left" Margin="0,280,0,0" Grid.RowSpan="2"/>
 
-            <Grid x:Name="GridContainer" Grid.Row="0" Width="auto" Grid.ColumnSpan="2">
+            <Grid x:Name="GridContainer" Grid.Row="0" Width="960" Grid.ColumnSpan="2" HorizontalAlignment="Left">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -133,36 +132,12 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
             </Grid>
+
+
             <!--Das ist der textblock für meine warnung-->
-            <TextBlock Name="Warnungstext" Grid.Row="1"  FontSize="20" FontWeight="Bold" Width="960"
+            <TextBlock Name="Warnungstext" Grid.Row="2"  FontSize="20" FontWeight="Bold" Width="auto" 
                        TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8"
-                       Text="Beim Starten bitte, die Schaltfläche 'Routen löschen' betätigen, um sicherzustellen, dass keine vorherigen Einstellungen oder Routen bereits vorhanden sind. Für die Verbindung mit Ihrem WLAN(mit dem Internet) verwenden Sie bitte die IP-Adresse 0.0.0.0 und die Subnetzmaske 0.0.0.0." Grid.ColumnSpan="2" Margin="0,280,0,0" Grid.RowSpan="2"/>
-
-            <!--<RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>-->
-            <!--<TextBlock Name="Netzwerk1" Grid.Row="0" Text="" FontSize="14"  TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" Grid.ColumnSpan="2" HorizontalAlignment="Left"/>-->
-
-            <!--<Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <TextBlock Name="Netzwerk1" Grid.Row="0" Grid.Column="0" Text="" FontSize="14"  TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" HorizontalAlignment="Left"/>
-            </Grid>-->
-
+                       Text="Beim Starten bitte, die Schaltfläche 'Routen löschen' betätigen, um sicherzustellen, dass keine vorherigen Einstellungen oder Routen bereits vorhanden sind. Für die Verbindung mit Ihrem WLAN(mit dem Internet) verwenden Sie bitte die IP-Adresse 0.0.0.0 und die Subnetzmaske 0.0.0.0." Grid.ColumnSpan="2" VerticalAlignment="Top"/>
 
         </Grid>
         <Image Grid.Row="1" 
@@ -173,9 +148,7 @@
            VerticalAlignment="Center"
            HorizontalAlignment="Right" 
            Height="98" 
-           Width="106" 
-           
-           />
+           Width="106"/>
 
 
         <Grid Grid.Row="2">
@@ -230,6 +203,8 @@
                        Grid.Row="1" Padding="0" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Stretch"
                        Background="Transparent" 
                        FontFamily="Consolas" Text="Maske" Foreground="#FFB9B9A8"/>
+
+
             <!--Das ist für die Gateway-->
             <TextBox Name="Gate_Block" 
                      Grid.Row="2" Grid.Column="1" 
@@ -246,6 +221,7 @@
                        Grid.Row="2" Padding="0" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Stretch"
                        Background="Transparent" 
                        FontFamily="Consolas" Text="Gate" Foreground="#FFB9B9A8"/>
+
 
             <!--Das ist für den Index-->
             <TextBox Name="Index_Block" 
