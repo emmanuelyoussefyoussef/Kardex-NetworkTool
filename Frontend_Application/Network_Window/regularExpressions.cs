@@ -8,92 +8,56 @@ using Network_Window;
 
 namespace Network_Window
 {
-    public class regularExpressions
-    {
-        private readonly string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
-        private String impIP;
-        private String impMask;
-        private String impGateway;
-        private String impIndex;
-        private Boolean isValid = false;
-        private String output;
+    //public class RegularExpressions
+    //{
+    //    private readonly string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
 
-        private MainWindow mainWindow;
+    //    public string ImpIp { get; set; }
+    //    public string ImpMask { get; set; }
+    //    public string ImpGateway { get; set;}
+    //    public string ImpIndex { get; set;}
+    //    private Boolean IsValid = false;
+    //    public string Output { get; set; }
+    //    private MainWindow mainWindow;
 
-        public regularExpressions(MainWindow mainWindow)
-        {
-            this.mainWindow = mainWindow;
-        }
-        public regularExpressions() { }
-        public void patternValiduation() {
-            if (!Regex.IsMatch(getImpIP(), pattern))
-            {
-                setOutput("IP Adresse ist ungültig");
-            }
-            else if (!Regex.IsMatch(getImpMask(), pattern))
-            {
-                setOutput("Subnetzmaske ist ungültig");
-            }
-            else if (!Regex.IsMatch(getImpGateway(), pattern))
-            {
-                setOutput("Gateway ist ungültig");
-            }
-            else if (mainWindow.counter == 5)
-            {
-                setOutput("Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.");
-            }
-            else setIsValid(true);
-        }
+    //    //private MainWindow mainWindow;
 
+    //    //public RegularExpressions(MainWindow mainWindow)
+    //    //{
+    //    //    this.mainWindow = mainWindow;
+    //    //}
+    //    public RegularExpressions(MainWindow mainWindow) {
+    //        this.mainWindow = mainWindow;
+    //    }
 
-        public void setImpIP(String impIP)
-        {
-            this.impIP = impIP;
-        }
-        public String getImpIP()
-        {
-            return impIP;
-        }
-        public void setImpMask(String impMask)
-        {
-            this.impMask = impMask;
-        }
-        public String getImpMask()
-        {
-            return impMask;
-        }
-        public void setImpGateway(String impGateway)
-        {
-            this.impGateway = impGateway;
-        }
-        public String getImpGateway()
-        {
-            return impGateway;
-        }
-        public void setImpIndex(String impIndex)
-        {
-            this.impIndex = impIndex;
-        }
-        public String getImpIndex()
-        {
-            return impIndex;
-        }
-        public void setIsValid(Boolean isValid)
-        {
-            this.isValid = isValid;
-        }
-        public Boolean getIsValid()
-        {
-            return isValid;
-        }
-        public void setOutput(String output)
-        {
-            this.output = output;
-        }
-        public String getOutput()
-        {
-            return output;
-        }
+    //    public void patternValiduation() {
+    //        if (!Regex.IsMatch(ImpIp, pattern))
+    //        {
+    //            Output="IP Adresse ist ungültig";
+    //        }
+    //        else if (!Regex.IsMatch(ImpMask, pattern))
+    //        {
+    //            Output = "Subnetzmaske ist ungültig";
+    //        }
+    //        else if (!Regex.IsMatch(ImpGateway, pattern))
+    //        {
+    //            Output = "Gateway ist ungültig";
+    //        }
+    //        else if (mainWindow.counter == 5)
+    //        {
+    //            Output = "Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.";
+    //        }
+    //        else setIsValid(true);
+    //    }
+    //    public void setIsValid(Boolean isValid)
+    //    {
+    //        this.isValid = isValid;
+    //    }
+    //    public Boolean getIsValid()
+    //    {
+    //        return isValid;
+    //    }
+
         
-    }
+    //}
 }

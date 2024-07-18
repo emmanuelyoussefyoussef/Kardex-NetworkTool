@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Network_Window
 {
-    public class terminalCommand
+    public class TerminalCommand
     {
         private String command;
         private String output;

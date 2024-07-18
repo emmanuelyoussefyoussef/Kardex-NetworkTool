@@ -27,15 +27,17 @@ namespace Network_Window
 {
     public partial class MainWindow : Window
     {
-        private terminalCommand terminalCommand = new terminalCommand();
-        
-        //private string impIP;
-        //private string impMask;
-        //private string impGateway;
-        //private string impIndex;
-        private string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+        public string ImpIp { get; set; }
+        public string ImpMask { get; set; }
+        public string ImpGateway { get; set; }
+        public string ImpIndex { get; set; }
         
         
+        private TerminalCommand terminalCommand = new TerminalCommand();
+
+        public string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+
+
         Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
             {
             { 1, Tuple.Create("", "", "", "") },
@@ -46,15 +48,19 @@ namespace Network_Window
         Dictionary<int, Tuple<string, string, string, string>> Netzwerke = new Dictionary<int, Tuple<string, string, string, string>>();
 
         public int counter = 1;
+
         public string[] interfaces;
+
         Boolean Maschinennetz = false;
+
         Boolean Internet = false;
+
         int Current_Network = 0;
-        regularExpressions regularExpressions = new regularExpressions();
+
+
         public MainWindow()
         {
             InitializeComponent();
-            regularExpressions regex = new regularExpressions(this);
             Netzwerk_Button(null, null);
         }
 
@@ -65,26 +71,40 @@ namespace Network_Window
             objInfo_Fenster.Show();
         }
 
-        private void Eingabe_Button_Click(object sender, RoutedEventArgs e)
+        private void Hinzufügen_Button_Click(object sender, RoutedEventArgs e)
         {
-            regularExpressions.setImpIP(IP_Adresse_Block.Text);
-            regularExpressions.setImpMask(Mask_Block.Text);
-            regularExpressions.setImpGateway(Gate_Block.Text);
-            regularExpressions.setImpIndex(Index_Block.Text);
-
-            regularExpressions.patternValiduation();
-            
-            output.Text = regularExpressions.getOutput();
+            ImpIp = IP_Adresse_Block.Text;
+            ImpMask = Mask_Block.Text;
+            ImpGateway = Gate_Block.Text;
+            ImpIndex = Index_Block.Text;
 
 
-            if (regularExpressions.getIsValid())
+
+
+            if (!Regex.IsMatch(ImpIp, pattern))
+            {
+                output.Text = "IP Adresse ist ungültig";
+            }
+            else if (!Regex.IsMatch(ImpMask, pattern))
+            {
+                output.Text = "Subnetzmaske ist ungültig";
+            }
+            else if (!Regex.IsMatch(ImpGateway, pattern))
+            {
+                output.Text = "Gateway ist ungültig";
+            }
+            else if (counter == 5)
+            {
+                output.Text = "Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.";
+            }
+            else 
             {
                 IP_Adresse_Block.Clear();
                 Mask_Block.Clear();
                 Gate_Block.Clear();
                 Index_Block.Clear();
 
-                terminalCommand.setCommand("route delete 0.0.0.0 mask 0.0.0.0 " + regularExpressions.getImpGateway());
+                terminalCommand.setCommand("route delete 0.0.0.0 mask 0.0.0.0 " + ImpGateway);
 
                 if (!string.IsNullOrWhiteSpace(terminalCommand.getError()))
                 {
@@ -94,7 +114,7 @@ namespace Network_Window
 
 
 
-                terminalCommand.setCommand("route add " + regularExpressions.getImpIP() + " mask " + regularExpressions.getImpMask() + " " + regularExpressions.getImpGateway() + " if " + regularExpressions.getImpIndex());
+                terminalCommand.setCommand("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway + " if " + ImpIndex);
 
 
                 if (!string.IsNullOrWhiteSpace(terminalCommand.getError()))
@@ -103,7 +123,7 @@ namespace Network_Window
                 }
                 else
                 {
-                    Added_Routes[counter] = Tuple.Create(regularExpressions.getImpIP(), regularExpressions.getImpMask(), regularExpressions.getImpGateway(), regularExpressions.getImpIndex());
+                    Added_Routes[counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
                     output.Text = terminalCommand.getOutput();
 
                     string text = $"IP Adresse: {Added_Routes[counter].Item1}\nSubnetMaske: {Added_Routes[counter].Item2}\nGateway: {Added_Routes[counter].Item3}\nSchnittstellenindex: {Added_Routes[counter].Item4}\n";
@@ -125,7 +145,7 @@ namespace Network_Window
                     }
                     counter++;
                 }
-            }else output.Text = regularExpressions.getOutput();
+            }
             
         }
         private void Netzwerk_Button(object sender, RoutedEventArgs e)
@@ -371,17 +391,17 @@ namespace Network_Window
         private void Löschen_Button_Click(object sender, RoutedEventArgs e)
         {
 
-            string command_only_IP = $"route delete {regularExpressions.getImpIP()}";
-            string command_no_index = $"route delete {regularExpressions.getImpIP()} mask {regularExpressions.getImpMask()} {regularExpressions.getImpGateway()}";
-            string command_with_index = $"route delete {regularExpressions.getImpIP()} mask {regularExpressions.getImpMask()} {regularExpressions.getImpGateway()} if {regularExpressions.getImpIndex()}";
+            string command_only_IP = $"route delete {ImpIp}";
+            string command_no_index = $"route delete {ImpIp} mask {ImpMask} {ImpGateway}";
+            string command_with_index = $"route delete {ImpIp} mask {ImpMask} {ImpGateway} if {ImpIndex}";
 
             //Wenn kein index angegeben wurde
-            if (string.IsNullOrEmpty(regularExpressions.getImpIndex()))
+            if (string.IsNullOrEmpty(ImpIndex))
             {
                 output.Text = ShellCommand(command_no_index);
             }
             //Wenn keine Maske angegeben wurde
-            else if (string.IsNullOrEmpty(regularExpressions.getImpMask()))
+            else if (string.IsNullOrEmpty(ImpMask))
             {
                 output.Text = ShellCommand(command_only_IP);
             }

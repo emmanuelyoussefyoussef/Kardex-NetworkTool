@@ -245,7 +245,7 @@
                     HorizontalAlignment="Left" Margin="158,0,0,0"  VerticalAlignment="Center" Height="25" Width="48" 
                     FontSize="8"
                     Content="Hinzufügen"
-                    Click="Eingabe_Button_Click" FontFamily="Consolas" Background="#FFD0AD00" BorderBrush="#FF317953" FontWeight="Bold">
+                    Click="Hinzufügen_Button_Click" FontFamily="Consolas" Background="#FFD0AD00" BorderBrush="#FF317953" FontWeight="Bold">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
