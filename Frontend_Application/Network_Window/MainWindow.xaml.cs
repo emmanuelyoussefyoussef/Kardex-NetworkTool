@@ -140,6 +140,10 @@ namespace Network_Window
         }//finished
         private void NetworkRefreshButton(object sender, RoutedEventArgs e)
         {
+            GridContainer.Children.Clear();
+
+            terminalCommand.GenerateNetworks();
+
             int ColumnIndex = 0;
             int RowIndex = 0;
             string Index = "";
@@ -149,10 +153,6 @@ namespace Network_Window
             string ColumnValue = "";
             string[] CommandRawOutput = terminalCommand.Output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             List<string[]> CommandRawOutputAsRows = new List<string[]>();
-
-            GridContainer.Children.Clear();
-
-            terminalCommand.GenerateNetworks();
 
             foreach (string RowRunner in CommandRawOutput)
             {

@@ -53,9 +53,7 @@ namespace Network_Window
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
-
             process.StartInfo = processStart;
-
 
             process.Start();
 
@@ -65,7 +63,6 @@ namespace Network_Window
             Error = process.StandardError.ReadToEnd();
 
             process.WaitForExit();
-
         }
         public void GenerateNetworks()
         {
