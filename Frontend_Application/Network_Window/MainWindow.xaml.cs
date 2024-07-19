@@ -23,7 +23,6 @@ using System.Reflection;
 using System.Collections.ObjectModel;
 
 namespace Network_Window
-    //test
 {
     public partial class MainWindow : Window
     {
@@ -33,10 +32,7 @@ namespace Network_Window
         Boolean Maschinennetz = false;
         public string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
         public string[] interfaces;
-        public string ImpIp { get; set; }
-        public string ImpMask { get; set; }
-        public string ImpGateway { get; set; }
-        public string ImpIndex { get; set; }
+       
         Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
         Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
             {
@@ -48,20 +44,21 @@ namespace Network_Window
 
 
         private TerminalCommand terminalCommand = new TerminalCommand();
-
         public MainWindow()
         {
             InitializeComponent();
             NetworkRefreshButton(null, null);
         }
-        //finished
+        public string ImpIp { get; set; }
+        public string ImpMask { get; set; }
+        public string ImpGateway { get; set; }
+        public string ImpIndex { get; set; }
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             Info_Fenster objInfo_Fenster = new Info_Fenster();
             this.Visibility = Visibility.Visible;
             objInfo_Fenster.Show();
-        }
-        //finished
+        }//finished
         private void Hinzufügen_Button_Click(object sender, RoutedEventArgs e)
         {
             ImpIp = IP_Adresse_Block.Text;
@@ -137,9 +134,10 @@ namespace Network_Window
                     counter++;
                 }
             }
-            
-        }
-        //finished
+
+            //finished
+            //finished
+        }//finished
         private void NetworkRefreshButton(object sender, RoutedEventArgs e)
         {
             int ColumnIndex = 0;
@@ -194,7 +192,7 @@ namespace Network_Window
                 }
                 NetworkSpecification[Runner] = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
             }
-        }
+        }//finished
         private void CreateCheckBox(int runner,int rowIndex, int columnIndex) {
             
             CheckBox checkBox = new CheckBox();
@@ -214,13 +212,12 @@ namespace Network_Window
             Grid.SetColumn(checkBox, columnIndex + 1);
 
             GridContainer.Children.Add(checkBox);
-        }
+        }//finished
         private void CheckBox_Checked(int value)
         {
             MessageBox.Show($"{NetworkSpecification[value].Item1} mask {NetworkSpecification[value].Item2} {NetworkSpecification[value].Item3} if {NetworkSpecification[value].Item4}");
             CurrentNetworkRowNumber = value;
-
-        }
+        }//finished
         private void CreateRows(string value, int row, int column)
         {
             int Row = row;
@@ -238,8 +235,6 @@ namespace Network_Window
             Grid.SetColumn(textBlock, Column);
             GridContainer.Children.Add(textBlock);
         }
-
-
         private void Route_1_Delete_Click(object sender, RoutedEventArgs e)
         {
             deleteRoute(1, Route_1.Text);
@@ -322,8 +317,6 @@ namespace Network_Window
                 }
             }
         }
-
-
         private void Routen_Button(object sender, RoutedEventArgs e)
         {
             Process process = new Process();
@@ -342,7 +335,6 @@ namespace Network_Window
 
             process.Start();
         }
-
         private void Löschen_Button_Click(object sender, RoutedEventArgs e)
         {
 
@@ -365,8 +357,6 @@ namespace Network_Window
                 output.Text = ShellCommand(command_with_index);
             }
         }
-
-        //Diese methode ist f r die Routen L schen, sie l scht alle eintr ge in den Routen vereichnis und setzt alle meine Routeboxes auf leer.
         private void Alle_Routen_Löschen(object sender, RoutedEventArgs e)
         {
             ShellCommand("route -f");
@@ -376,7 +366,6 @@ namespace Network_Window
             Route_4.Text = "";
             counter = 1;
         }
-
         private string ShellCommand(string command)
         {
             Process process = new Process();
@@ -414,7 +403,6 @@ namespace Network_Window
                 return output;
             }
         }
-
         private void Maschinen_netz_box_Click(object sender, RoutedEventArgs e)
         {
             Maschinennetz = !Maschinennetz;
@@ -428,7 +416,6 @@ namespace Network_Window
                 Internet_box.IsEnabled = true;
             }
         }
-
         private void Internet_box_Click(object sender, RoutedEventArgs e)
         {
             Internet = !Internet;
@@ -443,7 +430,6 @@ namespace Network_Window
                 Maschinen_netz_box.IsEnabled = true;
             }
         }
-
         private void Route_Add_Automatically(int value)
         {
             Process route_delete = new Process();
