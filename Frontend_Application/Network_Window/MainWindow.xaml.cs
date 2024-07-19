@@ -45,7 +45,7 @@ namespace Network_Window
             { 3, Tuple.Create("", "", "", "") },
             { 4, Tuple.Create("", "", "", "") }
             };
-        Dictionary<int, Tuple<string, string, string, string>> Netzwerke = new Dictionary<int, Tuple<string, string, string, string>>();
+        Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
 
         public int counter = 1;
 
@@ -55,7 +55,7 @@ namespace Network_Window
 
         Boolean Internet = false;
 
-        int Current_Network = 0;
+        int CurrentNetworkRowNumber = 0;
 
 
         public MainWindow()
@@ -155,69 +155,66 @@ namespace Network_Window
             terminalCommand.GenerateNetworks();
             //Unterteilt die Ausgabe in Zeilen
             string[] rows = terminalCommand.Output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            List<string[]> rowVariables = new List<string[]>();
+            List<string[]> NetworkRows = new List<string[]>();
 
             //Untereilt die Zeilen in Spalten
             foreach (string row in rows)
             {
                 string[] columns = row.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                rowVariables.Add(columns);
+                NetworkRows.Add(columns);
             }
+            //string test = null;
 
-            string test = null;
+            int count = NetworkRows.Count - 2;
 
-            int count = rowVariables.Count - 2;
+            int ColumnIndex = 0;
+            int RowIndex = 0;
+            string Index = "";
+            string Ip = "";
+            string SubnetMask = "";
+            string Gateway = "";
+            string ColumnValue= "";
 
-            int x = 0; // Column index
-            int v = 0;
-
-
-            string column_value = null;
-            string index = "";
-            string ip = "";
-            string subnetMask = "";
-            string gateway = "";
-
-            for (int j = 2; j < rowVariables.Count; j++)
+            for (int j = 2; j < NetworkRows.Count; j++)
             {
                 int runner = j - 1;
-                string[] testRow = rowVariables[j];
+                string[] testRow = NetworkRows[j];
 
 
 
                 for (int i = 0; i < testRow.Length; i++)
                 {
-                    test += $"{testRow[i]} ";
-                    column_value = testRow[i];
-                    index = testRow[0];
-                    ip = testRow[3];
-                    subnetMask = testRow[4];
-                    gateway = testRow[5];
-                    CreateRows(column_value, v, x);
-                    x++;
-                    if (x >= 7)
+                    //test += $"{testRow[i]} ";
+                    ColumnValue = testRow[i];
+                    Index = testRow[0];
+                    Ip = testRow[3];
+                    SubnetMask = testRow[4];
+                    Gateway = testRow[5];
+                    CreateRows(ColumnValue, RowIndex, ColumnIndex);
+                    ColumnIndex++;
+                    if (ColumnIndex >= 7)
                     {
                         CheckBox checkBox = new CheckBox();
-                        checkBox.Content = "Hinzuf gen";
+                        checkBox.Content = "Hinzufügen";
                         checkBox.FontSize = 12;
                         checkBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
                         checkBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
                         checkBox.Checked += (sender, e) => CheckBox_Checked(runner);
-                        Grid.SetRow(checkBox, v);
-                        Grid.SetColumn(checkBox, x + 1);
+                        Grid.SetRow(checkBox, RowIndex);
+                        Grid.SetColumn(checkBox, ColumnIndex + 1);
                         GridContainer.Children.Add(checkBox);
-                        x = 0;
-                        v++;
+                        ColumnIndex = 0;
+                        RowIndex++;
 
                     }
 
 
                 }
 
-                Tuple<string, string, string, string> value = Tuple.Create($"{ip}", $"{subnetMask}", $"{gateway}", $"{index}");
-                Netzwerke[runner] = value;
+                //Tuple<string, string, string, string> value = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
+                NetworkSpecification[runner] = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
                 //ButtonItems.Add(test);
-                test = null;
+                //test = null;
             }
 
             //ButtonContainer.ItemsSource = ButtonItems;
@@ -226,8 +223,8 @@ namespace Network_Window
 
         private void CheckBox_Checked(int value)
         {
-            MessageBox.Show($"{Netzwerke[value].Item1} mask {Netzwerke[value].Item2} {Netzwerke[value].Item3} if {Netzwerke[value].Item4}");
-            Current_Network = value;
+            MessageBox.Show($"{NetworkSpecification[value].Item1} mask {NetworkSpecification[value].Item2} {NetworkSpecification[value].Item3} if {NetworkSpecification[value].Item4}");
+            CurrentNetworkRowNumber = value;
 
         }
         private void CreateRows(string value, int row, int column)
@@ -359,7 +356,7 @@ namespace Network_Window
             string command_no_index = $"route delete {ImpIp} mask {ImpMask} {ImpGateway}";
             string command_with_index = $"route delete {ImpIp} mask {ImpMask} {ImpGateway} if {ImpIndex}";
 
-            //Wenn kein index angegeben wurde
+            //Wenn kein Index angegeben wurde
             if (string.IsNullOrEmpty(ImpIndex))
             {
                 output.Text = ShellCommand(command_no_index);
@@ -445,7 +442,7 @@ namespace Network_Window
             {
                 Maschinen_netz_box.IsEnabled = false;
                 Maschinennetz = false;
-                Route_Add_Automatically(Current_Network);
+                Route_Add_Automatically(CurrentNetworkRowNumber);
             }
             else
             {
@@ -457,13 +454,13 @@ namespace Network_Window
         {
             Process route_delete = new Process();
 
-            string command_route_delete = ("route delete 0.0.0.0 mask 0.0.0.0 " + Netzwerke[value].Item3);
+            string command_route_delete = ("route delete 0.0.0.0 mask 0.0.0.0 " + NetworkSpecification[value].Item3);
 
             // Set up the process start info
             ProcessStartInfo startInfo_route_delete = new ProcessStartInfo
             {
                 FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete};route delete {Netzwerke[value].Item1} mask {Netzwerke[value].Item2} {Netzwerke[value].Item3}\"", // Pass the Command as argument
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete};route delete {NetworkSpecification[value].Item1} mask {NetworkSpecification[value].Item2} {NetworkSpecification[value].Item3}\"", // Pass the Command as argument
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -494,7 +491,7 @@ namespace Network_Window
 
             Process route_add = new Process();
 
-            string command_route_add = ("route add " + Netzwerke[value].Item1 + " mask " + Netzwerke[value].Item2 + " " + Netzwerke[value].Item3 + " if " + Netzwerke[value].Item4);
+            string command_route_add = ("route add " + NetworkSpecification[value].Item1 + " mask " + NetworkSpecification[value].Item2 + " " + NetworkSpecification[value].Item3 + " if " + NetworkSpecification[value].Item4);
 
             // Set up the process start info
             ProcessStartInfo startInfo_route_add = new ProcessStartInfo
@@ -526,7 +523,7 @@ namespace Network_Window
             }
             else
             {
-                Added_Routes[counter] = Tuple.Create(Netzwerke[value].Item1, Netzwerke[value].Item2, Netzwerke[value].Item3, Netzwerke[value].Item4);
+                Added_Routes[counter] = Tuple.Create(NetworkSpecification[value].Item1, NetworkSpecification[value].Item2, NetworkSpecification[value].Item3, NetworkSpecification[value].Item4);
                 output.Text = output_route_add;
 
                 string text = $"IP Adresse: {Added_Routes[counter].Item1}\nSubnetMaske: {Added_Routes[counter].Item2}\nGateway: {Added_Routes[counter].Item3}\nSchnittstellenindex: {Added_Routes[counter].Item4}\n";
