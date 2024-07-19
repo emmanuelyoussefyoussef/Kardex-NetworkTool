@@ -1,0 +1,43 @@
+﻿<Page x:Class="Network_Window.Page1"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Network_Window"
+      mc:Ignorable="d" 
+      d:DesignHeight="800" d:DesignWidth="1200"
+      Title="Page1">
+
+    <Grid Background="#FF06373D">
+        
+        <!-- This is the main grid -->
+        <Grid >
+            <!--2 main Grids-->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/> <!--This is the top grid-->
+                <RowDefinition/> <!--This is the middle grid-->
+                <RowDefinition/> <!--This is the bottom grid-->
+            </Grid.RowDefinitions>
+            
+            
+            <!--DownGrid-->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions> <!--This is the bottom grid-->
+                    <ColumnDefinition/> <!--This is the bottom grid Left-->
+                    <ColumnDefinition/> <!--This is the bottom grid Right-->
+                </Grid.ColumnDefinitions>
+            </Grid>
+
+            <Grid Grid.Row="0">
+                <Menu>
+                    <MenuItem Header="File">
+                        <MenuItem Header="New"/>
+                        <MenuItem Header="Open"/>
+                        <MenuItem Header="Save"/>
+                    </MenuItem>
+                </Menu>
+            </Grid>
+            
+        </Grid>
+    </Grid>
+</Page>

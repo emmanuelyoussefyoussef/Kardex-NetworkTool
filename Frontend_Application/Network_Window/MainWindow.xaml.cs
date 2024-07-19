@@ -104,27 +104,27 @@ namespace Network_Window
                 Gate_Block.Clear();
                 Index_Block.Clear();
 
-                terminalCommand.setCommand("route delete 0.0.0.0 mask 0.0.0.0 " + ImpGateway);
+                terminalCommand.CommandShell("route delete 0.0.0.0 mask 0.0.0.0 " + ImpGateway);
 
-                if (!string.IsNullOrWhiteSpace(terminalCommand.getError()))
+                if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                 {
-                    output.Text = $"Error: {terminalCommand.getError()}";
+                    output.Text = $"Error: {terminalCommand.Error}";
                 }
-                else output.Text = terminalCommand.getOutput();
+                else output.Text = terminalCommand.Output;
 
 
 
-                terminalCommand.setCommand("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway + " if " + ImpIndex);
+                terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway + " if " + ImpIndex);
 
 
-                if (!string.IsNullOrWhiteSpace(terminalCommand.getError()))
+                if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                 {
-                    output.Text = $"Error: {terminalCommand.getError()}";
+                    output.Text = $"Error: {terminalCommand.Error}";
                 }
                 else
                 {
                     Added_Routes[counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
-                    output.Text = terminalCommand.getOutput();
+                    output.Text = terminalCommand.Output;
 
                     string text = $"IP Adresse: {Added_Routes[counter].Item1}\nSubnetMaske: {Added_Routes[counter].Item2}\nGateway: {Added_Routes[counter].Item3}\nSchnittstellenindex: {Added_Routes[counter].Item4}\n";
 
@@ -151,39 +151,10 @@ namespace Network_Window
         private void Netzwerk_Button(object sender, RoutedEventArgs e)
         {
             GridContainer.Children.Clear();
-            string command = @"
-                    Get-NetAdapter | ForEach-Object {
-                    $Interface = $_
-                    $IPConfiguration = Get-NetIPConfiguration -InterfaceIndex $Interface.InterfaceIndex
-                    $DNS = ($IPConfiguration.DNSServer.ServerAddresses | Where-Object { $_ -like '*.*.*.*' }) -join ','
-                    if (-not $DNS) {
-                        $DNS = 'EMPTY'
-                    }
-                    $SubnetMaskCIDR = $IPConfiguration.IPv4Address.PrefixLength
 
-                    $SubnetMaskDottedDecimal = (([math]::pow(2, $SubnetMaskCIDR) - 1) -shl (32 - $SubnetMaskCIDR)) -band 0xFFFFFFFF
-                    if ($SubnetMaskDottedDecimal -lt 0) {
-                        $SubnetMaskDottedDecimal += [math]::pow(2, 32)
-                    }
-                    $SubnetMaskDottedDecimal = ([ipaddress]$SubnetMaskDottedDecimal).IPAddressToString
-
-                    $InterfaceAlias = $Interface.InterfaceAlias -replace ' ', '_'
-
-                    [PSCustomObject]@{
-                        Index = $Interface.InterfaceIndex
-                        InterfaceAlias = $InterfaceAlias
-                        Status = if ($Interface.Status) { $Interface.Status } else { 'EMPTY' }
-                        IPAddress = if ($IPConfiguration.IPv4Address.IPAddress) { $IPConfiguration.IPv4Address.IPAddress } else { 'EMPTY' }
-                        SubnetMask = if ($SubnetMaskDottedDecimal) { $SubnetMaskDottedDecimal } else { 'EMPTY' }
-                        Gateway = if ($IPConfiguration.IPv4DefaultGateway.NextHop) { $IPConfiguration.IPv4DefaultGateway.NextHop } else { 'EMPTY' }
-                        DNS = $DNS
-                    }
-                } | Format-Table -AutoSize | Out-String -Width 4096";
-
-            string output = ShellCommand(command);
-
+            terminalCommand.GenerateNetworks();
             //Unterteilt die Ausgabe in Zeilen
-            string[] rows = output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] rows = terminalCommand.Output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             List<string[]> rowVariables = new List<string[]>();
 
             //Untereilt die Zeilen in Spalten
@@ -196,13 +167,6 @@ namespace Network_Window
             string test = null;
 
             int count = rowVariables.Count - 2;
-
-
-
-
-
-            //ButtonItems = new ObservableCollection<string>();
-
 
             int x = 0; // Column index
             int v = 0;
@@ -319,7 +283,7 @@ namespace Network_Window
                 ProcessStartInfo startInfo_route_delete_box_1 = new ProcessStartInfo
                 {
                     FileName = "powershell.exe",  // Specify PowerShell executable
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete_box1}\"", // Pass the command as argument
+                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete_box1}\"", // Pass the Command as argument
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
@@ -499,7 +463,7 @@ namespace Network_Window
             ProcessStartInfo startInfo_route_delete = new ProcessStartInfo
             {
                 FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete};route delete {Netzwerke[value].Item1} mask {Netzwerke[value].Item2} {Netzwerke[value].Item3}\"", // Pass the command as argument
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete};route delete {Netzwerke[value].Item1} mask {Netzwerke[value].Item2} {Netzwerke[value].Item3}\"", // Pass the Command as argument
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -536,7 +500,7 @@ namespace Network_Window
             ProcessStartInfo startInfo_route_add = new ProcessStartInfo
             {
                 FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_add}\"", // Pass the command as argument
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_add}\"", // Pass the Command as argument
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
