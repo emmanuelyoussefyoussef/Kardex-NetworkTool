@@ -32,7 +32,7 @@
 
             <Button Grid.Column="1" Content="Routen" FontSize="16" Click="Routen_Button" Background="#FFB9B9A8" HorizontalAlignment="Right" FontFamily="Consolas"/>
 
-            <Button Grid.Column="2" Content="Netzwerk-Tabelle Refresh" FontSize="16" Click="Netzwerk_Button" Background="#FFB9B9A8" FontFamily="Consolas"/>
+            <Button Grid.Column="2" Content="Netzwerk-Tabelle Refresh" FontSize="16" Click="NetworkRefreshButton" Background="#FFB9B9A8" FontFamily="Consolas"/>
 
             <Button Grid.Column="3" Content="Routen Löschen" FontSize="16" Click="Alle_Routen_Löschen" Background="#FFB9B9A8" HorizontalAlignment="Right" HorizontalContentAlignment="Right" FontFamily="Consolas"/>
         </Grid>

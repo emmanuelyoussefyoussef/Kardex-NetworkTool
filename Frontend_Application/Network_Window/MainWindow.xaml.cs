@@ -27,17 +27,17 @@ namespace Network_Window
 {
     public partial class MainWindow : Window
     {
+        public int counter = 1;
+        public int CurrentNetworkRowNumber = 0;
+        Boolean Internet = false;
+        Boolean Maschinennetz = false;
+        public string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+        public string[] interfaces;
         public string ImpIp { get; set; }
         public string ImpMask { get; set; }
         public string ImpGateway { get; set; }
         public string ImpIndex { get; set; }
-        
-        
-        private TerminalCommand terminalCommand = new TerminalCommand();
-
-        public string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
-
-
+        Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
         Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
             {
             { 1, Tuple.Create("", "", "", "") },
@@ -45,32 +45,23 @@ namespace Network_Window
             { 3, Tuple.Create("", "", "", "") },
             { 4, Tuple.Create("", "", "", "") }
             };
-        Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
 
-        public int counter = 1;
 
-        public string[] interfaces;
-
-        Boolean Maschinennetz = false;
-
-        Boolean Internet = false;
-
-        int CurrentNetworkRowNumber = 0;
-
+        private TerminalCommand terminalCommand = new TerminalCommand();
 
         public MainWindow()
         {
             InitializeComponent();
-            Netzwerk_Button(null, null);
+            NetworkRefreshButton(null, null);
         }
-
+        //finished
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             Info_Fenster objInfo_Fenster = new Info_Fenster();
             this.Visibility = Visibility.Visible;
             objInfo_Fenster.Show();
         }
-
+        //finished
         private void Hinzufügen_Button_Click(object sender, RoutedEventArgs e)
         {
             ImpIp = IP_Adresse_Block.Text;
@@ -148,79 +139,82 @@ namespace Network_Window
             }
             
         }
-        private void Netzwerk_Button(object sender, RoutedEventArgs e)
+        //finished
+        private void NetworkRefreshButton(object sender, RoutedEventArgs e)
         {
-            GridContainer.Children.Clear();
-
-            terminalCommand.GenerateNetworks();
-            //Unterteilt die Ausgabe in Zeilen
-            string[] rows = terminalCommand.Output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            List<string[]> NetworkRows = new List<string[]>();
-
-            //Untereilt die Zeilen in Spalten
-            foreach (string row in rows)
-            {
-                string[] columns = row.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                NetworkRows.Add(columns);
-            }
-            //string test = null;
-
-            int count = NetworkRows.Count - 2;
-
             int ColumnIndex = 0;
             int RowIndex = 0;
             string Index = "";
             string Ip = "";
             string SubnetMask = "";
             string Gateway = "";
-            string ColumnValue= "";
+            string ColumnValue = "";
+            string[] CommandRawOutput = terminalCommand.Output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            List<string[]> CommandRawOutputAsRows = new List<string[]>();
 
-            for (int j = 2; j < NetworkRows.Count; j++)
+            GridContainer.Children.Clear();
+
+            terminalCommand.GenerateNetworks();
+
+            foreach (string RowRunner in CommandRawOutput)
             {
-                int runner = j - 1;
-                string[] testRow = NetworkRows[j];
-
-
-
-                for (int i = 0; i < testRow.Length; i++)
-                {
-                    //test += $"{testRow[i]} ";
-                    ColumnValue = testRow[i];
-                    Index = testRow[0];
-                    Ip = testRow[3];
-                    SubnetMask = testRow[4];
-                    Gateway = testRow[5];
-                    CreateRows(ColumnValue, RowIndex, ColumnIndex);
-                    ColumnIndex++;
-                    if (ColumnIndex >= 7)
-                    {
-                        CheckBox checkBox = new CheckBox();
-                        checkBox.Content = "Hinzufügen";
-                        checkBox.FontSize = 12;
-                        checkBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
-                        checkBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
-                        checkBox.Checked += (sender, e) => CheckBox_Checked(runner);
-                        Grid.SetRow(checkBox, RowIndex);
-                        Grid.SetColumn(checkBox, ColumnIndex + 1);
-                        GridContainer.Children.Add(checkBox);
-                        ColumnIndex = 0;
-                        RowIndex++;
-
-                    }
-
-
-                }
-
-                //Tuple<string, string, string, string> value = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
-                NetworkSpecification[runner] = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
-                //ButtonItems.Add(test);
-                //test = null;
+                string[] SingleNetworkAsRow = RowRunner.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                CommandRawOutputAsRows.Add(SingleNetworkAsRow);
             }
 
-            //ButtonContainer.ItemsSource = ButtonItems;
+            int Count = CommandRawOutputAsRows.Count - 2;
 
+            for (int j = 2; j < CommandRawOutputAsRows.Count; j++)
+            {
+                int Runner = j - 1;
+                string[] OneNetworkRowData = CommandRawOutputAsRows[j];
+
+                for (int i = 0; i < OneNetworkRowData.Length; i++)
+                {
+                    ColumnValue = OneNetworkRowData[i];
+
+                    Index = OneNetworkRowData[0];
+
+                    Ip = OneNetworkRowData[3];
+
+                    SubnetMask = OneNetworkRowData[4];
+
+                    Gateway = OneNetworkRowData[5];
+
+                    CreateRows(ColumnValue, RowIndex, ColumnIndex);
+
+                    ColumnIndex++;
+
+                    if (ColumnIndex >= 7)
+                    {
+                        CreateCheckBox(Runner, RowIndex, ColumnIndex);
+                        RowIndex++;
+                        ColumnIndex = 0;
+                    }
+                }
+                NetworkSpecification[Runner] = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
+            }
         }
+        private void CreateCheckBox(int runner,int rowIndex, int columnIndex) {
+            
+            CheckBox checkBox = new CheckBox();
 
+            checkBox.Content = "Hinzufügen";
+
+            checkBox.FontSize = 12;
+
+            checkBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
+
+            checkBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
+
+            checkBox.Checked += (sender, e) => CheckBox_Checked(runner);
+
+            Grid.SetRow(checkBox, rowIndex);
+
+            Grid.SetColumn(checkBox, columnIndex + 1);
+
+            GridContainer.Children.Add(checkBox);
+        }
         private void CheckBox_Checked(int value)
         {
             MessageBox.Show($"{NetworkSpecification[value].Item1} mask {NetworkSpecification[value].Item2} {NetworkSpecification[value].Item3} if {NetworkSpecification[value].Item4}");
@@ -229,8 +223,8 @@ namespace Network_Window
         }
         private void CreateRows(string value, int row, int column)
         {
-            int x = row;
-            int y = column;
+            int Row = row;
+            int Column = column;
             TextBlock textBlock = new TextBlock();
             textBlock.Text = $"{value}";
             textBlock.FontSize = 12;
@@ -240,8 +234,8 @@ namespace Network_Window
             textBlock.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
             textBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
 
-            Grid.SetRow(textBlock, x);
-            Grid.SetColumn(textBlock, y);
+            Grid.SetRow(textBlock, Row);
+            Grid.SetColumn(textBlock, Column);
             GridContainer.Children.Add(textBlock);
         }
 
