@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace Network_Window
 {
@@ -24,14 +25,30 @@ namespace Network_Window
             { 3, Tuple.Create("", "", "", "") },
             { 4, Tuple.Create("", "", "", "") }
             };
-
+        //private DispatcherTimer timer;
+        //private int counterr = 0;
+        //private int limit = 10;
 
         private TerminalCommand terminalCommand = new TerminalCommand();
         public MainWindow()
         {
             InitializeComponent();
             NetworkRefreshButton(null, null);
+            //timer = new DispatcherTimer();
+            //timer.Interval = TimeSpan.FromSeconds(1); // Set the interval to 1 second
+            //timer.Tick += Timer_Tick;
+            //timer.Start();
         }
+        //private void Timer_Tick(object sender, EventArgs e)
+        //{
+        //    counter++; // Increment the counter by 1 every second
+        //    if (counter >= limit)
+        //    {
+        //        // Clear the TextBlock and stop the timer
+        //        output.Text = ""; // Assuming 'output' is the name of your TextBlock
+        //        timer.Stop(); // Optional: Stop the timer if you don't need it to run again
+        //    }
+        //}
         public string ImpIp { get; set; }
         public string ImpMask { get; set; }
         public string ImpGateway { get; set; }
@@ -83,10 +100,13 @@ namespace Network_Window
                 //}
                 //else output.Text = terminalCommand.Output;
 
-
-
-                terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway + " if " + ImpIndex);
-
+                if (!string.IsNullOrWhiteSpace(ImpIndex))
+                {
+                    terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway + " if " + ImpIndex);
+                }
+                else {
+                    terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway);
+                }
 
                 if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                 {
@@ -115,6 +135,7 @@ namespace Network_Window
                             break;
                     }
                     counter++;
+                    //timer.Start();
                 }
             }
         }//finished
@@ -142,7 +163,7 @@ namespace Network_Window
 
             int Count = CommandRawOutputAsRows.Count - 2;
 
-            for (int j = 2; j < CommandRawOutputAsRows.Count; j++)
+            for (int j = 0; j < CommandRawOutputAsRows.Count; j++)
             {
                 int Runner = j - 1;
                 string[] OneNetworkRowData = CommandRawOutputAsRows[j];
@@ -187,9 +208,9 @@ namespace Network_Window
 
             checkBox.Checked += (sender, e) => CheckBox_Checked(runner);
 
-            Grid.SetRow(checkBox, rowIndex);
+            Grid.SetRow(checkBox, rowIndex+2);
 
-            Grid.SetColumn(checkBox, columnIndex + 1);
+            Grid.SetColumn(checkBox, columnIndex + 3);
 
             GridContainer.Children.Add(checkBox);
         }//finished
@@ -206,10 +227,12 @@ namespace Network_Window
             textBlock.TextWrapping = TextWrapping.Wrap;
             textBlock.Width = 100;
             textBlock.Height = 30;
+            textBlock.Margin = new Thickness(1);
             textBlock.FontFamily = new System.Windows.Media.FontFamily("Consolas");
             textBlock.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
             textBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             textBlock.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+
 
             Grid.SetRow(textBlock,row);
             Grid.SetColumn(textBlock, column);

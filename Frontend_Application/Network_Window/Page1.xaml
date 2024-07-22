@@ -39,5 +39,9 @@
             </Grid>
             
         </Grid>
+        <StackPanel Grid.Row="1" VerticalAlignment="Center">
+            <TextBlock Text="Hallo" />
+            <TextBlock Text="heyy"/>
+        </StackPanel>
     </Grid>
 </Page>
