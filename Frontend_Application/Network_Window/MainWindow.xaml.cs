@@ -75,13 +75,13 @@ namespace Network_Window
                 Gate_Block.Clear();
                 Index_Block.Clear();
 
-                terminalCommand.CommandShell("route delete 0.0.0.0 mask 0.0.0.0 " + ImpGateway);
+                //terminalCommand.CommandShell("route delete 0.0.0.0 mask 0.0.0.0 " + ImpGateway);
 
-                if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
-                {
-                    output.Text = $"Error: {terminalCommand.Error}";
-                }
-                else output.Text = terminalCommand.Output;
+                //if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                //{
+                //    output.Text = $"Error: {terminalCommand.Error}";
+                //}
+                //else output.Text = terminalCommand.Output;
 
 
 
@@ -117,9 +117,6 @@ namespace Network_Window
                     counter++;
                 }
             }
-
-            //finished
-            //finished
         }//finished
         private void NetworkRefreshButton(object sender, RoutedEventArgs e)
         {
@@ -162,7 +159,7 @@ namespace Network_Window
 
                     Gateway = OneNetworkRowData[5];
 
-                    CreateRows(ColumnValue, RowIndex, ColumnIndex);
+                    CreateTextBlocks(ColumnValue, RowIndex, ColumnIndex);
 
                     ColumnIndex++;
 
@@ -201,40 +198,40 @@ namespace Network_Window
             MessageBox.Show($"{NetworkSpecification[value].Item1} mask {NetworkSpecification[value].Item2} {NetworkSpecification[value].Item3} if {NetworkSpecification[value].Item4}");
             CurrentNetworkRowNumber = value;
         }//finished
-        private void CreateRows(string value, int row, int column)
+        private void CreateTextBlocks(string value, int row, int column)
         {
-            int Row = row;
-            int Column = column;
             TextBlock textBlock = new TextBlock();
             textBlock.Text = $"{value}";
             textBlock.FontSize = 12;
             textBlock.TextWrapping = TextWrapping.Wrap;
             textBlock.Width = 100;
+            textBlock.Height = 30;
             textBlock.FontFamily = new System.Windows.Media.FontFamily("Consolas");
             textBlock.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
             textBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            textBlock.VerticalAlignment = System.Windows.VerticalAlignment.Center;
 
-            Grid.SetRow(textBlock, Row);
-            Grid.SetColumn(textBlock, Column);
+            Grid.SetRow(textBlock,row);
+            Grid.SetColumn(textBlock, column);
             GridContainer.Children.Add(textBlock);
         }
         private void Route_1_Delete_Click(object sender, RoutedEventArgs e)
         {
-            deleteRoute(1, Route_1.Text);
+            DeleteRoute(1, Route_1.Text);
         }
         private void Route_2_Delete_Click(object sender, RoutedEventArgs e)
         {
-            deleteRoute(2, Route_2.Text);
+            DeleteRoute(2, Route_2.Text);
         }
         private void Route_3_Delete_Click(object sender, RoutedEventArgs e)
         {
-            deleteRoute(3, Route_3.Text);
+            DeleteRoute(3, Route_3.Text);
         }
         private void Route_4_Delete_Click(object sender, RoutedEventArgs e)
         {
-            deleteRoute(4, Route_4.Text);
+            DeleteRoute(4, Route_4.Text);
         }
-        private void deleteRoute(int index, string boxnr)
+        private void DeleteRoute(int index, string boxnr)
         {
 
             if (string.IsNullOrWhiteSpace(boxnr))
@@ -243,41 +240,17 @@ namespace Network_Window
             }
             else
             {
-                Process route_delete_box1 = new Process();
+                terminalCommand.CommandShell($"route delete {Added_Routes[index].Item1} mask {Added_Routes[index].Item2} {Added_Routes[index].Item3} if {Added_Routes[index].Item4}");
+                
+                
 
-                string command_route_delete_box1 = ($"route delete {Added_Routes[index].Item1} mask {Added_Routes[index].Item2} {Added_Routes[index].Item3} if {Added_Routes[index].Item4}");
-
-
-                //Set up the process start info
-                ProcessStartInfo startInfo_route_delete_box_1 = new ProcessStartInfo
+                if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                 {
-                    FileName = "powershell.exe",  // Specify PowerShell executable
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete_box1}\"", // Pass the Command as argument
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                route_delete_box1.StartInfo = startInfo_route_delete_box_1;
-
-                // Start the process
-                route_delete_box1.Start();
-
-                route_delete_box1.WaitForExit();
-
-                string output_route_delete_box1 = route_delete_box1.StandardOutput.ReadToEnd();
-                string error_route_delete_box1 = route_delete_box1.StandardError.ReadToEnd();
-
-                route_delete_box1.WaitForExit();
-
-                if (!string.IsNullOrWhiteSpace(error_route_delete_box1))
-                {
-                    output.Text = error_route_delete_box1;
+                    output.Text = terminalCommand.Error;
                 }
                 else
                 {
-                    output.Text = output_route_delete_box1;
+                    output.Text = terminalCommand.Output;
                     Added_Routes.Remove(counter);
                     switch (index)
                     {
@@ -398,7 +371,7 @@ namespace Network_Window
             {
                 Internet_box.IsEnabled = true;
             }
-        }
+        }//ToDo implement logic
         private void Internet_box_Click(object sender, RoutedEventArgs e)
         {
             Internet = !Internet;
@@ -412,7 +385,7 @@ namespace Network_Window
             {
                 Maschinen_netz_box.IsEnabled = true;
             }
-        }
+        }//ToDo implement logic
         private void Route_Add_Automatically(int value)
         {
             Process route_delete = new Process();
