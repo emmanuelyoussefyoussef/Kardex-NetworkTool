@@ -13,6 +13,7 @@ namespace Network_Window
         public int Counter = 1;
         public int CurrentNetworkRowNumber = 0;
         private int currentlyCheckedCount = 0;
+        private int id = 0;
         Boolean InternetIsChecked = false;
         Boolean Maschinennetz = false;
         public string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
@@ -195,7 +196,7 @@ namespace Network_Window
 
             checkBox.Name = $"CheckBox_{runner}";
 
-            checkBox.Content = "Hinzufügen";
+            checkBox.Content = "";
 
             checkBox.FontSize = 12;
 
@@ -206,16 +207,22 @@ namespace Network_Window
             checkBox.Checked += (sender, e) => CheckBox_Checked(runner);
             checkBox.Unchecked += (sender, e) => CheckBox_Unchecked(runner);
 
+            if (rowIndex >1)
+            {
+                Grid.SetRow(checkBox, rowIndex);
 
-            Grid.SetRow(checkBox, rowIndex);
+                Grid.SetColumn(checkBox, columnIndex);
 
-            Grid.SetColumn(checkBox, columnIndex);
-
-            GridContainer.Children.Add(checkBox);
+                GridContainer.Children.Add(checkBox);
+            }
         }//finished
         private void CheckBox_Checked(int value)
         {
-            MessageBox.Show($"{NetworkSpecification[value].Item1} mask {NetworkSpecification[value].Item2} {NetworkSpecification[value].Item3} if {NetworkSpecification[value].Item4}");
+            MessageBox.Show($"IP Adresse: {NetworkSpecification[value].Item1}\n" +
+                $"Subnetzmaske: {NetworkSpecification[value].Item2}\n" +
+                $"Gateway: {NetworkSpecification[value].Item3}\n" +
+                $"Schnittstelle: {NetworkSpecification[value].Item4}");
+
             CurrentNetworkRowNumber = value;
             if (!IsChecked) 
             {
@@ -225,16 +232,16 @@ namespace Network_Window
             currentlyCheckedCount++;
             ManageCheckBoxesAvailability();
 
+
         }
         private void ManageCheckBoxesAvailability()
         {
-            bool shouldEnable = currentlyCheckedCount < 2; // Erlaube mehr Checks, wenn weniger als 2 gecheckt sind
+            bool shouldEnable = currentlyCheckedCount < 2;
 
             foreach (UIElement element in GridContainer.Children)
             {
                 if (element is CheckBox checkBox)
                 {
-                    // Deaktiviere alle anderen Checkboxes, wenn das Limit erreicht ist
                     if (checkBox.IsChecked == false)
                     {
                         checkBox.IsEnabled = shouldEnable;
@@ -482,6 +489,7 @@ namespace Network_Window
                 {
                     MessageBox.Show("Please enter a Gateway in the Gate field");
                     CheckGateWayButtonVisibilityRequirement();
+
                 }
             }
             else
@@ -501,103 +509,6 @@ namespace Network_Window
                 }
             }
         }//ToDo implement logic
-        private void Route_Add_Automatically(int value)
-        {
-            Process route_delete = new Process();
-
-            string command_route_delete = ("route delete 0.0.0.0 mask 0.0.0.0 " + NetworkSpecification[value].Item3);
-
-            // Set up the process start info
-            ProcessStartInfo startInfo_route_delete = new ProcessStartInfo
-            {
-                FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_delete};route delete {NetworkSpecification[value].Item1} mask {NetworkSpecification[value].Item2} {NetworkSpecification[value].Item3}\"", // Pass the Command as argument
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            route_delete.StartInfo = startInfo_route_delete;
-
-            // Start the process
-            route_delete.Start();
-
-            route_delete.WaitForExit();
-
-            string output_route_delete = route_delete.StandardOutput.ReadToEnd();
-            string error_route_delete = route_delete.StandardError.ReadToEnd();
-
-            route_delete.WaitForExit();
-
-
-            if (!string.IsNullOrWhiteSpace(error_route_delete))
-            {
-                output.Text = $"Error: {error_route_delete}";
-            }
-            else
-            {
-                output.Text = output_route_delete;
-            }
-
-            Process route_add = new Process();
-
-            string command_route_add = ("route add " + NetworkSpecification[value].Item1 + " mask " + NetworkSpecification[value].Item2 + " " + NetworkSpecification[value].Item3 + " if " + NetworkSpecification[value].Item4);
-
-            // Set up the process start info
-            ProcessStartInfo startInfo_route_add = new ProcessStartInfo
-            {
-                FileName = "powershell.exe",  // Specify PowerShell executable
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command_route_add}\"", // Pass the Command as argument
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            route_add.StartInfo = startInfo_route_add;
-
-            // Start the process
-            route_add.Start();
-
-            route_add.WaitForExit();
-
-            string output_route_add = route_add.StandardOutput.ReadToEnd();
-            string error_route_add = route_add.StandardError.ReadToEnd();
-
-            route_add.WaitForExit();
-
-
-            if (!string.IsNullOrWhiteSpace(error_route_add))
-            {
-                output.Text = $"Error: {error_route_add}";
-            }
-            else
-            {
-                Added_Routes[Counter] = Tuple.Create(NetworkSpecification[value].Item1, NetworkSpecification[value].Item2, NetworkSpecification[value].Item3, NetworkSpecification[value].Item4);
-                output.Text = output_route_add;
-
-                string text = $"IP Adresse: {Added_Routes[Counter].Item1}\nSubnetMaske: {Added_Routes[Counter].Item2}\nGateway: {Added_Routes[Counter].Item3}\nSchnittstellenindex: {Added_Routes[Counter].Item4}\n";
-
-                switch (Counter)
-                {
-                    case 1:
-                        Route_1.Text = text;
-                        break;
-                    case 2:
-                        Route_2.Text = text;
-                        break;
-                    case 3:
-                        Route_3.Text = text;
-                        break;
-                    case 4:
-                        Route_4.Text = text;
-                        break;
-                }
-                Counter++;
-            }
-        }
-
         private void GateWayButtonConfirm(object sender, RoutedEventArgs e)
         {
             ImpGateway = Gate_Block.Text;
@@ -612,7 +523,6 @@ namespace Network_Window
                 {
                     output.Text = terminalCommand.Output;
                     Gate_Block.Clear();
-
                 }
             }
         }

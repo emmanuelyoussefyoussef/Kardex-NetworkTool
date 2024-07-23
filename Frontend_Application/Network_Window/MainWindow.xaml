@@ -268,6 +268,11 @@
                 </Button.Resources>
             </Button>
 
+            <ComboBox Grid.Row="2" Grid.Column="2" Margin="163,0,0,0">
+                <ComboBoxItem Content="Internet"></ComboBoxItem>
+                <ComboBoxItem Content="Maschinen Netz"></ComboBoxItem>
+            </ComboBox>
+
             <Button Name="GateWayButton" 
                     Grid.Column="2" Grid.Row="2" 
                     HorizontalAlignment="Left" Margin="158,0,0,0"  VerticalAlignment="Center" Height="25" Width="48" 
