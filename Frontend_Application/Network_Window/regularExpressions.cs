@@ -43,7 +43,7 @@ namespace Network_Window
     //        {
     //            Output = "Gateway ist ungültig";
     //        }
-    //        else if (mainWindow.counter == 5)
+    //        else if (mainWindow.Counter == 5)
     //        {
     //            Output = "Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.";
     //        }

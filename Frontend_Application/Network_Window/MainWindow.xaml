@@ -273,7 +273,7 @@
                     HorizontalAlignment="Left" Margin="158,0,0,0"  VerticalAlignment="Center" Height="25" Width="48" 
                     FontSize="9"
                     Content="Eingabe"
-                    FontFamily="Consolas" Background="Yellow" BorderBrush="#FFB9B9A8" FontWeight="Bold" Visibility="Hidden">
+                    FontFamily="Consolas" Background="Yellow" BorderBrush="#FFB9B9A8" FontWeight="Bold" Visibility="Hidden" >
                 <Button.Resources>
                     <Style TargetType="Border" >
                         <Setter Property="CornerRadius" Value="5"/>

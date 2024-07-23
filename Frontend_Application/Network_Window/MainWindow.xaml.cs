@@ -10,9 +10,10 @@ namespace Network_Window
 {
     public partial class MainWindow : Window
     {
-        public int counter = 1;
+        public int Counter = 1;
         public int CurrentNetworkRowNumber = 0;
-        Boolean Internet = false;
+        private int currentlyCheckedCount = 0;
+        Boolean InternetIsChecked = false;
         Boolean Maschinennetz = false;
         public string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
         public string[] interfaces;
@@ -39,12 +40,12 @@ namespace Network_Window
             //timer.Interval = TimeSpan.FromSeconds(1); // Set the interval to 1 second
             //timer.Tick += Timer_Tick;
             //timer.Start();
-            GateWayButton.Click += ;
+            GateWayButton.Click += GateWayButtonConfirm;
         }
         //private void Timer_Tick(object sender, EventArgs e)
         //{
-        //    counter++; // Increment the counter by 1 every second
-        //    if (counter >= limit)
+        //    Counter++; // Increment the Counter by 1 every second
+        //    if (Counter >= limit)
         //    {
         //        // Clear the TextBlock and stop the timer
         //        output.Text = ""; // Assuming 'output' is the name of your TextBlock
@@ -77,7 +78,7 @@ namespace Network_Window
             {
                 output.Text = "Gateway ist ungültig";
             }
-            else if (counter == 5)
+            else if (Counter == 5)
             {
                 output.Text = "Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.";
             }
@@ -107,12 +108,12 @@ namespace Network_Window
                 }
                 else
                 {
-                    Added_Routes[counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
+                    Added_Routes[Counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
                     output.Text = terminalCommand.Output;
 
-                    string text = $"IP Adresse: {Added_Routes[counter].Item1}\nSubnetMaske: {Added_Routes[counter].Item2}\nGateway: {Added_Routes[counter].Item3}\nSchnittstellenindex: {Added_Routes[counter].Item4}\n";
+                    string text = $"IP Adresse: {Added_Routes[Counter].Item1}\nSubnetMaske: {Added_Routes[Counter].Item2}\nGateway: {Added_Routes[Counter].Item3}\nSchnittstellenindex: {Added_Routes[Counter].Item4}\n";
 
-                    switch (counter)
+                    switch (Counter)
                     {
                         case 1:
                             Route_1.Text = text;
@@ -127,7 +128,7 @@ namespace Network_Window
                             Route_4.Text = text;
                             break;
                     }
-                    counter++;
+                    Counter++;
                     //timer.Start();
                 }
             }
@@ -154,11 +155,12 @@ namespace Network_Window
                 CommandRawOutputAsRows.Add(SingleNetworkAsRow);
             }
 
-            int Count = CommandRawOutputAsRows.Count - 2;
+            int Count = CommandRawOutputAsRows.Count;
 
             for (int j = 0; j < CommandRawOutputAsRows.Count; j++)
             {
-                int Runner = j - 1;
+                int Runner = j;
+                int RunnerForCheckBox = j;
                 string[] OneNetworkRowData = CommandRawOutputAsRows[j];
 
                 for (int i = 0; i < OneNetworkRowData.Length; i++)
@@ -179,7 +181,7 @@ namespace Network_Window
 
                     if (ColumnIndex >= 7)
                     {
-                        CreateCheckBox(Runner, RowIndex, ColumnIndex);
+                        CreateCheckBox(RunnerForCheckBox, RowIndex, ColumnIndex);
                         RowIndex++;
                         ColumnIndex = 0;
                     }
@@ -190,6 +192,8 @@ namespace Network_Window
         private void CreateCheckBox(int runner,int rowIndex, int columnIndex) {
             
             CheckBox checkBox = new CheckBox();
+
+            checkBox.Name = $"CheckBox_{runner}";
 
             checkBox.Content = "Hinzufügen";
 
@@ -203,9 +207,9 @@ namespace Network_Window
             checkBox.Unchecked += (sender, e) => CheckBox_Unchecked(runner);
 
 
-            Grid.SetRow(checkBox, rowIndex+2);
+            Grid.SetRow(checkBox, rowIndex);
 
-            Grid.SetColumn(checkBox, columnIndex + 3);
+            Grid.SetColumn(checkBox, columnIndex);
 
             GridContainer.Children.Add(checkBox);
         }//finished
@@ -218,7 +222,25 @@ namespace Network_Window
                 IsChecked = !IsChecked;
             }
             CheckGateWayButtonVisibilityRequirement();
+            currentlyCheckedCount++;
+            ManageCheckBoxesAvailability();
 
+        }
+        private void ManageCheckBoxesAvailability()
+        {
+            bool shouldEnable = currentlyCheckedCount < 2; // Erlaube mehr Checks, wenn weniger als 2 gecheckt sind
+
+            foreach (UIElement element in GridContainer.Children)
+            {
+                if (element is CheckBox checkBox)
+                {
+                    // Deaktiviere alle anderen Checkboxes, wenn das Limit erreicht ist
+                    if (checkBox.IsChecked == false)
+                    {
+                        checkBox.IsEnabled = shouldEnable;
+                    }
+                }
+            }
         }
         private void CheckBox_Unchecked(int value)
         {
@@ -227,6 +249,8 @@ namespace Network_Window
                 IsChecked = !IsChecked; 
             }
             CheckGateWayButtonVisibilityRequirement();
+            currentlyCheckedCount--;
+            ManageCheckBoxesAvailability();
         }
         private void CreateTextBlocks(string value, int row, int column)
         {
@@ -283,7 +307,7 @@ namespace Network_Window
                 else
                 {
                     output.Text = terminalCommand.Output;
-                    Added_Routes.Remove(counter);
+                    Added_Routes.Remove(Counter);
                     switch (index)
                     {
                         case 1:
@@ -301,7 +325,7 @@ namespace Network_Window
                         default:
                             break;
                     }
-                    counter = index;
+                    Counter = index;
                 }
             }
         }
@@ -379,7 +403,7 @@ namespace Network_Window
             Route_2.Text = "";
             Route_3.Text = "";
             Route_4.Text = "";
-            counter = 1;
+            Counter = 1;
         }
         private string ShellCommand(string command)
         {
@@ -424,7 +448,7 @@ namespace Network_Window
             if (Maschinennetz)
             {
                 Internet_box.IsEnabled = false;
-                Internet = false;
+                InternetIsChecked = false;
             }
             else
             {
@@ -433,7 +457,7 @@ namespace Network_Window
         }//ToDo implement logic
         private void CheckGateWayButtonVisibilityRequirement()
         {
-            if (Internet && IsChecked)
+            if (InternetIsChecked && IsChecked)
             {
                 GateWayButton.Visibility= Visibility.Visible;
                 Löschen_Button.Visibility = Visibility.Hidden;
@@ -448,8 +472,8 @@ namespace Network_Window
         }
         private void InternetCheckboxChecked(object sender, RoutedEventArgs e)
         {
-            Internet = !Internet;
-            if (Internet)
+            InternetIsChecked = !InternetIsChecked;
+            if (InternetIsChecked)
             {
                 Maschinen_netz_box.IsEnabled = false;
                 Maschinennetz = false;
@@ -467,9 +491,9 @@ namespace Network_Window
         }//ToDo implement logic
         private void InternetCheckboxUnchecked(object sender, RoutedEventArgs e)
         {
-            if (Internet)
+            if (InternetIsChecked)
             {
-                Internet = !Internet;
+                InternetIsChecked = !InternetIsChecked;
                 Maschinen_netz_box.IsEnabled = true;
                 if (IsChecked)
                 {
@@ -550,12 +574,12 @@ namespace Network_Window
             }
             else
             {
-                Added_Routes[counter] = Tuple.Create(NetworkSpecification[value].Item1, NetworkSpecification[value].Item2, NetworkSpecification[value].Item3, NetworkSpecification[value].Item4);
+                Added_Routes[Counter] = Tuple.Create(NetworkSpecification[value].Item1, NetworkSpecification[value].Item2, NetworkSpecification[value].Item3, NetworkSpecification[value].Item4);
                 output.Text = output_route_add;
 
-                string text = $"IP Adresse: {Added_Routes[counter].Item1}\nSubnetMaske: {Added_Routes[counter].Item2}\nGateway: {Added_Routes[counter].Item3}\nSchnittstellenindex: {Added_Routes[counter].Item4}\n";
+                string text = $"IP Adresse: {Added_Routes[Counter].Item1}\nSubnetMaske: {Added_Routes[Counter].Item2}\nGateway: {Added_Routes[Counter].Item3}\nSchnittstellenindex: {Added_Routes[Counter].Item4}\n";
 
-                switch (counter)
+                switch (Counter)
                 {
                     case 1:
                         Route_1.Text = text;
@@ -570,7 +594,26 @@ namespace Network_Window
                         Route_4.Text = text;
                         break;
                 }
-                counter++;
+                Counter++;
+            }
+        }
+
+        private void GateWayButtonConfirm(object sender, RoutedEventArgs e)
+        {
+            ImpGateway = Gate_Block.Text;
+            if (IsChecked && InternetIsChecked && !string.IsNullOrEmpty(ImpGateway))
+            {
+                terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {NetworkSpecification[CurrentNetworkRowNumber].Item4}");
+                if(!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                {
+                    output.Text = $"Error: {terminalCommand.Error}";
+                }
+                else
+                {
+                    output.Text = terminalCommand.Output;
+                    Gate_Block.Clear();
+
+                }
             }
         }
     }
