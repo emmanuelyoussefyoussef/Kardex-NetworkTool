@@ -246,7 +246,7 @@
                     HorizontalAlignment="Left" Margin="158,0,0,0"  VerticalAlignment="Center" Height="25" Width="48" 
                     FontSize="8"
                     Content="Hinzufügen"
-                    Click="Hinzufügen_Button_Click" FontFamily="Consolas" Background="#FFD0AD00" BorderBrush="#FF317953" FontWeight="Bold">
+                    Click="Hinzufügen_Button_Click" FontFamily="Consolas" Background="#FFD0AD00" BorderBrush="#FF317953" FontWeight="Bold" Visibility="Visible">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
@@ -260,7 +260,20 @@
                     HorizontalAlignment="Left" Margin="158,0,0,0"  VerticalAlignment="Center" Height="25" Width="48" 
                     FontSize="9"
                     Content="Entfernen"
-                    Click="Löschen_Button_Click" FontFamily="Consolas" Background="#FFA52019" BorderBrush="#FFB9B9A8" FontWeight="Bold">
+                    Click="Löschen_Button_Click" FontFamily="Consolas" Background="#FFA52019" BorderBrush="#FFB9B9A8" FontWeight="Bold" Visibility="Visible">
+                <Button.Resources>
+                    <Style TargetType="Border" >
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+            <Button Name="GateWayButton" 
+                    Grid.Column="2" Grid.Row="2" 
+                    HorizontalAlignment="Left" Margin="158,0,0,0"  VerticalAlignment="Center" Height="25" Width="48" 
+                    FontSize="9"
+                    Content="Eingabe"
+                    FontFamily="Consolas" Background="Yellow" BorderBrush="#FFB9B9A8" FontWeight="Bold" Visibility="Hidden">
                 <Button.Resources>
                     <Style TargetType="Border" >
                         <Setter Property="CornerRadius" Value="5"/>
@@ -277,7 +290,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <CheckBox Name="Maschinen_netz_box" Grid.Column="0" Content="Maschinen Netz" Foreground="#FFB9B9A8" FontFamily="consolas" FontWeight="Bold" VerticalAlignment="Center" Click="Maschinen_netz_box_Click"/>
-            <CheckBox Name="Internet_box" Grid.Column="1" Content="Internet" Foreground="#FFB9B9A8" FontFamily="consolas" FontWeight="Bold" VerticalAlignment="Center" Click="Internet_box_Click"/>
+            <CheckBox Name="Internet_box" Grid.Column="1" Content="Internet" Foreground="#FFB9B9A8" FontFamily="consolas" FontWeight="Bold" VerticalAlignment="Center" Checked="InternetCheckboxChecked" Unchecked="InternetCheckboxUnchecked"/>
         </Grid>
 
 

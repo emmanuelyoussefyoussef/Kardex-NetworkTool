@@ -16,6 +16,7 @@ namespace Network_Window
         Boolean Maschinennetz = false;
         public string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
         public string[] interfaces;
+        Boolean IsChecked = false;
        
         Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
         Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
@@ -38,6 +39,7 @@ namespace Network_Window
             //timer.Interval = TimeSpan.FromSeconds(1); // Set the interval to 1 second
             //timer.Tick += Timer_Tick;
             //timer.Start();
+            GateWayButton.Click += ;
         }
         //private void Timer_Tick(object sender, EventArgs e)
         //{
@@ -61,13 +63,7 @@ namespace Network_Window
         }//finished
         private void Hinzufügen_Button_Click(object sender, RoutedEventArgs e)
         {
-            ImpIp = IP_Adresse_Block.Text;
-            ImpMask = Mask_Block.Text;
-            ImpGateway = Gate_Block.Text;
-            ImpIndex = Index_Block.Text;
-
-
-
+            GetInputFields();
 
             if (!Regex.IsMatch(ImpIp, pattern))
             {
@@ -204,6 +200,8 @@ namespace Network_Window
             checkBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
 
             checkBox.Checked += (sender, e) => CheckBox_Checked(runner);
+            checkBox.Unchecked += (sender, e) => CheckBox_Unchecked(runner);
+
 
             Grid.SetRow(checkBox, rowIndex+2);
 
@@ -215,7 +213,21 @@ namespace Network_Window
         {
             MessageBox.Show($"{NetworkSpecification[value].Item1} mask {NetworkSpecification[value].Item2} {NetworkSpecification[value].Item3} if {NetworkSpecification[value].Item4}");
             CurrentNetworkRowNumber = value;
-        }//finished
+            if (!IsChecked) 
+            {
+                IsChecked = !IsChecked;
+            }
+            CheckGateWayButtonVisibilityRequirement();
+
+        }
+        private void CheckBox_Unchecked(int value)
+        {
+            if (IsChecked)
+            { 
+                IsChecked = !IsChecked; 
+            }
+            CheckGateWayButtonVisibilityRequirement();
+        }
         private void CreateTextBlocks(string value, int row, int column)
         {
             TextBlock textBlock = new TextBlock();
@@ -313,14 +325,16 @@ namespace Network_Window
         }
         private void Löschen_Button_Click(object sender, RoutedEventArgs e)
         {
+            GetInputFields();
+            string command = BuildCommand();
+            ExecuteCommand(command);
+        }
+        private void GetInputFields()
+        {
             ImpIp = IP_Adresse_Block.Text;
             ImpMask = Mask_Block.Text;
             ImpGateway = Gate_Block.Text;
             ImpIndex = Index_Block.Text;
-
-            string command = BuildCommand();
-
-            ExecuteCommand(command);
         }
         private void ClearFields()
         {
@@ -417,18 +431,50 @@ namespace Network_Window
                 Internet_box.IsEnabled = true;
             }
         }//ToDo implement logic
-        private void Internet_box_Click(object sender, RoutedEventArgs e)
+        private void CheckGateWayButtonVisibilityRequirement()
+        {
+            if (Internet && IsChecked)
+            {
+                GateWayButton.Visibility= Visibility.Visible;
+                Löschen_Button.Visibility = Visibility.Hidden;
+                Eingabe_Button.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                GateWayButton.Visibility = Visibility.Hidden;
+                Löschen_Button.Visibility = Visibility.Visible;
+                Eingabe_Button.Visibility = Visibility.Visible;
+            }
+        }
+        private void InternetCheckboxChecked(object sender, RoutedEventArgs e)
         {
             Internet = !Internet;
             if (Internet)
             {
                 Maschinen_netz_box.IsEnabled = false;
                 Maschinennetz = false;
-                Route_Add_Automatically(CurrentNetworkRowNumber);
+
+                if (IsChecked)
+                {
+                    MessageBox.Show("Please enter a Gateway in the Gate field");
+                    CheckGateWayButtonVisibilityRequirement();
+                }
             }
             else
             {
                 Maschinen_netz_box.IsEnabled = true;
+            }
+        }//ToDo implement logic
+        private void InternetCheckboxUnchecked(object sender, RoutedEventArgs e)
+        {
+            if (Internet)
+            {
+                Internet = !Internet;
+                Maschinen_netz_box.IsEnabled = true;
+                if (IsChecked)
+                {
+                    CheckGateWayButtonVisibilityRequirement();
+                }
             }
         }//ToDo implement logic
         private void Route_Add_Automatically(int value)
