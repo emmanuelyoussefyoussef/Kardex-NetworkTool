@@ -99,17 +99,17 @@
         <Grid Grid.Row="1" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="4*" />
+                <RowDefinition Height="5*"/>
             </Grid.RowDefinitions>
             <Border Grid.Row="1" BorderBrush="White" BorderThickness="2">
                 <Rectangle Fill="Black" Margin="1"></Rectangle>
             </Border>
 
             <!--Das ist der textblock für mein output-->
-            <TextBlock Name="output" Text="" FontSize="20" Height="auto" TextWrapping="Wrap" FontFamily="Consolas" 
+            <TextBlock Name="output" FontSize="20" Height="auto" TextWrapping="Wrap" FontFamily="Consolas" 
                        Foreground="White" Background="Black" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                       Grid.Row="1" Margin="3,0,0,0"/>
+                       Grid.Row="1" Margin="3,0,1,0"/>
 
             <Grid x:Name="GridContainer" Grid.Row="0" Width="960" Grid.ColumnSpan="2" HorizontalAlignment="Left">
                 <Grid.RowDefinitions>

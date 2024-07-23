@@ -87,10 +87,7 @@ namespace Network_Window
             }
             else 
             {
-                IP_Adresse_Block.Clear();
-                Mask_Block.Clear();
-                Gate_Block.Clear();
-                Index_Block.Clear();
+                ClearFields();
 
                 //terminalCommand.CommandShell("route delete 0.0.0.0 mask 0.0.0.0 " + ImpGateway);
 
@@ -316,24 +313,49 @@ namespace Network_Window
         }
         private void Löschen_Button_Click(object sender, RoutedEventArgs e)
         {
+            ImpIp = IP_Adresse_Block.Text;
+            ImpMask = Mask_Block.Text;
+            ImpGateway = Gate_Block.Text;
+            ImpIndex = Index_Block.Text;
 
-            string command_only_IP = $"route delete {ImpIp}";
-            string command_no_index = $"route delete {ImpIp} mask {ImpMask} {ImpGateway}";
-            string command_with_index = $"route delete {ImpIp} mask {ImpMask} {ImpGateway} if {ImpIndex}";
+            string command = BuildCommand();
 
-            //Wenn kein Index angegeben wurde
+            ExecuteCommand(command);
+        }
+        private void ClearFields()
+        {
+            IP_Adresse_Block.Clear();
+            Mask_Block.Clear();
+            Gate_Block.Clear();
+            Index_Block.Clear();
+        }
+        private string BuildCommand()
+        {
             if (string.IsNullOrEmpty(ImpIndex))
             {
-                output.Text = ShellCommand(command_no_index);
+                return $"route delete {ImpIp} mask {ImpMask} {ImpGateway}";
             }
-            //Wenn keine Maske angegeben wurde
             else if (string.IsNullOrEmpty(ImpMask))
             {
-                output.Text = ShellCommand(command_only_IP);
+                return $"route delete {ImpIp}";
             }
             else
             {
-                output.Text = ShellCommand(command_with_index);
+                return $"route delete {ImpIp} mask {ImpMask} {ImpGateway} if {ImpIndex}";
+            }
+        }
+        private void ExecuteCommand(string command)
+        {
+            terminalCommand.CommandShell(command);
+
+            if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+            {
+                output.Text = terminalCommand.Error;
+            }
+            else
+            {
+                output.Text = terminalCommand.Output;
+                ClearFields();
             }
         }
         private void Alle_Routen_Löschen(object sender, RoutedEventArgs e)
