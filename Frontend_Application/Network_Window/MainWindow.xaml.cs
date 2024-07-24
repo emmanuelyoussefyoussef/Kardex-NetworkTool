@@ -18,6 +18,10 @@ namespace Network_Window
         Boolean Maschinennetz = false;
         public string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
         public string[] interfaces;
+        public string ImpIp { get; set; }
+        public string ImpMask { get; set; }
+        public string ImpGateway { get; set; }
+        public string ImpIndex { get; set; }
         Boolean IsChecked = false;
        
         Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
@@ -28,35 +32,16 @@ namespace Network_Window
             { 3, Tuple.Create("", "", "", "") },
             { 4, Tuple.Create("", "", "", "") }
             };
-        //private DispatcherTimer timer;
-        //private int counterr = 0;
-        //private int limit = 10;
+        Dictionary<ComboBox, object> previousSelections = new Dictionary<ComboBox, object>();
 
         private TerminalCommand terminalCommand = new TerminalCommand();
         public MainWindow()
         {
             InitializeComponent();
             NetworkRefreshButton(null, null);
-            //timer = new DispatcherTimer();
-            //timer.Interval = TimeSpan.FromSeconds(1); // Set the interval to 1 second
-            //timer.Tick += Timer_Tick;
-            //timer.Start();
-            GateWayButton.Click += GateWayButtonConfirm;
+            GateWayButton.Click += GateWayButton_Click;//Check
+            GateWayButton.Click += GateWayButtonConfirm;//Check
         }
-        //private void Timer_Tick(object sender, EventArgs e)
-        //{
-        //    Counter++; // Increment the Counter by 1 every second
-        //    if (Counter >= limit)
-        //    {
-        //        // Clear the TextBlock and stop the timer
-        //        output.Text = ""; // Assuming 'output' is the name of your TextBlock
-        //        timer.Stop(); // Optional: Stop the timer if you don't need it to run again
-        //    }
-        //}
-        public string ImpIp { get; set; }
-        public string ImpMask { get; set; }
-        public string ImpGateway { get; set; }
-        public string ImpIndex { get; set; }
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             Info_Fenster objInfo_Fenster = new Info_Fenster();
@@ -86,14 +71,6 @@ namespace Network_Window
             else 
             {
                 ClearFields();
-
-                //terminalCommand.CommandShell("route delete 0.0.0.0 mask 0.0.0.0 " + ImpGateway);
-
-                //if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
-                //{
-                //    output.Text = $"Error: {terminalCommand.Error}";
-                //}
-                //else output.Text = terminalCommand.Output;
 
                 if (!string.IsNullOrWhiteSpace(ImpIndex))
                 {
@@ -130,7 +107,6 @@ namespace Network_Window
                             break;
                     }
                     Counter++;
-                    //timer.Start();
                 }
             }
         }//finished
@@ -191,74 +167,67 @@ namespace Network_Window
             }
         }//finished
         private void CreateCheckBox(int runner,int rowIndex, int columnIndex) {
+
+            ComboBox comboBox = new ComboBox();
+            comboBox.Name = $"ComboBox_{runner}";
+            comboBox.FontSize = 12;
+            comboBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
+            comboBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
+            comboBox.Items.Add("-Auswahl-");
+            comboBox.Items.Add("Internet");
+            comboBox.Items.Add("Maschinenetz");
+            comboBox.SelectedIndex = 0;
+            comboBox.Width = 100;
+            comboBox.Margin = new Thickness(5);
+            comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+
+            comboBox.SelectionChanged += ComboBox_SelectionChanged;
+
+            if (rowIndex > 1)
+            {
+                Grid.SetRow(comboBox, rowIndex);
+
+                Grid.SetColumn(comboBox, columnIndex);
+
+                GridContainer.Children.Add(comboBox);
+            }
             
-            CheckBox checkBox = new CheckBox();
-
-            checkBox.Name = $"CheckBox_{runner}";
-
-            checkBox.Content = "";
-
-            checkBox.FontSize = 12;
-
-            checkBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
-
-            checkBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White);
-
-            checkBox.Checked += (sender, e) => CheckBox_Checked(runner);
-            checkBox.Unchecked += (sender, e) => CheckBox_Unchecked(runner);
-
-            if (rowIndex >1)
-            {
-                Grid.SetRow(checkBox, rowIndex);
-
-                Grid.SetColumn(checkBox, columnIndex);
-
-                GridContainer.Children.Add(checkBox);
-            }
         }//finished
-        private void CheckBox_Checked(int value)
+        private void ComboBox_SelectionChanged(object sender, EventArgs e)
         {
-            MessageBox.Show($"IP Adresse: {NetworkSpecification[value].Item1}\n" +
-                $"Subnetzmaske: {NetworkSpecification[value].Item2}\n" +
-                $"Gateway: {NetworkSpecification[value].Item3}\n" +
-                $"Schnittstelle: {NetworkSpecification[value].Item4}");
+            ComboBox selectedComboBox = sender as ComboBox; // Das auslösende ComboBox
+            string selectedItem = selectedComboBox.SelectedItem?.ToString();
 
-            CurrentNetworkRowNumber = value;
-            if (!IsChecked) 
+            if (selectedComboBox != null && (selectedItem == "Internet" || selectedItem == "Maschinenetz"))
             {
-                IsChecked = !IsChecked;
-            }
-            CheckGateWayButtonVisibilityRequirement();
-            currentlyCheckedCount++;
-            ManageCheckBoxesAvailability();
-
-
-        }
-        private void ManageCheckBoxesAvailability()
-        {
-            bool shouldEnable = currentlyCheckedCount < 2;
-
-            foreach (UIElement element in GridContainer.Children)
-            {
-                if (element is CheckBox checkBox)
+                bool isAlreadySelected = false;
+                foreach (UIElement element in GridContainer.Children)
                 {
-                    if (checkBox.IsChecked == false)
+                    if (element is ComboBox comboBox && comboBox != selectedComboBox && comboBox.SelectedItem?.ToString() == selectedItem)
                     {
-                        checkBox.IsEnabled = shouldEnable;
+                        isAlreadySelected = true;
+                        break;
                     }
                 }
+
+                if (isAlreadySelected)
+                {
+                    MessageBox.Show($"{selectedItem} ist schon ausgewählt");
+                    selectedComboBox.SelectedItem = previousSelections[selectedComboBox]; // Stelle den vorherigen Zustand wieder her
+                }
+                else
+                {
+                    previousSelections[selectedComboBox] = selectedItem;
+                }
             }
-        }
-        private void CheckBox_Unchecked(int value)
-        {
-            if (IsChecked)
-            { 
-                IsChecked = !IsChecked; 
+            else if (selectedComboBox != null)
+            {
+                previousSelections[selectedComboBox] = selectedItem;
             }
+
             CheckGateWayButtonVisibilityRequirement();
-            currentlyCheckedCount--;
-            ManageCheckBoxesAvailability();
-        }
+        }//Check
+
         private void CreateTextBlocks(string value, int row, int column)
         {
             TextBlock textBlock = new TextBlock();
@@ -449,24 +418,28 @@ namespace Network_Window
                 return output;
             }
         }
-        private void Maschinen_netz_box_Click(object sender, RoutedEventArgs e)
-        {
-            Maschinennetz = !Maschinennetz;
-            if (Maschinennetz)
-            {
-                Internet_box.IsEnabled = false;
-                InternetIsChecked = false;
-            }
-            else
-            {
-                Internet_box.IsEnabled = true;
-            }
-        }//ToDo implement logic
+        //private void Maschinen_netz_box_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Maschinennetz = !Maschinennetz;
+        //    if (Maschinennetz)
+        //    {
+        //        Internet_box.IsEnabled = false;
+        //        InternetIsChecked = false;
+        //    }
+        //    else
+        //    {
+        //        Internet_box.IsEnabled = true;
+        //    }
+        //}//ToDo implement logic
         private void CheckGateWayButtonVisibilityRequirement()
         {
-            if (InternetIsChecked && IsChecked)
+            bool anyInternetOrMachineNetSelected = GridContainer.Children
+                .OfType<ComboBox>()
+                .Any(cb => cb.SelectedItem?.ToString() == "Internet" || cb.SelectedItem?.ToString() == "Maschinenetz");
+
+            if (anyInternetOrMachineNetSelected)
             {
-                GateWayButton.Visibility= Visibility.Visible;
+                GateWayButton.Visibility = Visibility.Visible;
                 Löschen_Button.Visibility = Visibility.Hidden;
                 Eingabe_Button.Visibility = Visibility.Hidden;
             }
@@ -476,39 +449,7 @@ namespace Network_Window
                 Löschen_Button.Visibility = Visibility.Visible;
                 Eingabe_Button.Visibility = Visibility.Visible;
             }
-        }
-        private void InternetCheckboxChecked(object sender, RoutedEventArgs e)
-        {
-            InternetIsChecked = !InternetIsChecked;
-            if (InternetIsChecked)
-            {
-                Maschinen_netz_box.IsEnabled = false;
-                Maschinennetz = false;
-
-                if (IsChecked)
-                {
-                    MessageBox.Show("Please enter a Gateway in the Gate field");
-                    CheckGateWayButtonVisibilityRequirement();
-
-                }
-            }
-            else
-            {
-                Maschinen_netz_box.IsEnabled = true;
-            }
-        }//ToDo implement logic
-        private void InternetCheckboxUnchecked(object sender, RoutedEventArgs e)
-        {
-            if (InternetIsChecked)
-            {
-                InternetIsChecked = !InternetIsChecked;
-                Maschinen_netz_box.IsEnabled = true;
-                if (IsChecked)
-                {
-                    CheckGateWayButtonVisibilityRequirement();
-                }
-            }
-        }//ToDo implement logic
+        }//Check
         private void GateWayButtonConfirm(object sender, RoutedEventArgs e)
         {
             ImpGateway = Gate_Block.Text;
@@ -526,5 +467,9 @@ namespace Network_Window
                 }
             }
         }
+        private void GateWayButton_Click(object sender, EventArgs e)
+        {
+            CheckGateWayButtonVisibilityRequirement(); // Verstecke den Button nach dem Klicken
+        }//Check
     }
 }
