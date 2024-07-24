@@ -7,6 +7,7 @@ namespace Network_Window
         public string Command { get; set;}
         public string Output { get; set;}
         public string Error { get; set; }
+
         private string GenerateNetwork = @"
                     Get-NetAdapter | ForEach-Object {
                     $Interface = $_

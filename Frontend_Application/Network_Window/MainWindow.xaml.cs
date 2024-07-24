@@ -42,7 +42,7 @@ namespace Network_Window
             GateWayButton.Click += GateWayButton_Click;//Check
             GateWayButton.Click += GateWayButtonConfirm;//Check
         }
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void HelpButton_Click(object sender, RoutedEventArgs e)
         {
             Info_Fenster objInfo_Fenster = new Info_Fenster();
             this.Visibility = Visibility.Visible;
@@ -152,13 +152,13 @@ namespace Network_Window
 
                     Gateway = OneNetworkRowData[5];
 
-                    CreateTextBlocks(ColumnValue, RowIndex, ColumnIndex);
+                    CreateTextBlocksFields(ColumnValue, RowIndex, ColumnIndex);
 
                     ColumnIndex++;
 
                     if (ColumnIndex >= 7)
                     {
-                        CreateCheckBox(RunnerForCheckBox, RowIndex, ColumnIndex);
+                        CreateComboBox(RunnerForCheckBox, RowIndex, ColumnIndex);
                         RowIndex++;
                         ColumnIndex = 0;
                     }
@@ -166,7 +166,7 @@ namespace Network_Window
                 NetworkSpecification[Runner] = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
             }
         }//finished
-        private void CreateCheckBox(int runner,int rowIndex, int columnIndex) {
+        private void CreateComboBox(int runner,int rowIndex, int columnIndex) {
 
             ComboBox comboBox = new ComboBox();
             comboBox.Name = $"ComboBox_{runner}";
@@ -227,8 +227,7 @@ namespace Network_Window
 
             CheckGateWayButtonVisibilityRequirement();
         }//Check
-
-        private void CreateTextBlocks(string value, int row, int column)
+        private void CreateTextBlocksFields(string value, int row, int column)
         {
             TextBlock textBlock = new TextBlock();
             textBlock.Text = $"{value}";
@@ -247,21 +246,36 @@ namespace Network_Window
             Grid.SetColumn(textBlock, column);
             GridContainer.Children.Add(textBlock);
         }
-        private void Route_1_Delete_Click(object sender, RoutedEventArgs e)
+        private void GenericRouteDelete_Click(object sender, RoutedEventArgs e)
         {
-            DeleteRoute(1, Route_1.Text);
-        }
-        private void Route_2_Delete_Click(object sender, RoutedEventArgs e)
-        {
-            DeleteRoute(2, Route_2.Text);
-        }
-        private void Route_3_Delete_Click(object sender, RoutedEventArgs e)
-        {
-            DeleteRoute(3, Route_3.Text);
-        }
-        private void Route_4_Delete_Click(object sender, RoutedEventArgs e)
-        {
-            DeleteRoute(4, Route_4.Text);
+            Button deleteButton = sender as Button;
+            if (deleteButton == null) return;
+
+            int index = 0;
+            string boxText = "";
+
+            if (deleteButton.Name == "Route_1_Delete")
+            {
+                index = 1;
+                boxText = Route_1.Text;
+            }
+            else if (deleteButton.Name == "Route_2_Delete")
+            {
+                index = 2;
+                boxText = Route_2.Text;
+            }
+            else if (deleteButton.Name == "Route_3_Delete")
+            {
+                index = 3;
+                boxText = Route_3.Text;
+            }
+            else if (deleteButton.Name == "Route_4_Delete")
+            {
+                index = 4;
+                boxText = Route_4.Text;
+            }
+
+            DeleteRoute(index, boxText);
         }
         private void DeleteRoute(int index, string boxnr)
         {
@@ -323,7 +337,7 @@ namespace Network_Window
 
             process.Start();
         }
-        private void Löschen_Button_Click(object sender, RoutedEventArgs e)
+        private void LöschenButton_Click(object sender, RoutedEventArgs e)
         {
             GetInputFields();
             string command = BuildCommand();
@@ -372,65 +386,15 @@ namespace Network_Window
                 ClearFields();
             }
         }
-        private void Alle_Routen_Löschen(object sender, RoutedEventArgs e)
+        private void AlleRoutenLöschen_Click(object sender, RoutedEventArgs e)
         {
-            ShellCommand("route -f");
+            terminalCommand.CommandShell("route -f");
             Route_1.Text = "";
             Route_2.Text = "";
             Route_3.Text = "";
             Route_4.Text = "";
             Counter = 1;
         }
-        private string ShellCommand(string command)
-        {
-            Process process = new Process();
-
-            ProcessStartInfo argument = new ProcessStartInfo
-            {
-                FileName = "powershell.exe",
-                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command}\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                StandardOutputEncoding = Encoding.UTF8,
-                StandardErrorEncoding = Encoding.UTF8
-            };
-
-            process.StartInfo = argument;
-
-            process.Start();
-
-            process.WaitForExit();
-
-            string error = process.StandardError.ReadToEnd();
-            string response = process.StandardOutput.ReadToEnd();
-
-            if (!string.IsNullOrWhiteSpace(error))
-            {
-                string output = error;
-
-                return output;
-            }
-            else
-            {
-                string output = response;
-                return output;
-            }
-        }
-        //private void Maschinen_netz_box_Click(object sender, RoutedEventArgs e)
-        //{
-        //    Maschinennetz = !Maschinennetz;
-        //    if (Maschinennetz)
-        //    {
-        //        Internet_box.IsEnabled = false;
-        //        InternetIsChecked = false;
-        //    }
-        //    else
-        //    {
-        //        Internet_box.IsEnabled = true;
-        //    }
-        //}//ToDo implement logic
         private void CheckGateWayButtonVisibilityRequirement()
         {
             bool anyInternetOrMachineNetSelected = GridContainer.Children
@@ -466,7 +430,7 @@ namespace Network_Window
                     Gate_Block.Clear();
                 }
             }
-        }
+        }//Check
         private void GateWayButton_Click(object sender, EventArgs e)
         {
             CheckGateWayButtonVisibilityRequirement(); // Verstecke den Button nach dem Klicken
