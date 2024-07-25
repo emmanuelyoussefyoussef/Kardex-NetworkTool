@@ -110,8 +110,13 @@
                        Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" 
                        Grid.Row="1" Margin="3,0,1,0"/>
 
-            <Grid x:Name="GridContainer" Grid.Row="0" Width="auto" Grid.ColumnSpan="2" HorizontalAlignment="Left">
+            <Grid x:Name="GridContainer" Grid.Row="0" Width="auto" Grid.ColumnSpan="2" HorizontalAlignment="Center">
                 <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
