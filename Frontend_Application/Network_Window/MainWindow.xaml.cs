@@ -191,11 +191,11 @@ namespace Network_Window
 
                 GridContainer.Children.Add(comboBox);
             }
-            
+            previousSelections[comboBox] = comboBox.SelectedItem.ToString();
         }//finished
         private void ComboBox_SelectionChanged(object sender, EventArgs e)
         {
-            ComboBox selectedComboBox = sender as ComboBox; // Das auslösende ComboBox
+            ComboBox selectedComboBox = sender as ComboBox;
             string selectedItem = selectedComboBox.SelectedItem?.ToString();
 
             if (selectedComboBox != null && (selectedItem == "Internet" || selectedItem == "Maschinenetz"))
@@ -213,11 +213,11 @@ namespace Network_Window
                 if (isAlreadySelected)
                 {
                     MessageBox.Show($"{selectedItem} ist schon ausgewählt");
-                    selectedComboBox.SelectedItem = previousSelections[selectedComboBox]; // Stelle den vorherigen Zustand wieder her
+                    selectedComboBox.SelectedItem = previousSelections[selectedComboBox]; // Zurücksetzen zum letzten gespeicherten Wert
                 }
                 else
                 {
-                    previousSelections[selectedComboBox] = selectedItem;
+                    previousSelections[selectedComboBox] = selectedItem; // Aktualisierung zu neuem Wert
                 }
             }
             else if (selectedComboBox != null)
@@ -226,7 +226,7 @@ namespace Network_Window
             }
 
             CheckGateWayButtonVisibilityRequirement();
-        }//Check
+        }
         private void CreateTextBlocksFields(string value, int row, int column)
         {
             TextBlock textBlock = new TextBlock();
@@ -429,7 +429,7 @@ namespace Network_Window
                     output.Text = terminalCommand.Output;
                     Gate_Block.Clear();
                 }
-            }
+            }else MessageBox.Show("Bitte geben Sie ein Gateway ein.");
         }//Check
         private void GateWayButton_Click(object sender, EventArgs e)
         {

@@ -53,7 +53,7 @@
 
 
             <TextBlock Name="Route_1" Grid.Row="0" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" Width="auto" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8" Margin="0,0,0,138" Grid.RowSpan="2"/>
-            <Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="2" Content="Löschen" Height="50"  HorizontalAlignment="Center" Click="GenericRouteDelete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold" InputScope="PhraseList" Margin="0,44,0,45">
+            <Button Name="Route_1_Delete" VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Content="Löschen" Height="50"  HorizontalAlignment="Center" Click="GenericRouteDelete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold" InputScope="PhraseList" Margin="0,44,0,45">
                 <Button.Resources>
                     <Style TargetType="Border" >
                         <Setter Property="CornerRadius" Value="10"/>
