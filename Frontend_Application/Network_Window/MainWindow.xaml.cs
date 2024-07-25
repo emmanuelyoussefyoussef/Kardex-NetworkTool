@@ -25,7 +25,6 @@ namespace Network_Window
         public string ImpMask { get; set; }
         public string ImpGateway { get; set; }
         public string ImpIndex { get; set; }
-        private bool comboBoxesCreated = false;
 
         Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
         Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
@@ -165,42 +164,39 @@ namespace Network_Window
                         CreateComboBox(RunnerForCheckBox, RowIndex, ColumnIndex);
                         RowIndex++;
                         ColumnIndex = 0;
-
                     }
                 }
                 NetworkSpecification[Runner] = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
             }
             CheckGateWayButtonVisibilityRequirement();
-
+            
         }
-        
-        
         private void CreateComboBox(int runner, int rowIndex, int columnIndex)
         {
-            ComboBox comboBox = new ComboBox();
-            comboBox.Name = $"ComboBox_{runner}";
-            comboBox.FontSize = 12;
-            comboBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
-            comboBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
-            comboBox.Items.Add("-Auswahl-");
-            comboBox.Items.Add("Internet");
-            comboBox.Items.Add("Maschinenetz");
-            comboBox.SelectedIndex = 0;
-            comboBox.Width = 100;
-            comboBox.Margin = new Thickness(5);
-            comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                ComboBox comboBox = new ComboBox();
+                comboBox.Name = $"ComboBox_{runner}";
+                comboBox.FontSize = 12;
+                comboBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
+                comboBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
+                comboBox.Items.Add("-Auswahl-");
+                comboBox.Items.Add("Internet");
+                comboBox.Items.Add("Maschinenetz");
+                comboBox.SelectedIndex = 0;
+                comboBox.Width = 100;
+                comboBox.Margin = new Thickness(5);
+                comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
 
-            comboBox.SelectionChanged += ComboBox_SelectionChanged;
+                comboBox.SelectionChanged += ComboBox_SelectionChanged;
 
-            if (rowIndex > 1)
-            {
-                Grid.SetRow(comboBox, rowIndex);
+                if (rowIndex > 1)
+                {
+                    Grid.SetRow(comboBox, rowIndex);
 
-                Grid.SetColumn(comboBox, columnIndex);
+                    Grid.SetColumn(comboBox, columnIndex);
 
-                GridContainer.Children.Add(comboBox);
-            }
-            previousSelections[comboBox] = comboBox.SelectedItem.ToString();
+                    GridContainer.Children.Add(comboBox);
+                }
+                previousSelections[comboBox] = comboBox.SelectedItem.ToString();
         }
 
         private void ComboBox_SelectionChanged(object sender, EventArgs e)
@@ -471,7 +467,7 @@ namespace Network_Window
                 }
                 else if (CurrentlySelectedNetwork == "Maschinenetz")
                 {
-                    //terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway}");
+                    terminalCommand.CommandShell($"route add {NetworkSpecification[SelectedInternetRow].Item1} mask {NetworkSpecification[SelectedInternetRow].Item2} {ImpGateway} if {NetworkSpecification[SelectedInternetRow].Item4}");
                     MessageBox.Show("Maschinenetz");
 
                     if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
@@ -487,7 +483,7 @@ namespace Network_Window
                     }
 
                 }
-
+                
             }
             else MessageBox.Show("Bitte geben Sie ein Gateway ein.");
 
