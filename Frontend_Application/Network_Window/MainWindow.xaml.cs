@@ -14,16 +14,19 @@ namespace Network_Window
         public int CurrentNetworkRowNumber = 0;
         private int currentlyCheckedCount = 0;
         private int id = 0;
-        Boolean InternetIsChecked = false;
+        private int SelectedInternetRow;
+        int CounterStopper = 0;
         Boolean Maschinennetz = false;
+        Boolean Switcher = false;
         public string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
         public string[] interfaces;
+        public string CurrentlySelectedNetwork;
         public string ImpIp { get; set; }
         public string ImpMask { get; set; }
         public string ImpGateway { get; set; }
         public string ImpIndex { get; set; }
-        Boolean IsChecked = false;
-       
+        private bool comboBoxesCreated = false;
+
         Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
         Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
             {
@@ -47,7 +50,7 @@ namespace Network_Window
             Info_Fenster objInfo_Fenster = new Info_Fenster();
             this.Visibility = Visibility.Visible;
             objInfo_Fenster.Show();
-        }//finished
+        }
         private void Hinzufügen_Button_Click(object sender, RoutedEventArgs e)
         {
             GetInputFields();
@@ -68,7 +71,7 @@ namespace Network_Window
             {
                 output.Text = "Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.";
             }
-            else 
+            else
             {
                 ClearFields();
 
@@ -76,7 +79,8 @@ namespace Network_Window
                 {
                     terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway + " if " + ImpIndex);
                 }
-                else {
+                else
+                {
                     terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway);
                 }
 
@@ -109,11 +113,11 @@ namespace Network_Window
                     Counter++;
                 }
             }
-        }//finished
+        }
         private void NetworkRefreshButton(object sender, RoutedEventArgs e)
         {
             GridContainer.Children.Clear();
-
+            Switcher = false;
             terminalCommand.GenerateNetworks();
 
             int ColumnIndex = 0;
@@ -161,13 +165,18 @@ namespace Network_Window
                         CreateComboBox(RunnerForCheckBox, RowIndex, ColumnIndex);
                         RowIndex++;
                         ColumnIndex = 0;
+
                     }
                 }
                 NetworkSpecification[Runner] = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
             }
-        }//finished
-        private void CreateComboBox(int runner,int rowIndex, int columnIndex) {
+            CheckGateWayButtonVisibilityRequirement();
 
+        }
+        
+        
+        private void CreateComboBox(int runner, int rowIndex, int columnIndex)
+        {
             ComboBox comboBox = new ComboBox();
             comboBox.Name = $"ComboBox_{runner}";
             comboBox.FontSize = 12;
@@ -192,32 +201,53 @@ namespace Network_Window
                 GridContainer.Children.Add(comboBox);
             }
             previousSelections[comboBox] = comboBox.SelectedItem.ToString();
-        }//finished
+        }
+
         private void ComboBox_SelectionChanged(object sender, EventArgs e)
         {
             ComboBox selectedComboBox = sender as ComboBox;
             string selectedItem = selectedComboBox.SelectedItem?.ToString();
+            CurrentlySelectedNetwork = selectedItem;
 
-            if (selectedComboBox != null && (selectedItem == "Internet" || selectedItem == "Maschinenetz"))
+            SelectedInternetRow = Grid.GetRow(selectedComboBox);
+            if (selectedComboBox.SelectedIndex == 0)
             {
-                bool isAlreadySelected = false;
+                // Reaktivieren aller ComboBoxes
                 foreach (UIElement element in GridContainer.Children)
                 {
-                    if (element is ComboBox comboBox && comboBox != selectedComboBox && comboBox.SelectedItem?.ToString() == selectedItem)
+                    if (element is ComboBox comboBox)
                     {
-                        isAlreadySelected = true;
-                        break;
+                        comboBox.IsEnabled = true;
+                    }
+                }
+            }
+            else if (selectedComboBox != null && (selectedItem == "Internet" || selectedItem == "Maschinenetz"))
+            {
+                bool isAlreadySelected = false;
+                Switcher = true;
+                foreach (UIElement element in GridContainer.Children)
+                {
+                    if (element is ComboBox comboBox && comboBox != selectedComboBox)
+                    {
+                        if (comboBox.SelectedItem?.ToString() == selectedItem)
+                        {
+                            isAlreadySelected = true;
+                            previousSelections[selectedComboBox] = selectedItem;
+                            break;
+                        }
+                        comboBox.IsEnabled = false;
+
                     }
                 }
 
                 if (isAlreadySelected)
                 {
                     MessageBox.Show($"{selectedItem} ist schon ausgewählt");
-                    selectedComboBox.SelectedItem = previousSelections[selectedComboBox]; // Zurücksetzen zum letzten gespeicherten Wert
+                    selectedComboBox.SelectedItem = previousSelections[selectedComboBox];
                 }
                 else
                 {
-                    previousSelections[selectedComboBox] = selectedItem; // Aktualisierung zu neuem Wert
+                    previousSelections[selectedComboBox] = selectedItem;
                 }
             }
             else if (selectedComboBox != null)
@@ -242,7 +272,7 @@ namespace Network_Window
             textBlock.VerticalAlignment = System.Windows.VerticalAlignment.Center;
 
 
-            Grid.SetRow(textBlock,row);
+            Grid.SetRow(textBlock, row);
             Grid.SetColumn(textBlock, column);
             GridContainer.Children.Add(textBlock);
         }
@@ -287,8 +317,8 @@ namespace Network_Window
             else
             {
                 terminalCommand.CommandShell($"route delete {Added_Routes[index].Item1} mask {Added_Routes[index].Item2} {Added_Routes[index].Item3} if {Added_Routes[index].Item4}");
-                
-                
+
+
 
                 if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                 {
@@ -336,6 +366,7 @@ namespace Network_Window
             process.StartInfo = startInfo_routen_button;
 
             process.Start();
+
         }
         private void LöschenButton_Click(object sender, RoutedEventArgs e)
         {
@@ -394,6 +425,7 @@ namespace Network_Window
             Route_3.Text = "";
             Route_4.Text = "";
             Counter = 1;
+            NetworkRefreshButton(null, null);
         }
         private void CheckGateWayButtonVisibilityRequirement()
         {
@@ -401,7 +433,7 @@ namespace Network_Window
                 .OfType<ComboBox>()
                 .Any(cb => cb.SelectedItem?.ToString() == "Internet" || cb.SelectedItem?.ToString() == "Maschinenetz");
 
-            if (anyInternetOrMachineNetSelected)
+            if (anyInternetOrMachineNetSelected && Switcher)
             {
                 GateWayButton.Visibility = Visibility.Visible;
                 Löschen_Button.Visibility = Visibility.Hidden;
@@ -416,21 +448,59 @@ namespace Network_Window
         }//Check
         private void GateWayButtonConfirm(object sender, RoutedEventArgs e)
         {
-            ImpGateway = Gate_Block.Text;
-            if (IsChecked && InternetIsChecked && !string.IsNullOrEmpty(ImpGateway))
+            GetInputFields();
+            if (!string.IsNullOrEmpty(ImpGateway) && Regex.IsMatch(ImpGateway, pattern))
             {
-                terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {NetworkSpecification[CurrentNetworkRowNumber].Item4}");
-                if(!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                if (CurrentlySelectedNetwork == "Internet")
                 {
-                    output.Text = $"Error: {terminalCommand.Error}";
+                    terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {NetworkSpecification[SelectedInternetRow].Item4}");
+                    //MessageBox.Show("Internet");
+
+                    if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                    {
+                        output.Text = $"Error: {terminalCommand.Error}";
+                    }
+                    else
+                    {
+                        output.Text = terminalCommand.Output;
+                        Gate_Block.Clear();
+
+                        EnableComboBox();
+                    }
+
                 }
-                else
+                else if (CurrentlySelectedNetwork == "Maschinenetz")
                 {
-                    output.Text = terminalCommand.Output;
-                    Gate_Block.Clear();
+                    //terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway}");
+                    MessageBox.Show("Maschinenetz");
+
+                    if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                    {
+                        output.Text = $"Error: {terminalCommand.Error}";
+                    }
+                    else
+                    {
+                        output.Text = terminalCommand.Output;
+                        Gate_Block.Clear();
+
+                        EnableComboBox();
+                    }
+
                 }
-            }else MessageBox.Show("Bitte geben Sie ein Gateway ein.");
-        }//Check
+
+            }
+            else MessageBox.Show("Bitte geben Sie ein Gateway ein.");
+
+        }
+
+        private void EnableComboBox()
+        {
+            foreach (ComboBox comboBox in GridContainer.Children.OfType<ComboBox>())
+            {
+                comboBox.IsEnabled = true;
+            }
+        }
+
         private void GateWayButton_Click(object sender, EventArgs e)
         {
             CheckGateWayButtonVisibilityRequirement(); // Verstecke den Button nach dem Klicken
