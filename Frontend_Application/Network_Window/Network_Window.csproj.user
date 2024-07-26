@@ -10,24 +10,12 @@
     <Compile Update="Components\DeleteButton.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Components\TierCard.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="DeleteButton.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="Hilfe_Fenster\Info_Fenster.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Components\DeleteButton.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Components\TierCard.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="DeleteButton.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Hilfe_Fenster\Info_Fenster.xaml">

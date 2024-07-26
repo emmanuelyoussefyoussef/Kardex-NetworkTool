@@ -8,8 +8,6 @@
         mc:Ignorable="d"
         Title="MainWindow" Width="1200" Height="700" MinWidth="1200" MinHeight="600">
     <Grid Background="#FF06373D">
-        <components:DeleteButton/>
-        <components:TierCard/>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240"/>
             <ColumnDefinition Width="*"/>
@@ -49,37 +47,33 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Name="Route_1" Grid.Row="0" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
-            <Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="1" Content="Löschen" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="GenericRouteDelete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="10"/>
-                    </Style>
-                </Button.Resources>
-                <Button.Background>
-                    <SolidColorBrush Color="#FFA52019" Opacity="1"/>
-                </Button.Background>
-            </Button>
+            <components:DeleteButton Grid.Row="0" Grid.Column="1" />
+            
+            <!--Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="1" 
+            Content="Löschen" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            Click="GenericRouteDelete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold"-->
 
             <TextBlock Name="Route_2" Grid.Row="1" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+            <components:DeleteButton Grid.Row="1" Grid.Column="1" />
+            <!--Name="Route_2_Delete" Grid.Row="1" Grid.Column="1" Content="LÃ¶schen" 
+            Height="50" HorizontalAlignment="Center" Background="#FFA52019" Click="GenericRouteDelete_Click" 
+            FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold"-->
+
 
             <TextBlock Name="Route_3" Grid.Row="2" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
-            <Button Name="Route_3_Delete" Grid.Row="2" Grid.Column="1" Content="Löschen" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#FFA52019" Click="GenericRouteDelete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="10"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
-
+            
+            <components:DeleteButton Grid.Row="2" Grid.Column="1" />
+            <!--Name="Route_3_Delete" Grid.Row="2" Grid.Column="1" Content="Löschen" Height="50" VerticalAlignment="Center" 
+            HorizontalAlignment="Center" Background="#FFA52019" 
+            Click="GenericRouteDelete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold"-->
             
             <TextBlock Name="Route_4" Grid.Row="3" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
-            <Button Name="Route_4_Delete" Grid.Row="3" Grid.Column="1" Content="Löschen" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" Click="GenericRouteDelete_Click" FontFamily="Consolas" Background="#FFA52019" BorderBrush="#FFB9B9A8" FontWeight="Bold">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="10"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
+            
+            <components:DeleteButton Grid.Row="3" Grid.Column="1" />
+            <!--Button Name="Route_4_Delete" Grid.Row="3" Grid.Column="1" 
+            Content="Löschen" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            Click="GenericRouteDelete_Click" FontFamily="Consolas" Background="#FFA52019" 
+            BorderBrush="#FFB9B9A8" FontWeight="Bold"-->
         </Grid>
 
         <Grid Grid.Row="1" Grid.Column="1">
