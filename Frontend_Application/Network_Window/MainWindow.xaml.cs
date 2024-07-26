@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Network_Window
@@ -50,6 +51,7 @@ namespace Network_Window
             this.Visibility = Visibility.Visible;
             objInfo_Fenster.Show();
         }
+        
         private void Hinzufügen_Button_Click(object sender, RoutedEventArgs e)
         {
             GetInputFields();
@@ -259,7 +261,7 @@ namespace Network_Window
             textBlock.Text = $"{value}";
             textBlock.FontSize = 12;
             textBlock.TextWrapping = TextWrapping.Wrap;
-            textBlock.Width = 100;
+            textBlock.Padding = new Thickness(5);
             textBlock.Height = 30;
             textBlock.Margin = new Thickness(1);
             textBlock.FontFamily = new System.Windows.Media.FontFamily("Consolas");
@@ -501,5 +503,24 @@ namespace Network_Window
         {
             CheckGateWayButtonVisibilityRequirement(); // Verstecke den Button nach dem Klicken
         }//Check
+
+        private void CustomButton()
+        {
+               Button button = new Button();
+            button.Content = "Löschen";
+            button.FontSize = 8;
+            button.FontFamily = new System.Windows.Media.FontFamily("Consolas");
+            button.FontWeight = FontWeights.Bold;
+            button.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0xB9, 0xB9, 0xA8));
+            button.Height = 50;
+            button.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            button.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+            button.Click += GenericRouteDelete_Click;
+            button.Resources.Add(SystemColors.HighlightBrushKey, new SolidColorBrush(Colors.Cyan));
+            button.Resources.Add(SystemColors.ControlBrushKey, new SolidColorBrush(Colors.Red));
+            Style borderStyle = new Style(typeof(Border));
+            borderStyle.Setters.Add(new Setter(Border.CornerRadiusProperty, new CornerRadius(10)));
+            button.Resources.Add(typeof(Border), borderStyle);
+        }
     }
 }
