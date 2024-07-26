@@ -36,6 +36,7 @@ namespace Network_Window
             { 4, Tuple.Create("", "", "", "") }
             };
         Dictionary<ComboBox, object> previousSelections = new Dictionary<ComboBox, object>();
+        private Dictionary<int, string> comboBoxSelections = new Dictionary<int, string>();
 
         private TerminalCommand terminalCommand = new TerminalCommand();
         public MainWindow()
@@ -51,7 +52,6 @@ namespace Network_Window
             this.Visibility = Visibility.Visible;
             objInfo_Fenster.Show();
         }
-        
         private void Hinzufügen_Button_Click(object sender, RoutedEventArgs e)
         {
             GetInputFields();
@@ -117,6 +117,9 @@ namespace Network_Window
         }
         private void NetworkRefreshButton(object sender, RoutedEventArgs e)
         {
+            // Speichere die aktuellen Auswahlen der ComboBoxen
+            SaveComboBoxSelections();
+
             GridContainer.Children.Clear();
             Switcher = false;
             terminalCommand.GenerateNetworks();
@@ -171,36 +174,61 @@ namespace Network_Window
                 NetworkSpecification[Runner] = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
             }
             CheckGateWayButtonVisibilityRequirement();
-            
+
+            // Stelle die Auswahlen der ComboBoxen wieder her
+            RestoreComboBoxSelections();
+        }
+        private void RestoreComboBoxSelections()
+        {
+            foreach (var child in GridContainer.Children)
+            {
+                if (child is ComboBox comboBox)
+                {
+                    int runner = int.Parse(comboBox.Name.Split('_')[1]);
+                    if (comboBoxSelections.TryGetValue(runner, out string selectedValue))
+                    {
+                        comboBox.SelectedItem = selectedValue;
+                    }
+                }
+            }
+        }
+        private void SaveComboBoxSelections()
+        {
+            comboBoxSelections.Clear();
+            foreach (var child in GridContainer.Children)
+            {
+                if (child is ComboBox comboBox)
+                {
+                    int runner = int.Parse(comboBox.Name.Split('_')[1]);
+                    comboBoxSelections[runner] = comboBox.SelectedItem.ToString();
+                }
+            }
         }
         private void CreateComboBox(int runner, int rowIndex, int columnIndex)
         {
-                ComboBox comboBox = new ComboBox();
-                comboBox.Name = $"ComboBox_{runner}";
-                comboBox.FontSize = 12;
-                comboBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
-                comboBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
-                comboBox.Items.Add("-Auswahl-");
-                comboBox.Items.Add("Internet");
-                comboBox.Items.Add("Maschinenetz");
-                comboBox.SelectedIndex = 0;
-                comboBox.Width = 100;
-                comboBox.Margin = new Thickness(5);
-                comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            ComboBox comboBox = new ComboBox();
+            comboBox.Name = $"ComboBox_{runner}";
+            comboBox.FontSize = 12;
+            comboBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
+            comboBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
+            comboBox.Items.Add("-Auswahl-");
+            comboBox.Items.Add("Internet");
+            comboBox.Items.Add("Maschinenetz");
+            comboBox.SelectedIndex = 0;
+            comboBox.Width = 100;
+            comboBox.Margin = new Thickness(5);
+            comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
 
-                comboBox.SelectionChanged += ComboBox_SelectionChanged;
+            comboBox.SelectionChanged += ComboBox_SelectionChanged;
 
-                if (rowIndex > 1)
-                {
-                    Grid.SetRow(comboBox, rowIndex);
-
-                    Grid.SetColumn(comboBox, columnIndex);
-
-                    GridContainer.Children.Add(comboBox);
-                }
-                previousSelections[comboBox] = comboBox.SelectedItem.ToString();
+            if (rowIndex > 1)
+            {
+                Grid.SetRow(comboBox, rowIndex);
+                Grid.SetColumn(comboBox, columnIndex);
+                GridContainer.Children.Add(comboBox);
+            }
+            previousSelections[comboBox] = comboBox.SelectedItem.ToString();
         }
-
         private void ComboBox_SelectionChanged(object sender, EventArgs e)
         {
             ComboBox selectedComboBox = sender as ComboBox;
@@ -436,6 +464,7 @@ namespace Network_Window
                 GateWayButton.Visibility = Visibility.Visible;
                 Löschen_Button.Visibility = Visibility.Hidden;
                 Eingabe_Button.Visibility = Visibility.Hidden;
+                MessageBox.Show("Bitte geben Sie ein Gateway ein.");
             }
             else
             {
@@ -490,7 +519,6 @@ namespace Network_Window
             else MessageBox.Show("Bitte geben Sie ein Gateway ein.");
 
         }
-
         private void EnableComboBox()
         {
             foreach (ComboBox comboBox in GridContainer.Children.OfType<ComboBox>())
@@ -498,29 +526,10 @@ namespace Network_Window
                 comboBox.IsEnabled = true;
             }
         }
-
         private void GateWayButton_Click(object sender, EventArgs e)
         {
             CheckGateWayButtonVisibilityRequirement(); // Verstecke den Button nach dem Klicken
         }//Check
-
-        private void CustomButton()
-        {
-               Button button = new Button();
-            button.Content = "Löschen";
-            button.FontSize = 8;
-            button.FontFamily = new System.Windows.Media.FontFamily("Consolas");
-            button.FontWeight = FontWeights.Bold;
-            button.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0xB9, 0xB9, 0xA8));
-            button.Height = 50;
-            button.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
-            button.VerticalAlignment = System.Windows.VerticalAlignment.Center;
-            button.Click += GenericRouteDelete_Click;
-            button.Resources.Add(SystemColors.HighlightBrushKey, new SolidColorBrush(Colors.Cyan));
-            button.Resources.Add(SystemColors.ControlBrushKey, new SolidColorBrush(Colors.Red));
-            Style borderStyle = new Style(typeof(Border));
-            borderStyle.Setters.Add(new Setter(Border.CornerRadiusProperty, new CornerRadius(10)));
-            button.Resources.Add(typeof(Border), borderStyle);
-        }
+        // To Do gateway fenster taucht áuf auch nachdem ein netzwerk ausgewählt wurde und die tabelle refresht wurde
     }
 }

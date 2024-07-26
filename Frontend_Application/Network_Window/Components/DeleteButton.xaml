@@ -8,7 +8,7 @@
              x:Name="root"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Button Content="Löschen" 
+        <Button Content="Löschen" Click="Button_Click"
          Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" 
          Background="#FFA52019" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold">
 

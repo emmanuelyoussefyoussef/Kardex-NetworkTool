@@ -24,5 +24,22 @@ namespace Network_Window.Components
         {
             InitializeComponent();
         }
+        public static readonly RoutedEvent JoinClickEvent =
+            EventManager.RegisterRoutedEvent(nameof(JoinClick), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(DeleteButton));
+
+        public event RoutedEventHandler JoinClick
+        {
+            add { AddHandler(JoinClickEvent, value); }
+            remove
+            {
+                RemoveHandler(JoinClickEvent, value);
+            }
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            RaiseEvent(new RoutedEventArgs(JoinClickEvent));
+        }
     }
 }

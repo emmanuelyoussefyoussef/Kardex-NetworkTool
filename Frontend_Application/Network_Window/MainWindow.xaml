@@ -47,29 +47,29 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Name="Route_1" Grid.Row="0" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
-            <components:DeleteButton Grid.Row="0" Grid.Column="1" />
+            <components:DeleteButton Grid.Row="0" Grid.Column="1" x:Name="Route_1_Delete"/>
             
             <!--Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="1" 
             Content="Löschen" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" 
             Click="GenericRouteDelete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold"-->
 
             <TextBlock Name="Route_2" Grid.Row="1" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
-            <components:DeleteButton Grid.Row="1" Grid.Column="1" />
+            <components:DeleteButton Grid.Row="1" Grid.Column="1" x:Name="Route_2_Delete"/>
             <!--Name="Route_2_Delete" Grid.Row="1" Grid.Column="1" Content="LÃ¶schen" 
             Height="50" HorizontalAlignment="Center" Background="#FFA52019" Click="GenericRouteDelete_Click" 
             FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold"-->
 
 
             <TextBlock Name="Route_3" Grid.Row="2" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
-            
-            <components:DeleteButton Grid.Row="2" Grid.Column="1" />
+
+            <components:DeleteButton Grid.Row="2" Grid.Column="1" x:Name="Route_3_Delete"/>
             <!--Name="Route_3_Delete" Grid.Row="2" Grid.Column="1" Content="Löschen" Height="50" VerticalAlignment="Center" 
             HorizontalAlignment="Center" Background="#FFA52019" 
             Click="GenericRouteDelete_Click" FontFamily="Consolas" BorderBrush="#FFB9B9A8" FontWeight="Bold"-->
             
             <TextBlock Name="Route_4" Grid.Row="3" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
-            
-            <components:DeleteButton Grid.Row="3" Grid.Column="1" />
+
+            <components:DeleteButton Grid.Row="3" Grid.Column="1" x:Name="Route_4_Delete"/>
             <!--Button Name="Route_4_Delete" Grid.Row="3" Grid.Column="1" 
             Content="Löschen" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" 
             Click="GenericRouteDelete_Click" FontFamily="Consolas" Background="#FFA52019" 
