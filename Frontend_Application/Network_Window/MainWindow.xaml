@@ -29,7 +29,7 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Content="Hilfe" FontSize="16" Click="HelpButton_Click" Background="#FFB9B9A8" FontFamily="Consolas" HorizontalContentAlignment="Left"/>
-            <Button Grid.Column="1" Content="Routen" FontSize="16" Click="Routen_Button" Background="#FFB9B9A8" HorizontalAlignment="Right" FontFamily="Consolas"/>
+            <Button Grid.Column="1" Content="Routen" FontSize="16" Click="ShowRoutesButton" Background="#FFB9B9A8" HorizontalAlignment="Right" FontFamily="Consolas"/>
             <Button Grid.Column="2" Content="Netzwerk-Tabelle Refresh" FontSize="16" Click="NetworkRefreshButton" Background="#FFB9B9A8" FontFamily="Consolas"/>
             <Button Grid.Column="3" Content="Routen Löschen" FontSize="16" Click="AlleRoutenLöschen_Click" Background="#FFB9B9A8" HorizontalAlignment="Right" HorizontalContentAlignment="Right" FontFamily="Consolas"/>
         </Grid>
@@ -217,7 +217,7 @@
                 </Button.Resources>
             </Button>
 
-            <Button Name="Löschen_Button" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Left" Margin="158,0,0,0" VerticalAlignment="Center" Height="25" Width="48" FontSize="9" Content="Entfernen" Click="LöschenButton_Click" FontFamily="Consolas" Background="#FFA52019" BorderBrush="#FFB9B9A8" FontWeight="Bold" Visibility="Visible">
+            <Button Name="Löschen_Button" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Left" Margin="158,0,0,0" VerticalAlignment="Center" Height="25" Width="48" FontSize="9" Content="Entfernen" Click="DeleteButton" FontFamily="Consolas" Background="#FFA52019" BorderBrush="#FFB9B9A8" FontWeight="Bold" Visibility="Visible">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>

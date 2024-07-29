@@ -1,11 +1,8 @@
 ﻿using Network_Window.Info_button;
 using System.Diagnostics;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace Network_Window
 {
@@ -352,47 +349,64 @@ namespace Network_Window
         }
         private void DeleteRoute(int index, string boxnr)
         {
-
             if (string.IsNullOrWhiteSpace(boxnr))
             {
                 output.Text = "keine route";
             }
             else
             {
-                terminalCommand.CommandShell($"route delete {Added_Routes[index].Item1} mask {Added_Routes[index].Item2} {Added_Routes[index].Item3} if {Added_Routes[index].Item4}");
-
-
-
-                if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
-                {
-                    output.Text = terminalCommand.Error;
-                }
-                else
-                {
-                    output.Text = terminalCommand.Output;
+                //terminalCommand.CommandShell($"route delete {Added_Routes[index].Item1} mask {Added_Routes[index].Item2} {Added_Routes[index].Item3} if {Added_Routes[index].Item4}");
+                
                     Added_Routes.Remove(Counter);
                     switch (index)
                     {
                         case 1:
                             Route_1.Text = "";
-                            break;
+                        foreach (var child in GridContainer.Children)
+                        {
+                            if (child is ComboBox comboBox)
+                            {
+                                comboBox.Items.Remove(Added_Routes[1].Item4);
+                            }
+                        }
+                        break;
                         case 2:
                             Route_2.Text = "";
-                            break;
+                        foreach (var child in GridContainer.Children)
+                        {
+                            if (child is ComboBox comboBox)
+                            {
+                                comboBox.Items.Remove(Added_Routes[2].Item4);
+                            }
+                        }
+                        break;
                         case 3:
                             Route_3.Text = "";
-                            break;
+                        foreach (var child in GridContainer.Children)
+                        {
+                            if (child is ComboBox comboBox)
+                            {
+                                comboBox.Items.Remove(Added_Routes[3].Item4);
+                            }
+                        }
+                        break;
                         case 4:
                             Route_4.Text = "";
-                            break;
+                        foreach (var child in GridContainer.Children)
+                        {
+                            if (child is ComboBox comboBox)
+                            {
+                                comboBox.Items.Remove(Added_Routes[4].Item4);
+                            }
+                        }
+                        break;
                         default:
                             break;
                     }
                     Counter = index;
-                }
             }
         }
-        private void Routen_Button(object sender, RoutedEventArgs e)
+        private void ShowRoutesButton(object sender, RoutedEventArgs e)
         {
             Process process = new Process();
 
@@ -411,7 +425,7 @@ namespace Network_Window
             process.Start();
 
         }
-        private void LöschenButton_Click(object sender, RoutedEventArgs e)
+        private void DeleteButton(object sender, RoutedEventArgs e)
         {
             GetInputFields();
             string command = BuildCommand();
@@ -552,7 +566,6 @@ namespace Network_Window
         {
             CheckGateWayButtonVisibilityRequirement(); // Verstecke den Button nach dem Klicken
         }//Check
-        // To Do gateway fenster taucht áuf auch nachdem ein netzwerk ausgewählt wurde und die tabelle refresht wurde
         private void AddedCustomRoute(object sender, RoutedEventArgs e)
         {
             GetInputFields();
@@ -594,5 +607,8 @@ namespace Network_Window
                 output.Text=regularExpressions.Output;
             }
         }
+        // To Do gateway fenster taucht áuf auch nachdem ein netzwerk ausgewählt wurde und die tabelle refresht wurde
+        //Mit dem delete button soll die custom route gelöscht werden und auch vom combobox
+
     }
 }
