@@ -39,6 +39,7 @@ namespace Network_Window
         private Dictionary<int, string> comboBoxSelections = new Dictionary<int, string>();
 
         private TerminalCommand terminalCommand = new TerminalCommand();
+        private RegularExpressions regularExpressions = new RegularExpressions();
         public MainWindow()
         {
             InitializeComponent();
@@ -52,69 +53,69 @@ namespace Network_Window
             this.Visibility = Visibility.Visible;
             objInfo_Fenster.Show();
         }
-        private void Hinzufügen_Button_Click(object sender, RoutedEventArgs e)
-        {
-            GetInputFields();
+        //private void Hinzufügen_Button_Click(object sender, RoutedEventArgs e)
+        //{
+        //    GetInputFields();
 
-            if (!Regex.IsMatch(ImpIp, pattern))
-            {
-                output.Text = "IP Adresse ist ungültig";
-            }
-            else if (!Regex.IsMatch(ImpMask, pattern))
-            {
-                output.Text = "Subnetzmaske ist ungültig";
-            }
-            else if (!Regex.IsMatch(ImpGateway, pattern))
-            {
-                output.Text = "Gateway ist ungültig";
-            }
-            else if (Counter == 5)
-            {
-                output.Text = "Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.";
-            }
-            else
-            {
-                ClearFields();
+        //    if (!Regex.IsMatch(ImpIp, pattern))
+        //    {
+        //        output.Text = "IP Adresse ist ungültig";
+        //    }
+        //    else if (!Regex.IsMatch(ImpMask, pattern))
+        //    {
+        //        output.Text = "Subnetzmaske ist ungültig";
+        //    }
+        //    else if (!Regex.IsMatch(ImpGateway, pattern))
+        //    {
+        //        output.Text = "Gateway ist ungültig";
+        //    }
+        //    else if (Counter == 5)
+        //    {
+        //        output.Text = "Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.";
+        //    }
+        //    else
+        //    {
+        //        ClearFields();
 
-                if (!string.IsNullOrWhiteSpace(ImpIndex))
-                {
-                    terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway + " if " + ImpIndex);
-                }
-                else
-                {
-                    terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway);
-                }
+        //        if (!string.IsNullOrWhiteSpace(ImpIndex))
+        //        {
+        //            terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway + " if " + ImpIndex);
+        //        }
+        //        else
+        //        {
+        //            terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway);
+        //        }
 
-                if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
-                {
-                    output.Text = $"Error: {terminalCommand.Error}";
-                }
-                else
-                {
-                    Added_Routes[Counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
-                    output.Text = terminalCommand.Output;
+        //        if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+        //        {
+        //            output.Text = $"Error: {terminalCommand.Error}";
+        //        }
+        //        else
+        //        {
+        //            Added_Routes[Counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
+        //            output.Text = terminalCommand.Output;
 
-                    string text = $"IP Adresse: {Added_Routes[Counter].Item1}\nSubnetMaske: {Added_Routes[Counter].Item2}\nGateway: {Added_Routes[Counter].Item3}\nSchnittstellenindex: {Added_Routes[Counter].Item4}\n";
+        //            string text = $"IP Adresse: {Added_Routes[Counter].Item1}\nSubnetMaske: {Added_Routes[Counter].Item2}\nGateway: {Added_Routes[Counter].Item3}\nSchnittstellenindex: {Added_Routes[Counter].Item4}\n";
 
-                    switch (Counter)
-                    {
-                        case 1:
-                            Route_1.Text = text;
-                            break;
-                        case 2:
-                            Route_2.Text = text;
-                            break;
-                        case 3:
-                            Route_3.Text = text;
-                            break;
-                        case 4:
-                            Route_4.Text = text;
-                            break;
-                    }
-                    Counter++;
-                }
-            }
-        }
+        //            switch (Counter)
+        //            {
+        //                case 1:
+        //                    Route_1.Text = text;
+        //                    break;
+        //                case 2:
+        //                    Route_2.Text = text;
+        //                    break;
+        //                case 3:
+        //                    Route_3.Text = text;
+        //                    break;
+        //                case 4:
+        //                    Route_4.Text = text;
+        //                    break;
+        //            }
+        //            Counter++;
+        //        }
+        //    }
+        //}
         private void NetworkRefreshButton(object sender, RoutedEventArgs e)
         {
             // Speichere die aktuellen Auswahlen der ComboBoxen
@@ -142,10 +143,15 @@ namespace Network_Window
 
             int Count = CommandRawOutputAsRows.Count;
 
+            // Erstelle die ComboBoxes nur einmal
+            if (previousSelections.Count == 0)
+            {
+                CreateComboBoxes(CommandRawOutputAsRows.Count);
+            }
+
             for (int j = 0; j < CommandRawOutputAsRows.Count; j++)
             {
                 int Runner = j;
-                int RunnerForCheckBox = j;
                 string[] OneNetworkRowData = CommandRawOutputAsRows[j];
 
                 for (int i = 0; i < OneNetworkRowData.Length; i++)
@@ -153,11 +159,8 @@ namespace Network_Window
                     ColumnValue = OneNetworkRowData[i];
 
                     Index = OneNetworkRowData[0];
-
                     Ip = OneNetworkRowData[3];
-
                     SubnetMask = OneNetworkRowData[4];
-
                     Gateway = OneNetworkRowData[5];
 
                     CreateTextBlocksFields(ColumnValue, RowIndex, ColumnIndex);
@@ -166,13 +169,15 @@ namespace Network_Window
 
                     if (ColumnIndex >= 7)
                     {
-                        CreateComboBox(RunnerForCheckBox, RowIndex, ColumnIndex);
+                        // Füge die vorhandene ComboBox hinzu
+                        AddExistingComboBox(Runner, RowIndex, ColumnIndex);
                         RowIndex++;
                         ColumnIndex = 0;
                     }
                 }
                 NetworkSpecification[Runner] = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
             }
+
             CheckGateWayButtonVisibilityRequirement();
 
             // Stelle die Auswahlen der ComboBoxen wieder her
@@ -204,38 +209,51 @@ namespace Network_Window
                 }
             }
         }
-        private void CreateComboBox(int runner, int rowIndex, int columnIndex)
+        private void CreateComboBoxes(int count)
         {
-            ComboBox comboBox = new ComboBox();
-            comboBox.Name = $"ComboBox_{runner}";
-            comboBox.FontSize = 12;
-            comboBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
-            comboBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
-            comboBox.Items.Add("-Auswahl-");
-            comboBox.Items.Add("Internet");
-            comboBox.Items.Add("Maschinenetz");
-            comboBox.SelectedIndex = 0;
-            comboBox.Width = 100;
-            comboBox.Margin = new Thickness(5);
-            comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-
-            comboBox.SelectionChanged += ComboBox_SelectionChanged;
-
-            if (rowIndex > 1)
+            for (int i = 0; i < count; i++)
             {
-                Grid.SetRow(comboBox, rowIndex);
-                Grid.SetColumn(comboBox, columnIndex);
-                GridContainer.Children.Add(comboBox);
+                ComboBox comboBox = new ComboBox();
+                comboBox.Name = $"ComboBox_{i}";
+                comboBox.FontSize = 12;
+                comboBox.FontFamily = new System.Windows.Media.FontFamily("Consolas");
+                comboBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
+                comboBox.Items.Add("-Auswahl-");
+                comboBox.Items.Add("Internet");
+                comboBox.Items.Add("Maschinenetz");
+                comboBox.SelectedIndex = 0;
+                comboBox.Width = 100;
+                comboBox.Margin = new Thickness(5);
+                comboBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+
+                comboBox.SelectionChanged += ComboBox_SelectionChanged;
+
+                previousSelections[comboBox] = comboBox.SelectedItem.ToString();
             }
-            previousSelections[comboBox] = comboBox.SelectedItem.ToString();
+        }
+        private void AddExistingComboBox(int runner, int rowIndex, int columnIndex)
+        {
+            ComboBox comboBox = previousSelections.Keys.FirstOrDefault(cb => cb.Name == $"ComboBox_{runner}");
+            if (comboBox != null)
+            {
+                if (rowIndex > 1)
+                {
+                    Grid.SetRow(comboBox, rowIndex);
+                    Grid.SetColumn(comboBox, columnIndex);
+                    GridContainer.Children.Add(comboBox);
+                }
+            }
         }
         private void ComboBox_SelectionChanged(object sender, EventArgs e)
         {
             ComboBox selectedComboBox = sender as ComboBox;
+            if (selectedComboBox == null) return;
+
             string selectedItem = selectedComboBox.SelectedItem?.ToString();
             CurrentlySelectedNetwork = selectedItem;
 
             SelectedInternetRow = Grid.GetRow(selectedComboBox);
+
             if (selectedComboBox.SelectedIndex == 0)
             {
                 // Reaktivieren aller ComboBoxes
@@ -247,10 +265,11 @@ namespace Network_Window
                     }
                 }
             }
-            else if (selectedComboBox != null && (selectedItem == "Internet" || selectedItem == "Maschinenetz"))
+            else if (selectedItem == "Internet" || selectedItem == "Maschinenetz")
             {
                 bool isAlreadySelected = false;
                 Switcher = true;
+
                 foreach (UIElement element in GridContainer.Children)
                 {
                     if (element is ComboBox comboBox && comboBox != selectedComboBox)
@@ -258,11 +277,9 @@ namespace Network_Window
                         if (comboBox.SelectedItem?.ToString() == selectedItem)
                         {
                             isAlreadySelected = true;
-                            previousSelections[selectedComboBox] = selectedItem;
                             break;
                         }
                         comboBox.IsEnabled = false;
-
                     }
                 }
 
@@ -276,7 +293,7 @@ namespace Network_Window
                     previousSelections[selectedComboBox] = selectedItem;
                 }
             }
-            else if (selectedComboBox != null)
+            else
             {
                 previousSelections[selectedComboBox] = selectedItem;
             }
@@ -305,7 +322,7 @@ namespace Network_Window
         private void GenericRouteDelete_Click(object sender, RoutedEventArgs e)
         {
             Button deleteButton = sender as Button;
-            if (deleteButton == null) return;
+            if (deleteButton == null) return ;
 
             int index = 0;
             string boxText = "";
@@ -406,6 +423,11 @@ namespace Network_Window
             ImpMask = Mask_Block.Text;
             ImpGateway = Gate_Block.Text;
             ImpIndex = Index_Block.Text;
+
+            regularExpressions.ImpIp = IP_Adresse_Block.Text;
+            regularExpressions.ImpMask = Mask_Block.Text;
+            regularExpressions.ImpGateway = Gate_Block.Text;
+            regularExpressions.ImpIndex = Index_Block.Text;
         }
         private void ClearFields()
         {
@@ -531,5 +553,46 @@ namespace Network_Window
             CheckGateWayButtonVisibilityRequirement(); // Verstecke den Button nach dem Klicken
         }//Check
         // To Do gateway fenster taucht áuf auch nachdem ein netzwerk ausgewählt wurde und die tabelle refresht wurde
+        private void AddedCustomRoute(object sender, RoutedEventArgs e)
+        {
+            GetInputFields();
+            if (regularExpressions.PatternValiduation())
+            {
+                foreach (var child in GridContainer.Children)
+                {
+                    if (child is ComboBox comboBox)
+                    {
+                        comboBox.Items.Add(ImpIndex);
+                    }
+                }
+                output.Text = "Route zur Liste hinzugefügt";
+
+                Added_Routes[Counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
+
+                string text = $"IP Adresse: {Added_Routes[Counter].Item1}\nSubnetMaske: {Added_Routes[Counter].Item2}\nGateway: {Added_Routes[Counter].Item3}\nSchnittstellenindex: {Added_Routes[Counter].Item4}\n";
+
+                switch (Counter)
+                {
+                    case 1:
+                        Route_1.Text = text;
+                        break;
+                    case 2:
+                        Route_2.Text = text;
+                        break;
+                    case 3:
+                        Route_3.Text = text;
+                        break;
+                    case 4:
+                        Route_4.Text = text;
+                        break;
+                }
+                Counter++;
+                ClearFields();
+            }
+            else if (!regularExpressions.PatternValiduation() )
+            {
+                output.Text=regularExpressions.Output;
+            }
+        }
     }
 }

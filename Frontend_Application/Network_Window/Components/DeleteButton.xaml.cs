@@ -29,7 +29,10 @@ namespace Network_Window.Components
 
         public event RoutedEventHandler JoinClick
         {
-            add { AddHandler(JoinClickEvent, value); }
+            add 
+            { 
+                AddHandler(JoinClickEvent, value); 
+            }
             remove
             {
                 RemoveHandler(JoinClickEvent, value);
