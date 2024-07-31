@@ -20,6 +20,7 @@ namespace Network_Window
         public string ImpGateway { get; set; }
         public string ImpIndex { get; set; }
 
+        private List<string> addedRouteNames = new List<string> { "Internet", "Maschinenetz" };
         Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
         Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
             {
@@ -198,6 +199,7 @@ namespace Network_Window
                 output.Text = "Route zur Liste hinzugefügt";
 
                 Added_Routes[Counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
+                addedRouteNames.Add(ImpIndex);
 
                 string text = $"IP Adresse: {Added_Routes[Counter].Item1}\nSubnetMaske: {Added_Routes[Counter].Item2}\nGateway: {Added_Routes[Counter].Item3}\nSchnittstellenindex: {Added_Routes[Counter].Item4}\n";
 
@@ -283,24 +285,29 @@ namespace Network_Window
                     {
                         output.Text = terminalCommand.Output;
                         Gate_Block.Clear();
-
+                        
                         EnableComboBox();
                     }
 
                 }
-                else if (CurrentlySelectedNetwork == "Maschinenetz")
+                //else if (CurrentlySelectedNetwork == "Maschinenetz")
+                else if (addedRouteNames.Contains(CurrentlySelectedNetwork))
                 {
-                    //Hier muss am ende der ip adresse .0 stehen und kein wert
+                    string modifiedIP = ReplaceAfterThirdDotWithZero(NetworkSpecification[SelectedInternetRow].Item1);
+
+                    //terminalCommand.CommandShell($"route add {modifiedIP} mask 0.0.0.0 {ImpGateway} if {NetworkSpecification[SelectedInternetRow].Item4}");
+                    MessageBox.Show($"route add {modifiedIP} mask {NetworkSpecification[SelectedInternetRow].Item2} {ImpGateway} if {NetworkSpecification[SelectedInternetRow].Item4}");
 
                     if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                     {
-                        output.Text = $"Error: {terminalCommand.Error}";
+                        //output.Text = $"Error: {terminalCommand.Error}";
                     }
                     else
                     {
-                        output.Text = terminalCommand.Output;
+                        //output.Text = terminalCommand.Output;
                         Gate_Block.Clear();
-
+                        Switcher = false;
+                        CheckGateWayButtonVisibilityRequirement();
                         EnableComboBox();
                     }
 
@@ -315,7 +322,6 @@ namespace Network_Window
             SaveComboBoxSelections();
 
             GridContainer.Children.Clear();
-            Switcher = false;
             terminalCommand.GenerateNetworks();
 
             int ColumnIndex = 0;
@@ -374,11 +380,18 @@ namespace Network_Window
             RestoreComboBoxSelections();
         }
 
-        // To Do gateway fenster taucht áuf auch nachdem ein netzwerk ausgewählt wurde und die tabelle refresht wurde
         //Mit dem delete button soll die custom route gelöscht werden und auch vom combobox
 
 
-        
+        private string ReplaceAfterThirdDotWithZero(string ipAddress)
+        {
+            string[] parts = ipAddress.Split('.');
+            if (parts.Length == 4)
+            {
+                parts[3] = "0";
+            }
+            return string.Join(".", parts);
+        }
         private void GenericRouteDelete(object sender, RoutedEventArgs e)
         {
             Button deleteButton = sender as Button;
@@ -492,7 +505,7 @@ namespace Network_Window
         {
             bool anyInternetOrMachineNetSelected = GridContainer.Children
                 .OfType<ComboBox>()
-                .Any(cb => cb.SelectedItem?.ToString() == "Internet" || cb.SelectedItem?.ToString() == "Maschinenetz");
+                .Any(cb => cb.SelectedItem != null && addedRouteNames.Contains(cb.SelectedItem.ToString()));
 
             if (anyInternetOrMachineNetSelected && Switcher)
             {
