@@ -11,13 +11,26 @@ namespace Network_Window
         private string GenerateNetwork = @"
                     Get-NetAdapter | ForEach-Object {
     $Interface = $_
-    $IPConfiguration = Get-NetIPConfiguration -InterfaceIndex $Interface.InterfaceIndex
+    $InterfaceIndex = $Interface.InterfaceIndex
+
+    try {
+        $NetIPInterface = Get-NetIPInterface -InterfaceIndex $InterfaceIndex -ErrorAction Stop
+    } catch {
+        return
+    }
+
+    try {
+        $IPConfiguration = Get-NetIPConfiguration -InterfaceIndex $InterfaceIndex -ErrorAction Stop
+    } catch {
+        return
+    }
+
     $DNS = ($IPConfiguration.DNSServer.ServerAddresses | Where-Object { $_ -like '*.*.*.*' }) -join ','
     if (-not $DNS) {
         $DNS = 'EMPTY'
     }
-    $SubnetMaskCIDR = $IPConfiguration.IPv4Address.PrefixLength
 
+    $SubnetMaskCIDR = $IPConfiguration.IPv4Address.PrefixLength
     $SubnetMaskDottedDecimal = (([math]::pow(2, $SubnetMaskCIDR) - 1) -shl (32 - $SubnetMaskCIDR)) -band 0xFFFFFFFF
     if ($SubnetMaskDottedDecimal -lt 0) {
         $SubnetMaskDottedDecimal += [math]::pow(2, 32)
@@ -32,7 +45,7 @@ namespace Network_Window
     $Status = if ($Interface.Status) { $Interface.Status -replace ' ', '_' } else { 'EMPTY' }
 
     [PSCustomObject]@{
-        Index = $Interface.InterfaceIndex
+        Index = $InterfaceIndex
         InterfaceAlias = $InterfaceAlias
         Status = $Status
         IPAddress = $IPAddress
@@ -40,7 +53,8 @@ namespace Network_Window
         Gateway = $Gateway
         DNS = $DNS
     }
-} | Format-Table -AutoSize | Out-String -Width 4096";
+} | Format-Table -AutoSize | Out-String -Width 4096
+";
         public void CommandShell(string _Command)
         {
 
