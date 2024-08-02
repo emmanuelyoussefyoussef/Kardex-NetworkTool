@@ -1,28 +1,32 @@
 ﻿using Network_Window.Info_button;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using System.Windows;
 using System.Windows.Controls;
+using System.Windows;
 
 namespace Network_Window
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window // wenn ein combobox geändert wurde und derselbe wieder aus etwas außer -Auswahl-
+                                             // gesetzt wird dann beinhaltet meine AktiveRoutes Liste immernoch den Wert von vorher
+                                             //GateWayButton mit Enter klciken lassen (optional)
     {
-        public int Counter = 1;
-        public int CurrentNetworkRowNumber = 0;
+        private int Counter = 1;
+        private int CurrentNetworkRowNumber = 0;
         private int SelectedInternetRow;
+
         private bool Switcher = false;
-        public string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
-        public string[] interfaces;
-        public string CurrentlySelectedNetwork;
+
+        private string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+        private string CurrentlySelectedNetwork;
+        private string[] interfaces;
+
         public string ImpIp { get; set; }
         public string ImpMask { get; set; }
         public string ImpGateway { get; set; }
         public string ImpIndex { get; set; }
 
-        private List<string> addedRouteNames = new List<string> { "Internet", "Maschinenetz" };
-        Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
-        Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
+        private Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
+        private Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
             {
             { 1, Tuple.Create("", "", "", "") },
             { 2, Tuple.Create("", "", "", "") },
@@ -31,9 +35,17 @@ namespace Network_Window
             };
         private Dictionary<ComboBox, object> previousSelections = new Dictionary<ComboBox, object>();
         private Dictionary<int, string> comboBoxSelections = new Dictionary<int, string>();
+        
         private List<string> ActiveNetworks = new List<string>();
+        private List<string> addedRouteNames = new List<string> { "Internet", "Maschinenetz" };
+
+
+
         private TerminalCommand terminalCommand = new TerminalCommand();
         private RegularExpressions regularExpressions = new RegularExpressions();
+
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -128,7 +140,18 @@ namespace Network_Window
             if (selectedComboBox == null) return;
 
             string selectedItem = selectedComboBox.SelectedItem?.ToString();
+            if (selectedItem == "-Auswahl-")
+            {
+                if (previousSelections[selectedComboBox] != "-Auswahl-")
+                {
+                    DeleteCurrentSelectedNetworks(CurrentlySelectedNetwork);
+                }
+            }
             CurrentlySelectedNetwork = selectedItem;
+            if (selectedItem != "-Auswahl-")
+            {
+                ModifyCurrentSelectedNetworks(selectedItem);
+            }
 
             SelectedInternetRow = Grid.GetRow(selectedComboBox);
 
@@ -165,19 +188,13 @@ namespace Network_Window
                 if (isAlreadySelected)
                 {
                     MessageBox.Show($"{selectedItem} ist schon ausgewählt");
-                    bool allConditionsMet = selectedComboBox.SelectedItem != null &&
-                           addedRouteNames.Contains(CurrentlySelectedNetwork) && //mit dem selecteditem ist eventuell was falsch da es -Auswahl- Anzeigt
-                           selectedComboBox.SelectedItem.ToString() != "-Auswahl-" &&
-                           selectedComboBox.SelectedIndex != 0 &&
-                           ActiveNetworks.Contains(selectedComboBox.SelectedItem);
                     selectedComboBox.SelectedItem = previousSelections[selectedComboBox];
                 }
                 else
                 {
                     previousSelections[selectedComboBox] = selectedItem;
                     MessageBox.Show("Bitte geben Sie ein Gateway ein.");
-                    ActiveNetworks.Add(CurrentlySelectedNetwork);
-
+                    //ActiveNetworks.Add(CurrentlySelectedNetwork);
                     CheckGateWayButtonVisibilityRequirement();
                 }
             }
@@ -186,7 +203,6 @@ namespace Network_Window
                 previousSelections[selectedComboBox] = selectedItem;
                 CheckGateWayButtonVisibilityRequirement();
             }
-            
         }
         private void EnableComboBox()
         {
@@ -237,8 +253,8 @@ namespace Network_Window
                 output.Text = regularExpressions.Output;
             }
         }
-        
-        
+
+
         private void HelpButton(object sender, RoutedEventArgs e)
         {
             Info_Fenster objInfo_Fenster = new Info_Fenster();
@@ -278,7 +294,7 @@ namespace Network_Window
         {
             CheckGateWayButtonVisibilityRequirement();
             // Verstecke den Button nach dem Klicken
-        }//Check
+        }
         private void GateWayButtonConfirm(object sender, RoutedEventArgs e)
         {
             GetInputFields();
@@ -389,9 +405,18 @@ namespace Network_Window
 
             RestoreComboBoxSelections();
         }
+        private void ModifyCurrentSelectedNetworks(string name)
+        {
+            if (!ActiveNetworks.Contains(name))
+            {
+                ActiveNetworks.Add(name);
 
-        //Mit dem delete button soll die custom route gelöscht werden und auch vom combobox
-
+            }
+        }
+        private void DeleteCurrentSelectedNetworks(string name)
+        {
+            ActiveNetworks.Remove(name);
+        }
 
         private string ReplaceAfterThirdDotWithZero(string ipAddress)
         {
@@ -405,7 +430,7 @@ namespace Network_Window
         private void GenericRouteDelete(object sender, RoutedEventArgs e)
         {
             Button deleteButton = sender as Button;
-            if (deleteButton == null) return ;
+            if (deleteButton == null) return;
 
             int index = 0;
             string boxText = "";
@@ -442,12 +467,12 @@ namespace Network_Window
             else
             {
                 //terminalCommand.CommandShell($"route delete {Added_Routes[index].Item1} mask {Added_Routes[index].Item2} {Added_Routes[index].Item3} if {Added_Routes[index].Item4}");
-                
-                    Added_Routes.Remove(Counter);
-                    switch (index)
-                    {
-                        case 1:
-                            Route_1.Text = "";
+
+                Added_Routes.Remove(Counter);
+                switch (index)
+                {
+                    case 1:
+                        Route_1.Text = "";
                         foreach (var child in GridContainer.Children)
                         {
                             if (child is ComboBox comboBox)
@@ -456,8 +481,8 @@ namespace Network_Window
                             }
                         }
                         break;
-                        case 2:
-                            Route_2.Text = "";
+                    case 2:
+                        Route_2.Text = "";
                         foreach (var child in GridContainer.Children)
                         {
                             if (child is ComboBox comboBox)
@@ -466,8 +491,8 @@ namespace Network_Window
                             }
                         }
                         break;
-                        case 3:
-                            Route_3.Text = "";
+                    case 3:
+                        Route_3.Text = "";
                         foreach (var child in GridContainer.Children)
                         {
                             if (child is ComboBox comboBox)
@@ -476,8 +501,8 @@ namespace Network_Window
                             }
                         }
                         break;
-                        case 4:
-                            Route_4.Text = "";
+                    case 4:
+                        Route_4.Text = "";
                         foreach (var child in GridContainer.Children)
                         {
                             if (child is ComboBox comboBox)
@@ -486,10 +511,10 @@ namespace Network_Window
                             }
                         }
                         break;
-                        default:
-                            break;
-                    }
-                    Counter = index;
+                    default:
+                        break;
+                }
+                Counter = index;
             }
         }
         private void GetInputFields()
@@ -517,11 +542,6 @@ namespace Network_Window
                .OfType<ComboBox>()
                .Any(cb => cb.SelectedItem != null && addedRouteNames.Contains(cb.SelectedItem.ToString()));
 
-            //bool allConditionsMet = selectedComboBox.SelectedItem != null &&
-            //               addedRouteNames.Contains(CurrentlySelectedNetwork) && //mit dem selecteditem ist eventuell was falsch da es -Auswahl- Anzeigt
-            //               selectedComboBox.SelectedItem.ToString() != "-Auswahl-" &&
-            //               selectedComboBox.SelectedIndex != 0 &&
-            //               ActiveNetworks.Contains(selectedComboBox.SelectedItem); //hier durchläuft er alle comboboxes das soll nicht so sein
 
             if (anyInternetOrMachineNetSelected && Switcher)
             {
@@ -529,6 +549,7 @@ namespace Network_Window
                 Löschen_Button.Visibility = Visibility.Hidden;
                 Eingabe_Button.Visibility = Visibility.Hidden;
                 Gate_Block.Focus();
+                GateWayButton.
             }
             else
             {
@@ -537,99 +558,5 @@ namespace Network_Window
                 Eingabe_Button.Visibility = Visibility.Visible;
             }
         }//Check
-
-        //private void DeleteButton(object sender, RoutedEventArgs e)
-        //{
-        //    GetInputFields();
-        //    string command;
-        //    if (string.IsNullOrEmpty(ImpIndex))
-        //    {
-        //        command = $"route delete {ImpIp} mask {ImpMask} {ImpGateway}";
-        //    }
-        //    else if (string.IsNullOrEmpty(ImpMask))
-        //    {
-        //        command = $"route delete {ImpIp}";
-        //    }
-        //    else
-        //    {
-        //        command = $"route delete {ImpIp} mask {ImpMask} {ImpGateway} if {ImpIndex}";
-        //    }
-        //    terminalCommand.CommandShell(command);
-
-        //    if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
-        //    {
-        //        output.Text = terminalCommand.Error;
-        //    }
-        //    else
-        //    {
-        //        output.Text = terminalCommand.Output;
-        //        ClearInputFields();
-        //    }
-        //}
-
-        
-    }//wenn ein netzwerk schionmal ausgewählt wurde, dann wieder versucht wird auszuwählen, dann popt das gateway button, das soll nicht passieren
-    //private void Hinzufügen_Button_Click(object sender, RoutedEventArgs e)
-    //{
-    //    GetInputFields();
-
-    //    if (!Regex.IsMatch(ImpIp, pattern))
-    //    {
-    //        output.Text = "IP Adresse ist ungültig";
-    //    }
-    //    else if (!Regex.IsMatch(ImpMask, pattern))
-    //    {
-    //        output.Text = "Subnetzmaske ist ungültig";
-    //    }
-    //    else if (!Regex.IsMatch(ImpGateway, pattern))
-    //    {
-    //        output.Text = "Gateway ist ungültig";
-    //    }
-    //    else if (Counter == 5)
-    //    {
-    //        output.Text = "Maximale Anzahl an Routen erreicht, bitte löschen sie Routen.";
-    //    }
-    //    else
-    //    {
-    //        ClearInputFields();
-
-    //        if (!string.IsNullOrWhiteSpace(ImpIndex))
-    //        {
-    //            terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway + " if " + ImpIndex);
-    //        }
-    //        else
-    //        {
-    //            terminalCommand.CommandShell("route add " + ImpIp + " mask " + ImpMask + " " + ImpGateway);
-    //        }
-
-    //        if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
-    //        {
-    //            output.Text = $"Error: {terminalCommand.Error}";
-    //        }
-    //        else
-    //        {
-    //            Added_Routes[Counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
-    //            output.Text = terminalCommand.Output;
-
-    //            string text = $"IP Adresse: {Added_Routes[Counter].Item1}\nSubnetMaske: {Added_Routes[Counter].Item2}\nGateway: {Added_Routes[Counter].Item3}\nSchnittstellenindex: {Added_Routes[Counter].Item4}\n";
-
-    //            switch (Counter)
-    //            {
-    //                case 1:
-    //                    Route_1.Text = text;
-    //                    break;
-    //                case 2:
-    //                    Route_2.Text = text;
-    //                    break;
-    //                case 3:
-    //                    Route_3.Text = text;
-    //                    break;
-    //                case 4:
-    //                    Route_4.Text = text;
-    //                    break;
-    //            }
-    //            Counter++;
-    //        }
-    //    }
-    //}
+    }
 }
