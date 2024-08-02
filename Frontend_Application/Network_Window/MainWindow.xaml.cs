@@ -31,7 +31,7 @@ namespace Network_Window
             };
         private Dictionary<ComboBox, object> previousSelections = new Dictionary<ComboBox, object>();
         private Dictionary<int, string> comboBoxSelections = new Dictionary<int, string>();
-
+        private List<string> ActiveNetworks = new List<string>();
         private TerminalCommand terminalCommand = new TerminalCommand();
         private RegularExpressions regularExpressions = new RegularExpressions();
         public MainWindow()
@@ -141,12 +141,12 @@ namespace Network_Window
                         comboBox.IsEnabled = true;
                     }
                 }
+                CheckGateWayButtonVisibilityRequirement();
             }
-            else if (selectedItem == "Internet" || selectedItem == "Maschinenetz")
+            else if (addedRouteNames.Contains(selectedItem))
             {
                 bool isAlreadySelected = false;
                 Switcher = true;
-                MessageBox.Show("Bitte geben Sie ein Gateway ein.");
 
                 foreach (UIElement element in GridContainer.Children)
                 {
@@ -158,24 +158,35 @@ namespace Network_Window
                             break;
                         }
                         comboBox.IsEnabled = false;
+
                     }
                 }
 
                 if (isAlreadySelected)
                 {
                     MessageBox.Show($"{selectedItem} ist schon ausgewählt");
+                    bool allConditionsMet = selectedComboBox.SelectedItem != null &&
+                           addedRouteNames.Contains(CurrentlySelectedNetwork) && //mit dem selecteditem ist eventuell was falsch da es -Auswahl- Anzeigt
+                           selectedComboBox.SelectedItem.ToString() != "-Auswahl-" &&
+                           selectedComboBox.SelectedIndex != 0 &&
+                           ActiveNetworks.Contains(selectedComboBox.SelectedItem);
                     selectedComboBox.SelectedItem = previousSelections[selectedComboBox];
                 }
                 else
                 {
                     previousSelections[selectedComboBox] = selectedItem;
+                    MessageBox.Show("Bitte geben Sie ein Gateway ein.");
+                    ActiveNetworks.Add(CurrentlySelectedNetwork);
+
+                    CheckGateWayButtonVisibilityRequirement();
                 }
             }
             else
             {
                 previousSelections[selectedComboBox] = selectedItem;
+                CheckGateWayButtonVisibilityRequirement();
             }
-            CheckGateWayButtonVisibilityRequirement();
+            
         }
         private void EnableComboBox()
         {
@@ -285,7 +296,6 @@ namespace Network_Window
                     {
                         output.Text = terminalCommand.Output;
                         Gate_Block.Clear();
-                        
                         EnableComboBox();
                     }
 
@@ -504,14 +514,21 @@ namespace Network_Window
         private void CheckGateWayButtonVisibilityRequirement()
         {
             bool anyInternetOrMachineNetSelected = GridContainer.Children
-                .OfType<ComboBox>()
-                .Any(cb => cb.SelectedItem != null && addedRouteNames.Contains(cb.SelectedItem.ToString()));
+               .OfType<ComboBox>()
+               .Any(cb => cb.SelectedItem != null && addedRouteNames.Contains(cb.SelectedItem.ToString()));
+
+            //bool allConditionsMet = selectedComboBox.SelectedItem != null &&
+            //               addedRouteNames.Contains(CurrentlySelectedNetwork) && //mit dem selecteditem ist eventuell was falsch da es -Auswahl- Anzeigt
+            //               selectedComboBox.SelectedItem.ToString() != "-Auswahl-" &&
+            //               selectedComboBox.SelectedIndex != 0 &&
+            //               ActiveNetworks.Contains(selectedComboBox.SelectedItem); //hier durchläuft er alle comboboxes das soll nicht so sein
 
             if (anyInternetOrMachineNetSelected && Switcher)
             {
                 GateWayButton.Visibility = Visibility.Visible;
                 Löschen_Button.Visibility = Visibility.Hidden;
                 Eingabe_Button.Visibility = Visibility.Hidden;
+                Gate_Block.Focus();
             }
             else
             {
@@ -551,7 +568,7 @@ namespace Network_Window
         //}
 
         
-    }
+    }//wenn ein netzwerk schionmal ausgewählt wurde, dann wieder versucht wird auszuwählen, dann popt das gateway button, das soll nicht passieren
     //private void Hinzufügen_Button_Click(object sender, RoutedEventArgs e)
     //{
     //    GetInputFields();
