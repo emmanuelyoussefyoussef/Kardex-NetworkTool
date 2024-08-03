@@ -549,7 +549,7 @@ namespace Network_Window
                 Löschen_Button.Visibility = Visibility.Hidden;
                 Eingabe_Button.Visibility = Visibility.Hidden;
                 Gate_Block.Focus();
-                GateWayButton.
+                //GateWayButton.
             }
             else
             {
