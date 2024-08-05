@@ -33,7 +33,7 @@ namespace Network_Window
             { 3, Tuple.Create("", "", "", "") },
             { 4, Tuple.Create("", "", "", "") }
             };
-        private Dictionary<ComboBox, object> previousSelections = new Dictionary<ComboBox, object>();
+        private Dictionary<ComboBox, string> previousSelections = new Dictionary<ComboBox, string>();
         private Dictionary<int, string> comboBoxSelections = new Dictionary<int, string>();
         
         private List<string> ActiveNetworks = new List<string>();
@@ -140,17 +140,30 @@ namespace Network_Window
             if (selectedComboBox == null) return;
 
             string selectedItem = selectedComboBox.SelectedItem?.ToString();
+
+            string previousSelectedItem = previousSelections[selectedComboBox];
+
             if (selectedItem == "-Auswahl-")
             {
+                //if (previousSelectedItem != "-Auswahl-" && previousSelectedItem != selectedItem)
+                //{
+                //    DeleteCurrentSelectedNetworks(previousSelectedItem);
+                //}
+
                 if (previousSelections[selectedComboBox] != "-Auswahl-")
                 {
                     DeleteCurrentSelectedNetworks(CurrentlySelectedNetwork);
                 }
             }
             CurrentlySelectedNetwork = selectedItem;
+            string previousSelectedItem = previousSelections[selectedComboBox];
             if (selectedItem != "-Auswahl-")
             {
                 ModifyCurrentSelectedNetworks(selectedItem);
+                if (previousSelectedItem != "-Auswahl-" && previousSelectedItem != selectedItem)
+                {
+                    DeleteCurrentSelectedNetworks(previousSelectedItem);
+                }
             }
 
             SelectedInternetRow = Grid.GetRow(selectedComboBox);
@@ -410,7 +423,6 @@ namespace Network_Window
             if (!ActiveNetworks.Contains(name))
             {
                 ActiveNetworks.Add(name);
-
             }
         }
         private void DeleteCurrentSelectedNetworks(string name)
