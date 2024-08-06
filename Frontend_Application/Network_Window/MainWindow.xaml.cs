@@ -9,10 +9,13 @@ namespace Network_Window
     public partial class MainWindow : Window // wenn ein combobox geändert wurde und derselbe wieder aus etwas außer -Auswahl-
                                              // gesetzt wird dann beinhaltet meine AktiveRoutes Liste immernoch den Wert von vorher
                                              //GateWayButton mit Enter klciken lassen (optional)
+                                             //wenn routenlöschen geklckt wird dann sollen alle ausgewählte comboboxes auf -Auswahl- Gesetzt werden
+                                             //wenn beim eingeben von gateway und hinzufügen von route es nicht klappt dann erneut fragen nach gateeway
     {
         private int Counter = 1;
         private int CurrentNetworkRowNumber = 0;
         private int SelectedInternetRow;
+        private int index = 0;
 
         private bool Switcher = false;
 
@@ -25,19 +28,19 @@ namespace Network_Window
         public string ImpGateway { get; set; }
         public string ImpIndex { get; set; }
 
-        private Dictionary<int, Tuple<string, string, string, string>> NetworkSpecification = new Dictionary<int, Tuple<string, string, string, string>>();
-        private Dictionary<int, Tuple<string, string, string, string>> Added_Routes = new Dictionary<int, Tuple<string, string, string, string>>
+        private Dictionary<int, Tuple<string, string, string, string>> ImportedNetworksFromPowershell = new Dictionary<int, Tuple<string, string, string, string>>();
+        private Dictionary<int, Tuple<string, string, string, string>> ManualAddedNetworks = new Dictionary<int, Tuple<string, string, string, string>>
             {
             { 1, Tuple.Create("", "", "", "") },
             { 2, Tuple.Create("", "", "", "") },
             { 3, Tuple.Create("", "", "", "") },
             { 4, Tuple.Create("", "", "", "") }
             };
-        private Dictionary<ComboBox, string> previousSelections = new Dictionary<ComboBox, string>();
-        private Dictionary<int, string> comboBoxSelections = new Dictionary<int, string>();
+        private Dictionary<ComboBox, string> PreviousComboboxSelections = new Dictionary<ComboBox, string>();
+        private Dictionary<int, string> ComboBoxSelections = new Dictionary<int, string>();
         
         private List<string> ActiveNetworks = new List<string>();
-        private List<string> addedRouteNames = new List<string> { "Internet", "Maschinenetz" };
+        private List<string> AddedRouteNames = new List<string>{ "Internet", "Maschinennetz" };
 
 
 
@@ -84,7 +87,7 @@ namespace Network_Window
                 comboBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Black);
                 comboBox.Items.Add("-Auswahl-");
                 comboBox.Items.Add("Internet");
-                comboBox.Items.Add("Maschinenetz");
+                comboBox.Items.Add("Maschinennetz");
                 comboBox.SelectedIndex = 0;
                 comboBox.Width = 100;
                 comboBox.Margin = new Thickness(5);
@@ -92,12 +95,12 @@ namespace Network_Window
 
                 comboBox.SelectionChanged += ComboBoxSelectionChanged;
 
-                previousSelections[comboBox] = comboBox.SelectedItem.ToString();
+                PreviousComboboxSelections[comboBox] = comboBox.SelectedItem.ToString();
             }
         }
         private void AddExistingComboBox(int runner, int rowIndex, int columnIndex)
         {
-            ComboBox comboBox = previousSelections.Keys.FirstOrDefault(cb => cb.Name == $"ComboBox_{runner}");
+            ComboBox comboBox = PreviousComboboxSelections.Keys.FirstOrDefault(cb => cb.Name == $"ComboBox_{runner}");
             if (comboBox != null)
             {
                 if (rowIndex > 1)
@@ -110,13 +113,13 @@ namespace Network_Window
         }
         private void SaveComboBoxSelections()
         {
-            comboBoxSelections.Clear();
+            ComboBoxSelections.Clear();
             foreach (var child in GridContainer.Children)
             {
                 if (child is ComboBox comboBox)
                 {
                     int runner = int.Parse(comboBox.Name.Split('_')[1]);
-                    comboBoxSelections[runner] = comboBox.SelectedItem.ToString();
+                    ComboBoxSelections[runner] = comboBox.SelectedItem.ToString();
                 }
             }
         }
@@ -127,7 +130,7 @@ namespace Network_Window
                 if (child is ComboBox comboBox)
                 {
                     int runner = int.Parse(comboBox.Name.Split('_')[1]);
-                    if (comboBoxSelections.TryGetValue(runner, out string selectedValue))
+                    if (ComboBoxSelections.TryGetValue(runner, out string selectedValue))
                     {
                         comboBox.SelectedItem = selectedValue;
                     }
@@ -141,7 +144,7 @@ namespace Network_Window
 
             string selectedItem = selectedComboBox.SelectedItem?.ToString();
 
-            string previousSelectedItem = previousSelections[selectedComboBox];
+            string previousSelectedItem = PreviousComboboxSelections[selectedComboBox];
 
             if (selectedItem == "-Auswahl-")
             {
@@ -150,17 +153,19 @@ namespace Network_Window
                 //    DeleteCurrentSelectedNetworks(previousSelectedItem);
                 //}
 
-                if (previousSelections[selectedComboBox] != "-Auswahl-")
+                if (PreviousComboboxSelections[selectedComboBox] != "-Auswahl-")
                 {
+                    
                     DeleteCurrentSelectedNetworks(CurrentlySelectedNetwork);
+
                 }
             }
             CurrentlySelectedNetwork = selectedItem;
-            string previousSelectedItem = previousSelections[selectedComboBox];
+
             if (selectedItem != "-Auswahl-")
             {
                 ModifyCurrentSelectedNetworks(selectedItem);
-                if (previousSelectedItem != "-Auswahl-" && previousSelectedItem != selectedItem)
+                if (previousSelectedItem != "-Auswahl-")
                 {
                     DeleteCurrentSelectedNetworks(previousSelectedItem);
                 }
@@ -179,7 +184,7 @@ namespace Network_Window
                 }
                 CheckGateWayButtonVisibilityRequirement();
             }
-            else if (addedRouteNames.Contains(selectedItem))
+            else if (AddedRouteNames.Contains(selectedItem))
             {
                 bool isAlreadySelected = false;
                 Switcher = true;
@@ -201,11 +206,11 @@ namespace Network_Window
                 if (isAlreadySelected)
                 {
                     MessageBox.Show($"{selectedItem} ist schon ausgewählt");
-                    selectedComboBox.SelectedItem = previousSelections[selectedComboBox];
+                    selectedComboBox.SelectedItem = PreviousComboboxSelections[selectedComboBox];
                 }
                 else
                 {
-                    previousSelections[selectedComboBox] = selectedItem;
+                    PreviousComboboxSelections[selectedComboBox] = selectedItem;
                     MessageBox.Show("Bitte geben Sie ein Gateway ein.");
                     //ActiveNetworks.Add(CurrentlySelectedNetwork);
                     CheckGateWayButtonVisibilityRequirement();
@@ -213,7 +218,7 @@ namespace Network_Window
             }
             else
             {
-                previousSelections[selectedComboBox] = selectedItem;
+                PreviousComboboxSelections[selectedComboBox] = selectedItem;
                 CheckGateWayButtonVisibilityRequirement();
             }
         }
@@ -238,10 +243,10 @@ namespace Network_Window
                 }
                 output.Text = "Route zur Liste hinzugefügt";
 
-                Added_Routes[Counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
-                addedRouteNames.Add(ImpIndex);
+                ManualAddedNetworks[Counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
+                AddedRouteNames.Add(ImpIndex);
 
-                string text = $"IP Adresse: {Added_Routes[Counter].Item1}\nSubnetMaske: {Added_Routes[Counter].Item2}\nGateway: {Added_Routes[Counter].Item3}\nSchnittstellenindex: {Added_Routes[Counter].Item4}\n";
+                string text = $"IP Adresse: {ManualAddedNetworks[Counter].Item1}\nSubnetMaske: {ManualAddedNetworks[Counter].Item2}\nGateway: {ManualAddedNetworks[Counter].Item3}\nSchnittstellenindex: {ManualAddedNetworks[Counter].Item4}\n";
 
                 switch (Counter)
                 {
@@ -315,7 +320,7 @@ namespace Network_Window
             {
                 if (CurrentlySelectedNetwork == "Internet")
                 {
-                    terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {NetworkSpecification[SelectedInternetRow].Item4}");
+                    terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
 
                     if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                     {
@@ -329,29 +334,26 @@ namespace Network_Window
                     }
 
                 }
-                //else if (CurrentlySelectedNetwork == "Maschinenetz")
-                else if (addedRouteNames.Contains(CurrentlySelectedNetwork))
+                else if (CurrentlySelectedNetwork == "Maschinennetz")
                 {
-                    string modifiedIP = ReplaceAfterThirdDotWithZero(NetworkSpecification[SelectedInternetRow].Item1);
+                    string modifiedIP = ReplaceAfterThirdDotWithZero(ImportedNetworksFromPowershell[SelectedInternetRow].Item1);
 
-                    //terminalCommand.CommandShell($"route add {modifiedIP} mask 0.0.0.0 {ImpGateway} if {NetworkSpecification[SelectedInternetRow].Item4}");
-                    MessageBox.Show($"route add {modifiedIP} mask {NetworkSpecification[SelectedInternetRow].Item2} {ImpGateway} if {NetworkSpecification[SelectedInternetRow].Item4}");
+                    //terminalCommand.CommandShell($"route add {modifiedIP} mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                    MessageBox.Show($"route add {modifiedIP} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
 
                     if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                     {
-                        //output.Text = $"Error: {terminalCommand.Error}";
+                        output.Text = $"Error: {terminalCommand.Error}";
                     }
                     else
                     {
-                        //output.Text = terminalCommand.Output;
+                        output.Text = terminalCommand.Output;
                         Gate_Block.Clear();
                         Switcher = false;
                         CheckGateWayButtonVisibilityRequirement();
                         EnableComboBox();
                     }
-
                 }
-
             }
             else MessageBox.Show("Bitte geben Sie den Gateway erneut ein.");
 
@@ -381,7 +383,7 @@ namespace Network_Window
 
             int Count = CommandRawOutputAsRows.Count;
 
-            if (previousSelections.Count == 0)
+            if (PreviousComboboxSelections.Count == 0)
             {
                 CreateComboBoxes(CommandRawOutputAsRows.Count);
             }
@@ -411,7 +413,7 @@ namespace Network_Window
                         ColumnIndex = 0;
                     }
                 }
-                NetworkSpecification[Runner] = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
+                ImportedNetworksFromPowershell[Runner] = Tuple.Create($"{Ip}", $"{SubnetMask}", $"{Gateway}", $"{Index}");
             }
 
             CheckGateWayButtonVisibilityRequirement();
@@ -423,6 +425,29 @@ namespace Network_Window
             if (!ActiveNetworks.Contains(name))
             {
                 ActiveNetworks.Add(name);
+                //GetInputFields();
+                //if (AddedRouteNames.Contains(CurrentlySelectedNetwork))
+                //{
+                //    string modifiedIP = ReplaceAfterThirdDotWithZero(ManualAddedNetworks[index + 1].Item1);
+
+                //    //terminalCommand.CommandShell($"route add {modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                //    MessageBox.Show($"route add {modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+
+                //    if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                //    {
+                //        output.Text = $"Error: {terminalCommand.Error}";
+                //    }
+                //    else
+                //    {
+                //        output.Text = terminalCommand.Output;
+                //        Gate_Block.Clear();
+                //        Switcher = false;
+                //        //CheckGateWayButtonVisibilityRequirement();
+
+                //        EnableComboBox();
+                //    }
+
+                //}
             }
         }
         private void DeleteCurrentSelectedNetworks(string name)
@@ -444,7 +469,7 @@ namespace Network_Window
             Button deleteButton = sender as Button;
             if (deleteButton == null) return;
 
-            int index = 0;
+            index = 0;
             string boxText = "";
 
             if (deleteButton.Name == "Route_1_Delete")
@@ -478,48 +503,96 @@ namespace Network_Window
             }
             else
             {
-                //terminalCommand.CommandShell($"route delete {Added_Routes[index].Item1} mask {Added_Routes[index].Item2} {Added_Routes[index].Item3} if {Added_Routes[index].Item4}");
+                //terminalCommand.CommandShell($"route delete {ManualAddedNetworks[index].Item1} mask {ManualAddedNetworks[index].Item2} {ManualAddedNetworks[index].Item3} if {ManualAddedNetworks[index].Item4}");
 
-                Added_Routes.Remove(Counter);
+                ManualAddedNetworks.Remove(Counter);
                 switch (index)
                 {
                     case 1:
-                        Route_1.Text = "";
-                        foreach (var child in GridContainer.Children)
+                        if (!string.IsNullOrWhiteSpace(Route_1.Text))
                         {
-                            if (child is ComboBox comboBox)
+                            Route_1.Text = "";
+                            terminalCommand.CommandShell($"route delete {ManualAddedNetworks[1].Item1} mask {ManualAddedNetworks[1].Item2} {ManualAddedNetworks[1].Item3}");
+                            if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                             {
-                                comboBox.Items.Remove(Added_Routes[1].Item4);
+                                output.Text = $"Error: {terminalCommand.Error}";
+                            }
+                            else
+                            {
+                                output.Text = terminalCommand.Output;
+                                foreach (var child in GridContainer.Children)
+                                {
+                                    if (child is ComboBox comboBox)
+                                    {
+                                        comboBox.Items.Remove(ManualAddedNetworks[1].Item4);
+                                    }
+                                }
                             }
                         }
                         break;
                     case 2:
-                        Route_2.Text = "";
-                        foreach (var child in GridContainer.Children)
+                        if (!string.IsNullOrWhiteSpace(Route_2.Text))
                         {
-                            if (child is ComboBox comboBox)
+                            Route_2.Text = "";
+                            terminalCommand.CommandShell($"route delete {ManualAddedNetworks[1].Item1} mask {ManualAddedNetworks[1].Item2} {ManualAddedNetworks[1].Item3}");
+                            if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                             {
-                                comboBox.Items.Remove(Added_Routes[2].Item4);
+                                output.Text = $"Error: {terminalCommand.Error}";
+                            }
+                            else
+                            {
+                                output.Text = terminalCommand.Output;
+                                foreach (var child in GridContainer.Children)
+                                {
+                                    if (child is ComboBox comboBox)
+                                    {
+                                        comboBox.Items.Remove(ManualAddedNetworks[2].Item4);
+                                    }
+                                }
                             }
                         }
                         break;
                     case 3:
-                        Route_3.Text = "";
-                        foreach (var child in GridContainer.Children)
+                        if (!string.IsNullOrWhiteSpace(Route_3.Text))
                         {
-                            if (child is ComboBox comboBox)
+                            Route_3.Text = "";
+                            terminalCommand.CommandShell($"route delete {ManualAddedNetworks[1].Item1} mask {ManualAddedNetworks[1].Item2} {ManualAddedNetworks[1].Item3}");
+                            if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                             {
-                                comboBox.Items.Remove(Added_Routes[3].Item4);
+                                output.Text = $"Error: {terminalCommand.Error}";
+                            }
+                            else
+                            {
+                                output.Text = terminalCommand.Output;
+                                foreach (var child in GridContainer.Children)
+                                {
+                                    if (child is ComboBox comboBox)
+                                    {
+                                        comboBox.Items.Remove(ManualAddedNetworks[3].Item4);
+                                    }
+                                }
                             }
                         }
                         break;
                     case 4:
-                        Route_4.Text = "";
-                        foreach (var child in GridContainer.Children)
+                        if (!string.IsNullOrWhiteSpace(Route_4.Text))
                         {
-                            if (child is ComboBox comboBox)
+                            Route_4.Text = "";
+                            terminalCommand.CommandShell($"route delete {ManualAddedNetworks[1].Item1} mask {ManualAddedNetworks[1].Item2} {ManualAddedNetworks[1].Item3}");
+                            if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                             {
-                                comboBox.Items.Remove(Added_Routes[4].Item4);
+                                output.Text = $"Error: {terminalCommand.Error}";
+                            }
+                            else
+                            {
+                                output.Text = terminalCommand.Output;
+                                foreach (var child in GridContainer.Children)
+                                {
+                                    if (child is ComboBox comboBox)
+                                    {
+                                        comboBox.Items.Remove(ManualAddedNetworks[4].Item4);
+                                    }
+                                }
                             }
                         }
                         break;
@@ -552,7 +625,7 @@ namespace Network_Window
         {
             bool anyInternetOrMachineNetSelected = GridContainer.Children
                .OfType<ComboBox>()
-               .Any(cb => cb.SelectedItem != null && addedRouteNames.Contains(cb.SelectedItem.ToString()));
+               .Any(cb => cb.SelectedItem != null && AddedRouteNames.Contains(cb.SelectedItem.ToString()));
 
 
             if (anyInternetOrMachineNetSelected && Switcher)
