@@ -57,7 +57,6 @@ namespace Network_Window
 ";
         public void CommandShell(string _Command)
         {
-
             Process process = new Process();
 
             ProcessStartInfo processStart = new ProcessStartInfo

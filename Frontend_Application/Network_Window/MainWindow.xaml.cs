@@ -9,7 +9,6 @@ namespace Network_Window
     public partial class MainWindow : Window // wenn ein combobox geändert wurde und derselbe wieder aus etwas außer -Auswahl-
                                              // gesetzt wird dann beinhaltet meine AktiveRoutes Liste immernoch den Wert von vorher
                                              //GateWayButton mit Enter klciken lassen (optional)
-                                             //wenn routenlöschen geklckt wird dann sollen alle ausgewählte comboboxes auf -Auswahl- Gesetzt werden
                                              //wenn beim eingeben von gateway und hinzufügen von route es nicht klappt dann erneut fragen nach gateeway
     {
         private int Counter = 1;
@@ -17,7 +16,7 @@ namespace Network_Window
         private int SelectedInternetRow;
         private int index = 0;
 
-        private bool Switcher = false;
+        private bool ShowGateWay = false;
 
         private string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
         private string CurrentlySelectedNetwork;
@@ -146,13 +145,15 @@ namespace Network_Window
 
             string previousSelectedItem = PreviousComboboxSelections[selectedComboBox];
 
+            SelectedInternetRow = Grid.GetRow(selectedComboBox);
+
             if (selectedItem == "-Auswahl-")
             {
                 //if (previousSelectedItem != "-Auswahl-" && previousSelectedItem != selectedItem)
                 //{
                 //    DeleteCurrentSelectedNetworks(previousSelectedItem);
                 //}
-
+                ShowGateWay = false;
                 if (PreviousComboboxSelections[selectedComboBox] != "-Auswahl-")
                 {
                     
@@ -171,7 +172,7 @@ namespace Network_Window
                 }
             }
 
-            SelectedInternetRow = Grid.GetRow(selectedComboBox);
+            
 
             if (selectedComboBox.SelectedIndex == 0)
             {
@@ -187,7 +188,6 @@ namespace Network_Window
             else if (AddedRouteNames.Contains(selectedItem))
             {
                 bool isAlreadySelected = false;
-                Switcher = true;
 
                 foreach (UIElement element in GridContainer.Children)
                 {
@@ -307,6 +307,14 @@ namespace Network_Window
             Route_4.Text = "";
             Counter = 1;
             NetworkRefreshButton(null, null);
+            foreach (UIElement element in GridContainer.Children)
+            {
+                if (element is ComboBox comboBox)
+                {
+                    comboBox.SelectedIndex = 0;
+
+                }
+            }
         }
         private void GateWayButton_Click(object sender, EventArgs e)
         {
@@ -331,6 +339,8 @@ namespace Network_Window
                         output.Text = terminalCommand.Output;
                         Gate_Block.Clear();
                         EnableComboBox();
+                        ShowGateWay = false;
+                        CheckGateWayButtonVisibilityRequirement();
                     }
 
                 }
@@ -338,8 +348,8 @@ namespace Network_Window
                 {
                     string modifiedIP = ReplaceAfterThirdDotWithZero(ImportedNetworksFromPowershell[SelectedInternetRow].Item1);
 
-                    //terminalCommand.CommandShell($"route add {modifiedIP} mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
-                    MessageBox.Show($"route add {modifiedIP} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                    terminalCommand.CommandShell($"route add {modifiedIP} mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                    //MessageBox.Show($"route add {modifiedIP} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
 
                     if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                     {
@@ -349,7 +359,7 @@ namespace Network_Window
                     {
                         output.Text = terminalCommand.Output;
                         Gate_Block.Clear();
-                        Switcher = false;
+                        ShowGateWay = false;
                         CheckGateWayButtonVisibilityRequirement();
                         EnableComboBox();
                     }
@@ -425,36 +435,34 @@ namespace Network_Window
             if (!ActiveNetworks.Contains(name))
             {
                 ActiveNetworks.Add(name);
-                //GetInputFields();
-                //if (AddedRouteNames.Contains(CurrentlySelectedNetwork))
-                //{
-                //    string modifiedIP = ReplaceAfterThirdDotWithZero(ManualAddedNetworks[index + 1].Item1);
+                ShowGateWay = true;
+                GetInputFields();
+                if (AddedRouteNames.Contains(CurrentlySelectedNetwork) && CurrentlySelectedNetwork != "Internet" && CurrentlySelectedNetwork != "Maschinennetz")
+                {
+                    string modifiedIP = ReplaceAfterThirdDotWithZero(ManualAddedNetworks[index + 1].Item1);
 
-                //    //terminalCommand.CommandShell($"route add {modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
-                //    MessageBox.Show($"route add {modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                    //terminalCommand.CommandShell($"route add {modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                    MessageBox.Show($"route add {modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
 
-                //    if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
-                //    {
-                //        output.Text = $"Error: {terminalCommand.Error}";
-                //    }
-                //    else
-                //    {
-                //        output.Text = terminalCommand.Output;
-                //        Gate_Block.Clear();
-                //        Switcher = false;
-                //        //CheckGateWayButtonVisibilityRequirement();
+                    if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                    {
+                        output.Text = $"Error: {terminalCommand.Error}";
+                    }
+                    else
+                    {
+                        output.Text = terminalCommand.Output;
+                        Gate_Block.Clear();
+                        EnableComboBox();
+                        ShowGateWay = false;
+                    }
 
-                //        EnableComboBox();
-                //    }
-
-                //}
+                }
             }
         }
         private void DeleteCurrentSelectedNetworks(string name)
         {
             ActiveNetworks.Remove(name);
         }
-
         private string ReplaceAfterThirdDotWithZero(string ipAddress)
         {
             string[] parts = ipAddress.Split('.');
@@ -628,7 +636,7 @@ namespace Network_Window
                .Any(cb => cb.SelectedItem != null && AddedRouteNames.Contains(cb.SelectedItem.ToString()));
 
 
-            if (anyInternetOrMachineNetSelected && Switcher)
+            if (ShowGateWay)
             {
                 GateWayButton.Visibility = Visibility.Visible;
                 Löschen_Button.Visibility = Visibility.Hidden;
