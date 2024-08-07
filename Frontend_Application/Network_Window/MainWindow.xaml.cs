@@ -4,12 +4,13 @@ using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows;
 
-namespace Network_Window
+namespace Network_Window // To activate the programm remove comment from 331 & 351 and remove the MessageBox.Show
 {
     public partial class MainWindow : Window // wenn ein combobox geändert wurde und derselbe wieder aus etwas außer -Auswahl-
                                              // gesetzt wird dann beinhaltet meine AktiveRoutes Liste immernoch den Wert von vorher
                                              //GateWayButton mit Enter klciken lassen (optional)
                                              //wenn beim eingeben von gateway und hinzufügen von route es nicht klappt dann erneut fragen nach gateeway
+                                             // wenn von maschinennetz oder internet zu einem geaddeten netz wechselt dann wird gatewaybutton angezeigt
     {
         private int Counter = 1;
         private int CurrentNetworkRowNumber = 0;
@@ -185,7 +186,7 @@ namespace Network_Window
                 }
                 CheckGateWayButtonVisibilityRequirement();
             }
-            else if (AddedRouteNames.Contains(selectedItem))
+            else if (AddedRouteNames.Contains(selectedItem) )
             {
                 bool isAlreadySelected = false;
 
@@ -211,14 +212,24 @@ namespace Network_Window
                 else
                 {
                     PreviousComboboxSelections[selectedComboBox] = selectedItem;
-                    MessageBox.Show("Bitte geben Sie ein Gateway ein.");
+                    if (selectedItem == "Internet" || selectedItem == "Maschinennetz")
+                    {
+                        MessageBox.Show("Bitte geben Sie ein Gateway ein.");
+                        CheckGateWayButtonVisibilityRequirement();
+
+
+                    }
+                    
                     //ActiveNetworks.Add(CurrentlySelectedNetwork);
-                    CheckGateWayButtonVisibilityRequirement();
                 }
             }
             else
             {
                 PreviousComboboxSelections[selectedComboBox] = selectedItem;
+                if (selectedItem == "Internet" || selectedItem == "Maschinennetz")
+                {
+                    ShowGateWay = true;
+                }else ShowGateWay = false;
                 CheckGateWayButtonVisibilityRequirement();
             }
         }
@@ -328,8 +339,8 @@ namespace Network_Window
             {
                 if (CurrentlySelectedNetwork == "Internet")
                 {
-                    terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
-
+                    //terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}"); 
+                    MessageBox.Show($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
                     if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                     {
                         output.Text = $"Error: {terminalCommand.Error}";
@@ -348,8 +359,8 @@ namespace Network_Window
                 {
                     string modifiedIP = ReplaceAfterThirdDotWithZero(ImportedNetworksFromPowershell[SelectedInternetRow].Item1);
 
-                    terminalCommand.CommandShell($"route add {modifiedIP} mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
-                    //MessageBox.Show($"route add {modifiedIP} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                    //terminalCommand.CommandShell($"route add {modifiedIP} mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                    MessageBox.Show($"route add {modifiedIP} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
 
                     if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
                     {
@@ -642,7 +653,6 @@ namespace Network_Window
                 Löschen_Button.Visibility = Visibility.Hidden;
                 Eingabe_Button.Visibility = Visibility.Hidden;
                 Gate_Block.Focus();
-                //GateWayButton.
             }
             else
             {
