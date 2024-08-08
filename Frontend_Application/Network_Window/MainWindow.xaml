@@ -16,7 +16,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="120"/>
         </Grid.RowDefinitions>
 
         <!-- Menü tasten -->
@@ -46,7 +46,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Name="Route_1" Grid.Row="0" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+            <TextBlock Name="Route_1" Grid.Row="0" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
             <!--<components:DeleteButton Grid.Row="0" Grid.Column="1" x:Name="Route_1_Delete" JoinClick="GenericRouteDelete_Click"/>-->
             <Button Name="Route_1_Delete" Grid.Row="0" Grid.Column="1" 
                 Content="Löschen" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" 
@@ -61,9 +61,9 @@
                 </Button.Resources>
             </Button>
 
-            
 
-            <TextBlock Name="Route_2" Grid.Row="1" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+
+            <TextBlock Name="Route_2" Grid.Row="1" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
             <!--<components:DeleteButton Grid.Row="1" Grid.Column="1" x:Name="Route_2_Delete" JoinClick="GenericRouteDelete_Click"/>-->
             <Button Name="Route_2_Delete" Grid.Row="1" Grid.Column="1" 
                 Content="Löschen" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" 
@@ -77,8 +77,8 @@
 
                 </Button.Resources>
             </Button>
-            
-            <TextBlock Name="Route_3" Grid.Row="2" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+
+            <TextBlock Name="Route_3" Grid.Row="2" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
             <Button Name="Route_3_Delete" Grid.Row="2" Grid.Column="1" 
                 Content="Löschen" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center" 
                 Click="GenericRouteDelete" FontFamily="Consolas" Background="#FFA52019" 
@@ -91,8 +91,8 @@
 
                 </Button.Resources>
             </Button>
-            
-            <TextBlock Name="Route_4" Grid.Row="3" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#b9b9a8"/>
+
+            <TextBlock Name="Route_4" Grid.Row="3" Grid.Column="0" Text="" FontSize="15" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="#b9b9a8"/>
 
             <!--<components:DeleteButton Grid.Row="3" Grid.Column="1" x:Name="Route_4_Delete" JoinClick="GenericRouteDelete_Click"/>-->
             <Button Name="Route_4_Delete" Grid.Row="3" Grid.Column="1" 
@@ -109,7 +109,7 @@
             </Button>
         </Grid>
 
-        <Grid Grid.Row="1" Grid.Column="1">
+        <Grid Grid.Row="1" Grid.Column="1" Grid.RowSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -119,8 +119,8 @@
             </Border>
 
             <!-- Das ist der textblock für mein output -->
-            <TextBlock Name="output" FontSize="20" TextWrapping="Wrap" FontFamily="Consolas" Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="1" Margin="3,0,1,0"/>
-            <Grid x:Name="GridContainer" Grid.Row="0" Width="auto" HorizontalAlignment="Stretch" Grid.ColumnSpan="2" >
+            <TextBlock Name="output" FontSize="20" TextWrapping="Wrap" FontFamily="Consolas" Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="1" Grid.RowSpan="2" Margin="3,0,1,0" Text="Beim Starten bitte, die Schaltfläche 'Routen löschen' betätigen, um sicherzustellen, dass keine vorherigen Einstellungen oder Routen bereits vorhanden sind."/>
+            <Grid x:Name="NetworkGridContainer" Grid.Row="0" Width="auto" HorizontalAlignment="Stretch" Grid.ColumnSpan="2" >
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -209,7 +209,7 @@
 
             <TextBlock Name="Index_Block_Beschreibung" Grid.Row="3" Padding="0" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Stretch" Background="Transparent" FontFamily="Consolas" Text="Index" Foreground="#FFB9B9A8"/>
 
-            <Button Name="Eingabe_Button" Grid.Column="2" Grid.Row="3" HorizontalAlignment="Left" Margin="158,0,0,0" VerticalAlignment="Center" Height="25" Width="48" FontSize="8" Content="Hinzufügen" Click="AddedCustomRoute" FontFamily="Consolas" Background="#FFD0AD00" BorderBrush="#FF317953" FontWeight="Bold" Visibility="Visible">
+            <Button Name="Eingabe_Button" Grid.Column="2" Grid.Row="0" Grid.RowSpan="4" HorizontalAlignment="right" Height="auto" Width="48" FontSize="8" Content="Hinzufügen" Click="AddedCustomRoute" FontFamily="Consolas" Background="#FFD0AD00" BorderBrush="#FF317953" FontWeight="Bold" Visibility="Visible">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
@@ -217,25 +217,21 @@
                 </Button.Resources>
             </Button>
 
-            <Button Name="Löschen_Button" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Left" Margin="158,0,0,0" VerticalAlignment="Center" Height="25" Width="48" FontSize="9" Content="Entfernen" FontFamily="Consolas" Background="#FFA52019" BorderBrush="#FFB9B9A8" FontWeight="Bold" Visibility="Visible">
+            <!--<Button Name="Löschen_Button" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Left" Margin="158,0,0,0" VerticalAlignment="Center" Height="25" Width="48" FontSize="9" Content="Entfernen" FontFamily="Consolas" Background="#FFA52019" BorderBrush="#FFB9B9A8" FontWeight="Bold" Visibility="Visible">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+            </Button>-->
+
+            <Button Name="GateWayButton" Grid.Column="2" Grid.Row="0" Grid.RowSpan="4" HorizontalAlignment="right" Height="auto" Width="48" FontSize="11" Content="Eingabe" FontFamily="Consolas" Background="Yellow" BorderBrush="#FFB9B9A8" FontWeight="Bold" Visibility="Hidden"  Click="GateWayButtonConfirm">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
                     </Style>
                 </Button.Resources>
             </Button>
-
-            <Button Name="GateWayButton" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left" Margin="158,0,0,0" VerticalAlignment="Center" Height="25" Width="48" FontSize="9" Content="Eingabe" FontFamily="Consolas" Background="Yellow" BorderBrush="#FFB9B9A8" FontWeight="Bold" Visibility="Hidden">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="5"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
-        </Grid>
-
-        <Grid Grid.Row="2" Grid.Column="1">
-            <TextBlock Name="Warnungstext" Grid.Row="0" FontSize="20" FontWeight="Bold" VerticalAlignment="Bottom" TextWrapping="Wrap" FontFamily="Consolas" Foreground="#FFB9B9A8" Text="Beim Starten bitte, die Schaltfläche 'Routen löschen' betätigen, um sicherzustellen, dass keine vorherigen Einstellungen oder Routen bereits vorhanden sind. Für die Verbindung mit Ihrem WLAN(mit dem Internet) verwenden Sie bitte die IP-Adresse 0.0.0.0 und die Subnetzmaske 0.0.0.0."/>
         </Grid>
     </Grid>
 </Window>
