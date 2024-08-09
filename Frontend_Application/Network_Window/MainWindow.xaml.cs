@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace Network_Window // To activate the programm remove comment from 331 & 351 and remove the MessageBox.Show
 {
@@ -39,7 +40,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             { 4, Tuple.Create("", "", "", "") }
             };
         private Dictionary<ComboBox, string> PreviousComboboxSelections = new Dictionary<ComboBox, string>();
-        private Dictionary<int, string> ComboBoxSelections = new Dictionary<int, string>();
+        private Dictionary<int, string> CurrentComboBoxSelections = new Dictionary<int, string>();
         
         private List<string> ActiveNetworks = new List<string>();
         private List<string> AddedRouteNames = new List<string>{ "Internet", "Maschinennetz" };
@@ -115,13 +116,13 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         }
         private void SaveComboBoxSelections()
         {
-            ComboBoxSelections.Clear();
+            CurrentComboBoxSelections.Clear();
             foreach (var child in NetworkGridContainer.Children)
             {
                 if (child is ComboBox comboBox)
                 {
                     int runner = int.Parse(comboBox.Name.Split('_')[1]);
-                    ComboBoxSelections[runner] = comboBox.SelectedItem.ToString();
+                    CurrentComboBoxSelections[runner] = comboBox.SelectedItem.ToString();
                 }
             }
         }
@@ -132,7 +133,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 if (child is ComboBox comboBox)
                 {
                     int runner = int.Parse(comboBox.Name.Split('_')[1]);
-                    if (ComboBoxSelections.TryGetValue(runner, out string selectedValue))
+                    if (CurrentComboBoxSelections.TryGetValue(runner, out string selectedValue))
                     {
                         comboBox.SelectedItem = selectedValue;
                     }
@@ -142,36 +143,33 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         private void ComboBoxSelectionChanged(object sender, EventArgs e)
         {
             selectedComboBox = sender as ComboBox;
+
             if (selectedComboBox == null) return;
 
-            string selectedItem = selectedComboBox.SelectedItem?.ToString();
+            string SelectedComboboxName = selectedComboBox.SelectedItem?.ToString();
 
-            string previousSelectedItem = PreviousComboboxSelections[selectedComboBox];
+            string PreviousSelectedComboboxName = PreviousComboboxSelections[selectedComboBox];
 
             SelectedInternetRow = Grid.GetRow(selectedComboBox);
 
-            if (selectedItem == "-Auswahl-")
+            if (SelectedComboboxName == "-Auswahl-")
             {
                 ShowGateWay = false;
                 if (PreviousComboboxSelections[selectedComboBox] != "-Auswahl-")
                 {
                     DeleteCurrentSelectedNetworks(CurrentlySelectedNetwork);
-                    //MessageBox.Show($"route delete {ImportedNetworksFromPowershell[SelectedInternetRow].Item1} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}"); //Wichtig
                 }
             }
-            CurrentlySelectedNetwork = selectedItem;
+            CurrentlySelectedNetwork = SelectedComboboxName;
 
-            if (selectedItem != "-Auswahl-")
+            if (SelectedComboboxName != "-Auswahl-")
             {
-                ModifyCurrentSelectedNetworks(selectedItem);
-                if (previousSelectedItem != "-Auswahl-")
+                ModifyCurrentSelectedNetworks(SelectedComboboxName);
+                if (PreviousSelectedComboboxName != "-Auswahl-")
                 {
-                    DeleteCurrentSelectedNetworks(previousSelectedItem);
-                    //MessageBox.Show($"route delete {ImportedNetworksFromPowershell[SelectedInternetRow].Item1} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                    DeleteCurrentSelectedNetworks(PreviousSelectedComboboxName);
                 }
             }
-
-            
 
             if (selectedComboBox.SelectedIndex == 0)
             {
@@ -182,9 +180,10 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                         comboBox.IsEnabled = true;
                     }
                 }
+                ShowGateWay = false;
                 CheckGateWayButtonVisibilityRequirement();
             }
-            else if (AddedRouteNames.Contains(selectedItem) )
+            else if (AddedRouteNames.Contains(SelectedComboboxName) )
             {
                 bool isAlreadySelected = false;
 
@@ -192,7 +191,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 {
                     if (element is ComboBox comboBox && comboBox != selectedComboBox)
                     {
-                        if (comboBox.SelectedItem?.ToString() == selectedItem)
+                        if (comboBox.SelectedItem?.ToString() == SelectedComboboxName)
                         {
                             isAlreadySelected = true;
                             break;
@@ -204,29 +203,30 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
 
                 if (isAlreadySelected)
                 {
-                    MessageBox.Show($"{selectedItem} ist schon ausgewählt");
+                    MessageBox.Show($"{SelectedComboboxName} ist schon ausgewählt");
                     selectedComboBox.SelectedItem = PreviousComboboxSelections[selectedComboBox];
                 }
                 else
                 {
-                    PreviousComboboxSelections[selectedComboBox] = selectedItem;
+                    //PreviousComboboxSelections[selectedComboBox] = SelectedComboboxName;
+                    ShowGateWay = true;
                     CheckGateWayButtonVisibilityRequirement();
-                    if (selectedItem == "Internet" || selectedItem == "Maschinennetz")
+                    if (SelectedComboboxName == "Internet" || SelectedComboboxName == "Maschinennetz")
                     {
                         MessageBox.Show("Bitte geben Sie ein Gateway ein.");
+                        ShowGateWay = true;
                         CheckGateWayButtonVisibilityRequirement();
                     }
-                    
-                    //ActiveNetworks.Add(CurrentlySelectedNetwork);
                 }
             }
             else
             {
-                PreviousComboboxSelections[selectedComboBox] = selectedItem;
-                if (selectedItem == "Internet" || selectedItem == "Maschinennetz")
+                PreviousComboboxSelections[selectedComboBox] = SelectedComboboxName;
+                if (SelectedComboboxName == "Internet" || SelectedComboboxName == "Maschinennetz")
                 {
                     ShowGateWay = true;
-                }else ShowGateWay = false;
+                }
+                else ShowGateWay = false;
                 CheckGateWayButtonVisibilityRequirement();
             }
         }
@@ -336,19 +336,17 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 if (CurrentlySelectedNetwork == "Internet")
                 {
                     terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}"); 
+
                     MessageBox.Show($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
-                    if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+
+                    if (GetOutput())
                     {
-                        output.Text = $"Error: {terminalCommand.Error}";
-                    }
-                    else
-                    {
-                        output.Text = terminalCommand.Output;
                         Gate_Block.Clear();
-                        EnableComboBox();
                         ShowGateWay = false;
                         CheckGateWayButtonVisibilityRequirement();
+                        EnableComboBox();
                     }
+                    else selectedComboBox.SelectedItem = PreviousComboboxSelections[selectedComboBox];
 
                 }
                 else if (CurrentlySelectedNetwork == "Maschinennetz")
@@ -358,18 +356,14 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                     terminalCommand.CommandShell($"route add {modifiedIP} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
                     MessageBox.Show($"route add {modifiedIP} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
 
-                    if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                    if (GetOutput()) 
                     {
-                        output.Text = $"Error: {terminalCommand.Error}";
-                    }
-                    else
-                    {
-                        output.Text = terminalCommand.Output;
                         Gate_Block.Clear();
                         ShowGateWay = false;
                         CheckGateWayButtonVisibilityRequirement();
                         EnableComboBox();
                     }
+                    else selectedComboBox.SelectedItem = PreviousComboboxSelections[selectedComboBox];
                 }
             }
             else MessageBox.Show("Bitte geben Sie den Gateway erneut ein.");
@@ -437,6 +431,68 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
 
             RestoreComboBoxSelections();
         }
+
+        private bool GetOutput() {
+            if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+            {
+                output.Text = $"Error: {terminalCommand.Error}";
+                return false;
+            }
+            else
+            {
+                output.Text = terminalCommand.Output;
+                return true;
+            }
+        }
+
+        private void DeleteLastSelectedNetwork() {
+
+
+            //if (PreviousComboboxSelections[selectedComboBox] != "-Auswahl-")
+            //{
+            //    if (name != "Internet" && name != "Maschinennetz" && name != "-Auswahl-")
+            //    {
+            //        MessageBox.Show($"route delete {ImportedNetworksFromPowershell[SelectedInternetRow].Item1} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+            //        //terminalCommand.CommandShell($"route delete {ImportedNetworksFromPowershell[SelectedInternetRow].Item1} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+            //        if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+            //        {
+            //            output.Text = $"Error: {terminalCommand.Error}";
+            //        }
+            //        else
+            //        {
+            //            output.Text = terminalCommand.Output;
+            //        }
+            //    }
+            //    if (name == "Internet")
+            //    {
+            //        MessageBox.Show($"route delete 0.0.0.0 mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+            //        //terminalCommand.CommandShell($"route delete 0.0.0.0 mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+            //        if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+            //        {
+            //            output.Text = $"Error: {terminalCommand.Error}";
+            //        }
+            //        else
+            //        {
+            //            output.Text = terminalCommand.Output;
+            //        }
+
+            //    }
+            //    if (name == "Maschinennetz")
+            //    {
+            //        if (ImportedNetworksFromPowershell[SelectedInternetRow].Item3 == "EMPTY")
+            //        {
+            //            MessageBox.Show($"route delete {ReplaceAfterThirdDotWithZero(ImportedNetworksFromPowershell[SelectedInternetRow].Item1)}");
+            //            terminalCommand.CommandShell($"route delete {ReplaceAfterThirdDotWithZero(ImportedNetworksFromPowershell[SelectedInternetRow].Item1)}");
+            //        }
+            //        else
+            //        {
+            //            MessageBox.Show($"route delete {ImportedNetworksFromPowershell[SelectedInternetRow].Item1} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+            //            terminalCommand.CommandShell($"route delete {ImportedNetworksFromPowershell[SelectedInternetRow].Item1} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+
+            //        }
+            //    }
+            //}
+        }
         private void ModifyCurrentSelectedNetworks(string name)
         {
             if (!ActiveNetworks.Contains(name))
@@ -451,52 +507,17 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                     //terminalCommand.CommandShell($"route add {modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
                     MessageBox.Show($"route add {modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
 
-                    if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                    if (GetOutput())
                     {
-                        output.Text = $"Error: {terminalCommand.Error}";
-                    }
-                    else
-                    {
-                        output.Text = terminalCommand.Output;
                         Gate_Block.Clear();
                         EnableComboBox();
                         ShowGateWay = false;
                     }
-
                 }
             }
         }
         private void DeleteCurrentSelectedNetworks(string name)
         {
-            //Deletes Internet and/or Maschinennetz when its not selected anymore
-            if (PreviousComboboxSelections[selectedComboBox] != "-Auswahl-")
-            {
-                if (name != "Internet" && name != "Maschinennetz" && name != "-Auswahl-")
-                {
-                    MessageBox.Show($"route delete {ImportedNetworksFromPowershell[SelectedInternetRow].Item1} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
-                    terminalCommand.CommandShell($"route delete {ImportedNetworksFromPowershell[SelectedInternetRow].Item1} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
-                }
-                if (name == "Internet")
-                {
-                    MessageBox.Show($"route delete 0.0.0.0 mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
-                    terminalCommand.CommandShell($"route delete 0.0.0.0 mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
-                    output.Text = terminalCommand.Output;
-                
-                }
-                if (name == "Maschinennetz")
-                {
-                    if (ImportedNetworksFromPowershell[SelectedInternetRow].Item3 == "EMPTY")
-                    {
-                        MessageBox.Show($"route delete {ReplaceAfterThirdDotWithZero(ImportedNetworksFromPowershell[SelectedInternetRow].Item1)}");
-                        terminalCommand.CommandShell($"route delete {ReplaceAfterThirdDotWithZero(ImportedNetworksFromPowershell[SelectedInternetRow].Item1)}");
-                    }
-                    else {
-                        MessageBox.Show($"route delete {ImportedNetworksFromPowershell[SelectedInternetRow].Item1} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
-                        terminalCommand.CommandShell($"route delete {ImportedNetworksFromPowershell[SelectedInternetRow].Item1} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImportedNetworksFromPowershell[SelectedInternetRow].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
-
-                    }
-                }
-            }
             ActiveNetworks.Remove(name);
         }
         private string ReplaceAfterThirdDotWithZero(string ipAddress)
@@ -547,8 +568,6 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             }
             else
             {
-                //terminalCommand.CommandShell($"route delete {ManualAddedNetworks[index].Item1} mask {ManualAddedNetworks[index].Item2} {ManualAddedNetworks[index].Item3} if {ManualAddedNetworks[index].Item4}");
-
                 ManualAddedNetworks.Remove(Counter);
                 switch (index)
                 {
@@ -556,43 +575,24 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                         if (!string.IsNullOrWhiteSpace(Route_1.Text))
                         {
                             Route_1.Text = "";
-                            foreach (var child in NetworkGridContainer.Children)
+                            if (GetOutput())
                             {
-                                if (child is ComboBox comboBox)
+                                foreach (var child in NetworkGridContainer.Children)
                                 {
-                                    comboBox.Items.Remove(ManualAddedNetworks[1].Item4);
+                                    if (child is ComboBox comboBox)
+                                    {
+                                        comboBox.Items.Remove(ManualAddedNetworks[1].Item4);
+                                    }
                                 }
                             }
-                            //terminalCommand.CommandShell($"route delete {ManualAddedNetworks[1].Item1} mask {ManualAddedNetworks[1].Item2} {ManualAddedNetworks[1].Item3}");
-                            //if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
-                            //{
-                            //    output.Text = $"Error: {terminalCommand.Error}";
-                            //}
-                            //else
-                            //{
-                            //    output.Text = terminalCommand.Output;
-                            //    foreach (var child in NetworkGridContainer.Children)
-                            //    {
-                            //        if (child is ComboBox comboBox)
-                            //        {
-                            //            comboBox.Items.Remove(ManualAddedNetworks[1].Item4);
-                            //        }
-                            //    }
-                            //}
                         }
                         break;
                     case 2:
                         if (!string.IsNullOrWhiteSpace(Route_2.Text))
                         {
                             Route_2.Text = "";
-                            terminalCommand.CommandShell($"route delete {ManualAddedNetworks[1].Item1} mask {ManualAddedNetworks[1].Item2} {ManualAddedNetworks[1].Item3}");
-                            if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                            if (GetOutput()) 
                             {
-                                output.Text = $"Error: {terminalCommand.Error}";
-                            }
-                            else
-                            {
-                                output.Text = terminalCommand.Output;
                                 foreach (var child in NetworkGridContainer.Children)
                                 {
                                     if (child is ComboBox comboBox)
@@ -607,14 +607,8 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                         if (!string.IsNullOrWhiteSpace(Route_3.Text))
                         {
                             Route_3.Text = "";
-                            terminalCommand.CommandShell($"route delete {ManualAddedNetworks[1].Item1} mask {ManualAddedNetworks[1].Item2} {ManualAddedNetworks[1].Item3}");
-                            if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                            if (GetOutput()) 
                             {
-                                output.Text = $"Error: {terminalCommand.Error}";
-                            }
-                            else
-                            {
-                                output.Text = terminalCommand.Output;
                                 foreach (var child in NetworkGridContainer.Children)
                                 {
                                     if (child is ComboBox comboBox)
@@ -629,14 +623,8 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                         if (!string.IsNullOrWhiteSpace(Route_4.Text))
                         {
                             Route_4.Text = "";
-                            terminalCommand.CommandShell($"route delete {ManualAddedNetworks[1].Item1} mask {ManualAddedNetworks[1].Item2} {ManualAddedNetworks[1].Item3}");
-                            if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
+                            if (GetOutput())
                             {
-                                output.Text = $"Error: {terminalCommand.Error}";
-                            }
-                            else
-                            {
-                                output.Text = terminalCommand.Output;
                                 foreach (var child in NetworkGridContainer.Children)
                                 {
                                     if (child is ComboBox comboBox)
@@ -674,11 +662,6 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         }
         private void CheckGateWayButtonVisibilityRequirement()
         {
-            bool anyInternetOrMachineNetSelected = NetworkGridContainer.Children
-               .OfType<ComboBox>()
-               .Any(cb => cb.SelectedItem != null && AddedRouteNames.Contains(cb.SelectedItem.ToString()));
-
-
             if (ShowGateWay)
             {
                 GateWayButton.Visibility = Visibility.Visible;
