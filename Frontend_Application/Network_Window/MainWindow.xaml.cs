@@ -11,13 +11,13 @@ using System.Security.Policy;
 
 namespace Network_Window // To activate the programm remove comment from 331 & 351 and remove the MessageBox.Show
 {
-    public partial class MainWindow : Window 
-                                             //wenn beim eingeben von gateway und hinzufügen von route es nicht klappt dann erneut fragen nach gateway
-                                             //route soll gelöscht werden nachdem combobox sich ändert(FIX)
-                                             //nachdem eine manual geaddete route gelöscht wird dann soll es vom combobox entfernt werden
-                                             //wenn ein manualgeaddedes netzwerk ausgewählt wird dann werden alle comboboxes deaktiviert und nicht mehr aktiviert(FIX)
-                                             //route delete messagebox soll erst erscheinen wenn ein gateway hinzugefügt wurde
-                                             //wenn ich zu einem manual geaddetes netzwerk wechsel und dann zu einem anderen nicht manual geadded und dann wieder zu manual geadded dann erscheint kein messagebox
+    public partial class MainWindow : Window
+    //wenn beim eingeben von gateway und hinzufügen von route es nicht klappt dann erneut fragen nach gateway
+    //route soll gelöscht werden nachdem combobox sich ändert(FIX)
+    //nachdem eine manual geaddete route gelöscht wird dann soll es vom combobox entfernt werden
+    //wenn ein manualgeaddedes netzwerk ausgewählt wird dann werden alle comboboxes deaktiviert und nicht mehr aktiviert(FIX)
+    //route delete messagebox soll erst erscheinen wenn ein gateway hinzugefügt wurde
+    //wenn ich zu einem manual geaddetes netzwerk wechsel und dann zu einem anderen nicht manual geadded und dann wieder zu manual geadded dann erscheint kein messagebox
     {
         private int Counter = 1;
         private int CurrentNetworkRowNumber = 0;
@@ -36,9 +36,9 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         public string ImpGateway { get; set; }
         public string ImpIndex { get; set; }
 
-        private Dictionary<int,string> ActiveRoutes = new Dictionary<int, string>();
+        private Dictionary<int, string> ActiveRoutes = new Dictionary<int, string>();
 
-        
+
         private Dictionary<int, Tuple<string, string, string, string>> ImportedNetworksFromPowershell = new Dictionary<int, Tuple<string, string, string, string>>();
         private Dictionary<int, Tuple<string, string, string, string>> ManualAddedNetworks = new Dictionary<int, Tuple<string, string, string, string>>
             {
@@ -49,9 +49,9 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             };
         private Dictionary<ComboBox, string> PreviousComboboxSelections = new Dictionary<ComboBox, string>();
         private Dictionary<int, string> CurrentComboBoxSelections = new Dictionary<int, string>();
-        
+
         private List<string> ActiveNetworks = new List<string>();
-        private List<string> AddedRouteNames = new List<string>{ "Internet", "Maschinennetz" };
+        private List<string> AddedRouteNames = new List<string> { "Internet", "Maschinennetz" };
 
 
 
@@ -153,7 +153,6 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         private void ComboBoxSelectionChanged(object sender, EventArgs e)
         {
             selectedComboBox = sender as ComboBox;
-            SaveComboBoxSelections();
 
             if (selectedComboBox == null) return;
 
@@ -259,6 +258,8 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 else ShowGateWay = false;
                 CheckGateWayButtonVisibilityRequirement();
             }
+
+            SaveComboBoxSelections();
         }
 
 
@@ -368,7 +369,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             {
                 if (CurrentlySelectedNetwork == "Internet")
                 {
-                    terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}"); 
+                    terminalCommand.CommandShell($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
 
                     MessageBox.Show($"route add 0.0.0.0 mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
 
@@ -390,7 +391,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                     terminalCommand.CommandShell($"route add {modifiedIP} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
                     MessageBox.Show($"route add {modifiedIP} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
 
-                    if (GetOutput()) 
+                    if (GetOutput())
                     {
                         Gate_Block.Clear();
                         ShowGateWay = false;
@@ -467,7 +468,8 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             RestoreComboBoxSelections();
         }
 
-        private bool GetOutput() {
+        private bool GetOutput()
+        {
             if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
             {
                 output.Text = $"Error: {terminalCommand.Error}";
@@ -498,7 +500,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                         Gate_Block.Clear();
                         EnableComboBox();
                         ShowGateWay = false;
-                        ActiveRoutes.Add(SelectedInternetRow,$"{modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                        ActiveRoutes.Add(SelectedInternetRow, $"{modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
                     }
                 }
             }
@@ -561,7 +563,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             }
             else
             {
-                
+
                 switch (index)
                 {
                     case 1:
@@ -584,7 +586,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                         if (!string.IsNullOrWhiteSpace(Route_2.Text))
                         {
                             Route_2.Text = "";
-                            if (GetOutput()) 
+                            if (GetOutput())
                             {
                                 foreach (var child in NetworkGridContainer.Children)
                                 {
@@ -600,7 +602,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                         if (!string.IsNullOrWhiteSpace(Route_3.Text))
                         {
                             Route_3.Text = "";
-                            if (GetOutput()) 
+                            if (GetOutput())
                             {
                                 foreach (var child in NetworkGridContainer.Children)
                                 {
