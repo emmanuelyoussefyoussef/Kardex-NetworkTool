@@ -5,14 +5,19 @@ using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml.Linq;
+using System.Collections;
+using System.Buffers;
+using System.Security.Policy;
 
 namespace Network_Window // To activate the programm remove comment from 331 & 351 and remove the MessageBox.Show
 {
     public partial class MainWindow : Window 
-                                             //wenn beim eingeben von gateway und hinzufügen von route es nicht klappt dann erneut fragen nach gateeway
+                                             //wenn beim eingeben von gateway und hinzufügen von route es nicht klappt dann erneut fragen nach gateway
                                              //route soll gelöscht werden nachdem combobox sich ändert(FIX)
                                              //nachdem eine manual geaddete route gelöscht wird dann soll es vom combobox entfernt werden
                                              //wenn ein manualgeaddedes netzwerk ausgewählt wird dann werden alle comboboxes deaktiviert und nicht mehr aktiviert(FIX)
+                                             //route delete messagebox soll erst erscheinen wenn ein gateway hinzugefügt wurde
+                                             //wenn ich zu einem manual geaddetes netzwerk wechsel und dann zu einem anderen nicht manual geadded und dann wieder zu manual geadded dann erscheint kein messagebox
     {
         private int Counter = 1;
         private int CurrentNetworkRowNumber = 0;
@@ -33,6 +38,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
 
         private Dictionary<int,string> ActiveRoutes = new Dictionary<int, string>();
 
+        
         private Dictionary<int, Tuple<string, string, string, string>> ImportedNetworksFromPowershell = new Dictionary<int, Tuple<string, string, string, string>>();
         private Dictionary<int, Tuple<string, string, string, string>> ManualAddedNetworks = new Dictionary<int, Tuple<string, string, string, string>>
             {
@@ -118,6 +124,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         }
         private void SaveComboBoxSelections()
         {
+            PreviousComboboxSelections = CurrentComboBoxSelections.ToDictionary(kvp => NetworkGridContainer.Children.OfType<ComboBox>().First(cb => cb.Name == $"ComboBox_{kvp.Key}"), kvp => kvp.Value);
             CurrentComboBoxSelections.Clear();
             foreach (var child in NetworkGridContainer.Children)
             {
@@ -127,6 +134,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                     CurrentComboBoxSelections[runner] = comboBox.SelectedItem.ToString();
                 }
             }
+
         }
         private void RestoreComboBoxSelections()
         {
@@ -145,29 +153,51 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         private void ComboBoxSelectionChanged(object sender, EventArgs e)
         {
             selectedComboBox = sender as ComboBox;
+            SaveComboBoxSelections();
 
             if (selectedComboBox == null) return;
 
-            string SelectedComboboxName = selectedComboBox.SelectedItem?.ToString();
+            string SelectedComboboxIndex = selectedComboBox.SelectedItem?.ToString();
 
             string PreviousSelectedComboboxName = PreviousComboboxSelections[selectedComboBox];
 
+
+
+
             SelectedInternetRow = Grid.GetRow(selectedComboBox);
 
-            if (SelectedComboboxName == "-Auswahl-")
+            //PreviousComboboxSelections[selectedComboBox] = CurrentComboBoxSelections[SelectedInternetRow];
+
+
+            if (SelectedComboboxIndex == "-Auswahl-")
             {
                 ShowGateWay = false;
+                CheckGateWayButtonVisibilityRequirement();
+                EnableComboBox();
                 if (PreviousComboboxSelections[selectedComboBox] != "-Auswahl-")
                 {
                     DeleteCurrentSelectedNetworks(CurrentlySelectedNetwork);
                 }
-                else MessageBox.Show($"route delete {ActiveRoutes[SelectedInternetRow]}");
-            }
-            CurrentlySelectedNetwork = SelectedComboboxName;
+                //else {
 
-            if (SelectedComboboxName != "-Auswahl-")
+                //    MessageBox.Show($"route delete {ActiveRoutes[SelectedInternetRow]}");
+                //    terminalCommand.CommandShell($"route delete {ActiveRoutes[SelectedInternetRow]}");
+                //    ActiveRoutes.Remove(SelectedInternetRow);
+                //    ActiveNetworks.Remove(CurrentlySelectedNetwork);
+
+                //}
+                else if (PreviousComboboxSelections[selectedComboBox] == "-Auswahl-")
+                {
+                    ShowGateWay = false;
+                    CheckGateWayButtonVisibilityRequirement();
+                    return;
+                }
+            }
+            CurrentlySelectedNetwork = SelectedComboboxIndex;
+
+            if (SelectedComboboxIndex != "-Auswahl-")
             {
-                ModifyCurrentSelectedNetworks(SelectedComboboxName);
+                ModifyCurrentSelectedNetworks(SelectedComboboxIndex);
                 if (PreviousSelectedComboboxName != "-Auswahl-")
                 {
                     DeleteCurrentSelectedNetworks(PreviousSelectedComboboxName);
@@ -186,7 +216,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 ShowGateWay = false;
                 CheckGateWayButtonVisibilityRequirement();
             }
-            else if (AddedRouteNames.Contains(SelectedComboboxName) )
+            else if (AddedRouteNames.Contains(SelectedComboboxIndex))
             {
                 bool isAlreadySelected = false;
 
@@ -194,7 +224,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 {
                     if (element is ComboBox comboBox && comboBox != selectedComboBox)
                     {
-                        if (comboBox.SelectedItem?.ToString() == SelectedComboboxName)
+                        if (comboBox.SelectedItem?.ToString() == SelectedComboboxIndex)
                         {
                             isAlreadySelected = true;
                             break;
@@ -206,12 +236,12 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
 
                 if (isAlreadySelected)
                 {
-                    MessageBox.Show($"{SelectedComboboxName} ist schon ausgewählt");
+                    MessageBox.Show($"{SelectedComboboxIndex} ist schon ausgewählt");
                     selectedComboBox.SelectedItem = PreviousComboboxSelections[selectedComboBox];
                 }
                 else
                 {
-                    if (SelectedComboboxName == "Internet" || SelectedComboboxName == "Maschinennetz")
+                    if (SelectedComboboxIndex == "Internet" || SelectedComboboxIndex == "Maschinennetz")
                     {
                         MessageBox.Show("Bitte geben Sie ein Gateway ein.");
                         ShowGateWay = true;
@@ -221,8 +251,8 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             }
             else
             {
-                PreviousComboboxSelections[selectedComboBox] = SelectedComboboxName;
-                if (SelectedComboboxName == "Internet" || SelectedComboboxName == "Maschinennetz")
+                PreviousComboboxSelections[selectedComboBox] = SelectedComboboxIndex;
+                if (SelectedComboboxIndex == "Internet" || SelectedComboboxIndex == "Maschinennetz")
                 {
                     ShowGateWay = true;
                 }
@@ -230,6 +260,9 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 CheckGateWayButtonVisibilityRequirement();
             }
         }
+
+
+
         private void EnableComboBox()
         {
             foreach (ComboBox comboBox in NetworkGridContainer.Children.OfType<ComboBox>())
@@ -457,7 +490,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 {
                     string modifiedIP = ReplaceAfterThirdDotWithZero(ManualAddedNetworks[index + 1].Item1);
 
-                    //terminalCommand.CommandShell($"route add {modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                    terminalCommand.CommandShell($"route add {modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
                     MessageBox.Show($"route add {modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
 
                     if (GetOutput())
@@ -473,7 +506,12 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         private void DeleteCurrentSelectedNetworks(string name)
         {
             ActiveNetworks.Remove(name);
+
             MessageBox.Show($"route delete {ActiveRoutes[SelectedInternetRow]}");
+
+            terminalCommand.CommandShell($"route delete {ActiveRoutes[SelectedInternetRow]}");
+
+            ActiveRoutes.Remove(SelectedInternetRow);
         }
         private string ReplaceAfterThirdDotWithZero(string ipAddress)
         {
@@ -489,31 +527,31 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             Button deleteButton = sender as Button;
             if (deleteButton == null) return;
 
-            index = 0;
+            int internIndex = 0;
             string boxText = "";
 
             if (deleteButton.Name == "Route_1_Delete")
             {
-                index = 1;
+                internIndex = 1;
                 boxText = Route_1.Text;
             }
             else if (deleteButton.Name == "Route_2_Delete")
             {
-                index = 2;
+                internIndex = 2;
                 boxText = Route_2.Text;
             }
             else if (deleteButton.Name == "Route_3_Delete")
             {
-                index = 3;
+                internIndex = 3;
                 boxText = Route_3.Text;
             }
             else if (deleteButton.Name == "Route_4_Delete")
             {
-                index = 4;
+                internIndex = 4;
                 boxText = Route_4.Text;
             }
 
-            DeleteManualAddedRoute(index, boxText);
+            DeleteManualAddedRoute(internIndex, boxText);
         }
         private void DeleteManualAddedRoute(int index, string boxnr)
         {
@@ -523,7 +561,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             }
             else
             {
-                ManualAddedNetworks.Remove(Counter);
+                
                 switch (index)
                 {
                     case 1:
@@ -593,6 +631,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                     default:
                         break;
                 }
+                ManualAddedNetworks[index] = Tuple.Create("", "", "", "");
                 Counter = index;
             }
         }
