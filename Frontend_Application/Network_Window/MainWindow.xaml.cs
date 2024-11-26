@@ -25,6 +25,9 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         private int index = 0;
         private ComboBox selectedComboBox;
 
+
+        private bool SwitchToDisableOverwritingCombobox = true;
+
         private bool ShowGateWay = false;
 
         private string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
@@ -107,6 +110,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 comboBox.SelectionChanged += ComboBoxSelectionChanged;
 
                 PreviousComboboxSelections[comboBox] = comboBox.SelectedItem.ToString();
+                //CurrentComboBoxSelections[i] = comboBox.SelectedItem.ToString();
             }
         }
         private void AddExistingComboBox(int runner, int rowIndex, int columnIndex)
@@ -124,7 +128,10 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         }
         private void SaveComboBoxSelections()
         {
-            PreviousComboboxSelections = CurrentComboBoxSelections.ToDictionary(kvp => NetworkGridContainer.Children.OfType<ComboBox>().First(cb => cb.Name == $"ComboBox_{kvp.Key}"), kvp => kvp.Value);
+            if (CurrentComboBoxSelections.Count > 0)
+            {
+                PreviousComboboxSelections = CurrentComboBoxSelections.ToDictionary(kvp => NetworkGridContainer.Children.OfType<ComboBox>().First(cb => cb.Name == $"ComboBox_{kvp.Key}"), kvp => kvp.Value);
+            }
             CurrentComboBoxSelections.Clear();
             foreach (var child in NetworkGridContainer.Children)
             {
@@ -152,114 +159,107 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         }
         private void ComboBoxSelectionChanged(object sender, EventArgs e)
         {
-            selectedComboBox = sender as ComboBox;
-
-            if (selectedComboBox == null) return;
-
-            string SelectedComboboxIndex = selectedComboBox.SelectedItem?.ToString();
-
-            string PreviousSelectedComboboxName = PreviousComboboxSelections[selectedComboBox];
-
-
-
-
-            SelectedInternetRow = Grid.GetRow(selectedComboBox);
-
-            //PreviousComboboxSelections[selectedComboBox] = CurrentComboBoxSelections[SelectedInternetRow];
-
-
-            if (SelectedComboboxIndex == "-Auswahl-")
+            if (SwitchToDisableOverwritingCombobox)
             {
-                ShowGateWay = false;
-                CheckGateWayButtonVisibilityRequirement();
-                EnableComboBox();
-                if (PreviousComboboxSelections[selectedComboBox] != "-Auswahl-")
-                {
-                    DeleteCurrentSelectedNetworks(CurrentlySelectedNetwork);
-                }
-                //else {
+                selectedComboBox = sender as ComboBox;
 
-                //    MessageBox.Show($"route delete {ActiveRoutes[SelectedInternetRow]}");
-                //    terminalCommand.CommandShell($"route delete {ActiveRoutes[SelectedInternetRow]}");
-                //    ActiveRoutes.Remove(SelectedInternetRow);
-                //    ActiveNetworks.Remove(CurrentlySelectedNetwork);
+                if (selectedComboBox == null) return;
+                SaveComboBoxSelections();
 
-                //}
-                else if (PreviousComboboxSelections[selectedComboBox] == "-Auswahl-")
+                string SelectedComboboxIndex = selectedComboBox.SelectedItem?.ToString();
+
+                string PreviousSelectedComboboxName = PreviousComboboxSelections[selectedComboBox];
+
+
+                SelectedInternetRow = Grid.GetRow(selectedComboBox);
+
+
+                if (SelectedComboboxIndex == "-Auswahl-")
                 {
                     ShowGateWay = false;
                     CheckGateWayButtonVisibilityRequirement();
-                    return;
-                }
-            }
-            CurrentlySelectedNetwork = SelectedComboboxIndex;
-
-            if (SelectedComboboxIndex != "-Auswahl-")
-            {
-                ModifyCurrentSelectedNetworks(SelectedComboboxIndex);
-                if (PreviousSelectedComboboxName != "-Auswahl-")
-                {
-                    DeleteCurrentSelectedNetworks(PreviousSelectedComboboxName);
-                }
-            }
-
-            if (selectedComboBox.SelectedIndex == 0)
-            {
-                foreach (UIElement element in NetworkGridContainer.Children)
-                {
-                    if (element is ComboBox comboBox)
+                    EnableComboBox();
+                    if (PreviousComboboxSelections[selectedComboBox] != "-Auswahl-")
                     {
-                        comboBox.IsEnabled = true;
+                        DeleteCurrentSelectedNetworks(CurrentlySelectedNetwork);
+                        NetworkRefreshButton(null, null);
+                    }
+
+                    else if (PreviousComboboxSelections[selectedComboBox] == "-Auswahl-")
+                    {
+                        ShowGateWay = false;
+                        CheckGateWayButtonVisibilityRequirement();
+                        return;
                     }
                 }
-                ShowGateWay = false;
-                CheckGateWayButtonVisibilityRequirement();
-            }
-            else if (AddedRouteNames.Contains(SelectedComboboxIndex))
-            {
-                bool isAlreadySelected = false;
+                CurrentlySelectedNetwork = SelectedComboboxIndex;
 
-                foreach (UIElement element in NetworkGridContainer.Children)
+                if (SelectedComboboxIndex != "-Auswahl-")
                 {
-                    if (element is ComboBox comboBox && comboBox != selectedComboBox)
+                    ModifyCurrentSelectedNetworks(SelectedComboboxIndex);
+                    if (PreviousSelectedComboboxName != "-Auswahl-")
                     {
-                        if (comboBox.SelectedItem?.ToString() == SelectedComboboxIndex)
+                        DeleteCurrentSelectedNetworks(PreviousSelectedComboboxName);
+                    }
+                }
+
+                if (selectedComboBox.SelectedIndex == 0)
+                {
+                    foreach (UIElement element in NetworkGridContainer.Children)
+                    {
+                        if (element is ComboBox comboBox)
                         {
-                            isAlreadySelected = true;
-                            break;
+                            comboBox.IsEnabled = true;
                         }
-                        comboBox.IsEnabled = false;
-
                     }
+                    ShowGateWay = false;
+                    CheckGateWayButtonVisibilityRequirement();
                 }
-
-                if (isAlreadySelected)
+                else if (AddedRouteNames.Contains(SelectedComboboxIndex))
                 {
-                    MessageBox.Show($"{SelectedComboboxIndex} ist schon ausgewählt");
-                    selectedComboBox.SelectedItem = PreviousComboboxSelections[selectedComboBox];
+                    bool isAlreadySelected = false;
+
+                    foreach (UIElement element in NetworkGridContainer.Children)
+                    {
+                        if (element is ComboBox comboBox && comboBox != selectedComboBox)
+                        {
+                            if (comboBox.SelectedItem?.ToString() == SelectedComboboxIndex)
+                            {
+                                isAlreadySelected = true;
+                                break;
+                            }
+                            comboBox.IsEnabled = false;
+
+                        }
+                    }
+
+                    if (isAlreadySelected)
+                    {
+                        MessageBox.Show($"{SelectedComboboxIndex} ist schon ausgewählt");
+                        selectedComboBox.SelectedItem = PreviousComboboxSelections[selectedComboBox];
+                    }
+                    else
+                    {
+                        if (SelectedComboboxIndex == "Internet" || SelectedComboboxIndex == "Maschinennetz")
+                        {
+                            MessageBox.Show("Bitte geben Sie ein Gateway ein.");
+                            ShowGateWay = true;
+                            CheckGateWayButtonVisibilityRequirement();
+                        }
+                    }
                 }
                 else
                 {
+                    PreviousComboboxSelections[selectedComboBox] = SelectedComboboxIndex;
                     if (SelectedComboboxIndex == "Internet" || SelectedComboboxIndex == "Maschinennetz")
                     {
-                        MessageBox.Show("Bitte geben Sie ein Gateway ein.");
                         ShowGateWay = true;
-                        CheckGateWayButtonVisibilityRequirement();
                     }
+                    else ShowGateWay = false;
+                    CheckGateWayButtonVisibilityRequirement();
                 }
             }
-            else
-            {
-                PreviousComboboxSelections[selectedComboBox] = SelectedComboboxIndex;
-                if (SelectedComboboxIndex == "Internet" || SelectedComboboxIndex == "Maschinennetz")
-                {
-                    ShowGateWay = true;
-                }
-                else ShowGateWay = false;
-                CheckGateWayButtonVisibilityRequirement();
-            }
-
-            SaveComboBoxSelections();
+            else return;
         }
 
 
@@ -380,6 +380,8 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                         CheckGateWayButtonVisibilityRequirement();
                         EnableComboBox();
                         ActiveRoutes.Add(SelectedInternetRow, $"0.0.0.0 mask 0.0.0.0 {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                        //SaveComboBoxSelections();
+
                     }
                     else selectedComboBox.SelectedItem = PreviousComboboxSelections[selectedComboBox];
 
@@ -398,16 +400,21 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                         CheckGateWayButtonVisibilityRequirement();
                         EnableComboBox();
                         ActiveRoutes.Add(SelectedInternetRow, $"{modifiedIP} mask {ImportedNetworksFromPowershell[SelectedInternetRow].Item2} {ImpGateway} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                        //SaveComboBoxSelections();
+
                     }
                     else selectedComboBox.SelectedItem = PreviousComboboxSelections[selectedComboBox];
                 }
             }
-            else MessageBox.Show("Bitte geben Sie den Gateway erneut ein.");
+            else {
+                MessageBox.Show("Bitte geben Sie den Gateway erneut ein.");
+            }
+            SwitchToDisableOverwritingCombobox = false;
             NetworkRefreshButton(null, null);
+
         }
         private void NetworkRefreshButton(object sender, RoutedEventArgs e)
         {
-            SaveComboBoxSelections();
 
             NetworkGridContainer.Children.Clear();
             terminalCommand.GenerateNetworks();
@@ -466,6 +473,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             CheckGateWayButtonVisibilityRequirement();
 
             RestoreComboBoxSelections();
+            SwitchToDisableOverwritingCombobox = true;
         }
 
         private bool GetOutput()
@@ -485,7 +493,6 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         {
             if (!ActiveNetworks.Contains(name))
             {
-                ActiveNetworks.Add(name);
                 ShowGateWay = true;
                 GetInputFields();
                 if (AddedRouteNames.Contains(CurrentlySelectedNetwork) && CurrentlySelectedNetwork != "Internet" && CurrentlySelectedNetwork != "Maschinennetz")
@@ -497,10 +504,13 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
 
                     if (GetOutput())
                     {
+                        ActiveNetworks.Add(name);
+
                         Gate_Block.Clear();
                         EnableComboBox();
                         ShowGateWay = false;
                         ActiveRoutes.Add(SelectedInternetRow, $"{modifiedIP} mask {ManualAddedNetworks[index + 1].Item2} {ManualAddedNetworks[index + 1].Item3} if {ImportedNetworksFromPowershell[SelectedInternetRow].Item4}");
+                        NetworkRefreshButton(null,null);
                     }
                 }
             }
