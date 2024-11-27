@@ -11,6 +11,7 @@ namespace Network_Window
 
     {
         private int Counter = 1;
+        private bool[] FreeNetworkBoxes = new bool[4];
         private int CurrentNetworkRowNumber = 0;
         private int SelectedInternetRow;
         private int index = 0;
@@ -258,44 +259,53 @@ namespace Network_Window
         }
         private void AddedCustomRoute(object sender, RoutedEventArgs e)
         {
-            GetInputFields();
-            if (regularExpressions.PatternValiduation())
+            if (!Counter.Equals(-1))
             {
-                foreach (var child in NetworkGridContainer.Children)
+                GetInputFields();
+                if (regularExpressions.PatternValiduation())
                 {
-                    if (child is ComboBox comboBox)
+                    foreach (var child in NetworkGridContainer.Children)
                     {
-                        comboBox.Items.Add(ImpIndex);
+                        if (child is ComboBox comboBox)
+                        {
+                            comboBox.Items.Add(ImpIndex);
+                        }
                     }
+                    output.Text = "Route zur Liste hinzugefügt";
+
+                    ManualAddedNetworks[Counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
+                    FreeNetworkBoxes[Counter - 1] = true;
+                    AddedRouteNames.Add(ImpIndex);
+
+                    string text = $"IP Adresse: {ManualAddedNetworks[Counter].Item1}\nSubnetMaske: {ManualAddedNetworks[Counter].Item2}\nGateway: {ManualAddedNetworks[Counter].Item3}\nSchnittstellenindex: {ManualAddedNetworks[Counter].Item4}\n";
+
+                    switch (Counter)
+                    {
+                        case 1:
+                            Route_1.Text = text;
+                            break;
+                        case 2:
+                            Route_2.Text = text;
+                            break;
+                        case 3:
+                            Route_3.Text = text;
+                            break;
+                        case 4:
+                            Route_4.Text = text;
+                            break;
+                    }
+                    Counter = SetCounterToFreeSpace(FreeNetworkBoxes);
+                    ClearInputFields();
                 }
-                output.Text = "Route zur Liste hinzugefügt";
-
-                ManualAddedNetworks[Counter] = Tuple.Create(ImpIp, ImpMask, ImpGateway, ImpIndex);
-                AddedRouteNames.Add(ImpIndex);
-
-                string text = $"IP Adresse: {ManualAddedNetworks[Counter].Item1}\nSubnetMaske: {ManualAddedNetworks[Counter].Item2}\nGateway: {ManualAddedNetworks[Counter].Item3}\nSchnittstellenindex: {ManualAddedNetworks[Counter].Item4}\n";
-
-                switch (Counter)
+                else if (!regularExpressions.PatternValiduation())
                 {
-                    case 1:
-                        Route_1.Text = text;
-                        break;
-                    case 2:
-                        Route_2.Text = text;
-                        break;
-                    case 3:
-                        Route_3.Text = text;
-                        break;
-                    case 4:
-                        Route_4.Text = text;
-                        break;
+                    
+                     output.Text = regularExpressions.Output;
                 }
-                Counter++;
-                ClearInputFields();
             }
-            else if (!regularExpressions.PatternValiduation())
+            else
             {
-                output.Text = regularExpressions.Output;
+                output.Text = "Kein Platz mehr";
             }
         }
         private void HelpButton(object sender, RoutedEventArgs e)
@@ -615,7 +625,8 @@ namespace Network_Window
                 }
                 AddedRouteNames.Remove(ManualAddedNetworks[index].Item4);
                 ManualAddedNetworks[index] = Tuple.Create("", "", "", "");
-                Counter = index;
+                FreeNetworkBoxes[index - 1] = false;
+                Counter = SetCounterToFreeSpace(FreeNetworkBoxes);
             }
         }
         private void GetInputFields()
@@ -650,6 +661,17 @@ namespace Network_Window
                 GateWayButton.Visibility = Visibility.Hidden;
                 Eingabe_Button.Visibility = Visibility.Visible;
             }
+        }
+        private int SetCounterToFreeSpace(bool[] array)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (!array[i])
+                {
+                    return i+1;
+                }
+            }
+            return -1;
         }
     }
 }
