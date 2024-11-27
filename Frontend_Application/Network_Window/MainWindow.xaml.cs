@@ -3,21 +3,12 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows;
-using System.Windows.Input;
-using System.Xml.Linq;
-using System.Collections;
-using System.Buffers;
-using System.Security.Policy;
 
-namespace Network_Window // To activate the programm remove comment from 331 & 351 and remove the MessageBox.Show
+
+namespace Network_Window
 {
-    public partial class MainWindow : Window
-    //wenn beim eingeben von gateway und hinzufügen von route es nicht klappt dann erneut fragen nach gateway
-    //route soll gelöscht werden nachdem combobox sich ändert(FIX)
-    //nachdem eine manual geaddete route gelöscht wird dann soll es vom combobox entfernt werden
-    //wenn ein manualgeaddedes netzwerk ausgewählt wird dann werden alle comboboxes deaktiviert und nicht mehr aktiviert(FIX)
-    //route delete messagebox soll erst erscheinen wenn ein gateway hinzugefügt wurde
-    //wenn ich zu einem manual geaddetes netzwerk wechsel und dann zu einem anderen nicht manual geadded und dann wieder zu manual geadded dann erscheint kein messagebox
+    public partial class MainWindow : Window //line 611 nachde eine route gelöscht wurde soll der name aus der dict addedroutesnames entfernt werden && 196 checken
+
     {
         private int Counter = 1;
         private int CurrentNetworkRowNumber = 0;
@@ -32,7 +23,6 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
 
         private string pattern = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
         private string CurrentlySelectedNetwork;
-        private string[] interfaces;
 
         public string ImpIp { get; set; }
         public string ImpMask { get; set; }
@@ -67,7 +57,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         {
             InitializeComponent();
             NetworkRefreshButton(null, null);
-            GateWayButton.Click += GateWayButton_Click;//Check
+            GateWayButton.Click += GateWayButton_Click;
             MessageBox.Show("Bitte beachten Sie, dass das Programm als Administrator ausgeführt werden muss.");
         }
 
@@ -110,7 +100,6 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 comboBox.SelectionChanged += ComboBoxSelectionChanged;
 
                 PreviousComboboxSelections[comboBox] = comboBox.SelectedItem.ToString();
-                //CurrentComboBoxSelections[i] = comboBox.SelectedItem.ToString();
             }
         }
         private void AddExistingComboBox(int runner, int rowIndex, int columnIndex)
@@ -128,7 +117,7 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         }
         private void SaveComboBoxSelections()
         {
-            if (CurrentComboBoxSelections.Count > 0)
+            if (CurrentComboBoxSelections.Count > 0 && ShowGateWay == false)
             {
                 PreviousComboboxSelections = CurrentComboBoxSelections.ToDictionary(kvp => NetworkGridContainer.Children.OfType<ComboBox>().First(cb => cb.Name == $"ComboBox_{kvp.Key}"), kvp => kvp.Value);
             }
@@ -201,15 +190,16 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 }
                 else if (SelectedComboboxIndex != "-Auswahl-")
                 {
+                    CurrentlySelectedNetwork = SelectedComboboxIndex;
                     ModifyCurrentSelectedNetworks(SelectedComboboxIndex);
 
-                    if (PreviousSelectedComboboxName != "-Auswahl-" && ActiveNetworks.Contains(PreviousSelectedComboboxName))
+                    if (PreviousSelectedComboboxName != "-Auswahl-" && ActiveNetworks.Contains(PreviousSelectedComboboxName) && ActiveNetworks.Contains(CurrentlySelectedNetwork))
                     {
                         DeleteCurrentSelectedNetworks(PreviousSelectedComboboxName);
                     }
 
                 }
-                if (AddedRouteNames.Contains(SelectedComboboxIndex))
+                if (AddedRouteNames.Contains(SelectedComboboxIndex)&& CurrentComboBoxSelections[SelectedInternetRow] == SelectedComboboxIndex)
                 {
                     bool isAlreadySelected = false;
 
@@ -247,7 +237,6 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 }
                 else
                 {
-                    //PreviousComboboxSelections[selectedComboBox] = SelectedComboboxIndex;
                     if (SelectedComboboxIndex == "Internet" || SelectedComboboxIndex == "Maschinennetz")
                     {
                         ShowGateWay = true;
@@ -260,9 +249,6 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             else return;
 
         }
-
-
-
         private void EnableComboBox()
         {
             foreach (ComboBox comboBox in NetworkGridContainer.Children.OfType<ComboBox>())
@@ -312,8 +298,6 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                 output.Text = regularExpressions.Output;
             }
         }
-
-
         private void HelpButton(object sender, RoutedEventArgs e)
         {
             Info_Fenster objInfo_Fenster = new Info_Fenster();
@@ -491,7 +475,6 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
             RestoreComboBoxSelections();
             SwitchToDisableOverwritingCombobox = true;
         }
-
         private bool GetOutput()
         {
             if (!string.IsNullOrWhiteSpace(terminalCommand.Error))
@@ -530,7 +513,12 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
                     }
                     else
                     {
+                        SwitchToDisableOverwritingCombobox = false;
                         selectedComboBox.SelectedItem = PreviousComboboxSelections[selectedComboBox];
+                        CurrentComboBoxSelections[SelectedInternetRow] = PreviousComboboxSelections[selectedComboBox];
+                        EnableComboBox();
+                        SwitchToDisableOverwritingCombobox = true;
+                        ShowGateWay = false;
                     }
                 }
             }
@@ -587,82 +575,45 @@ namespace Network_Window // To activate the programm remove comment from 331 & 3
         }
         private void DeleteManualAddedRoute(int index, string boxnr)
         {
+            TextBlock boxnumber = null;
             if (string.IsNullOrWhiteSpace(boxnr))
             {
                 output.Text = "keine route";
             }
             else
             {
-
                 switch (index)
                 {
                     case 1:
-                        if (!string.IsNullOrWhiteSpace(Route_1.Text))
-                        {
-                            Route_1.Text = "";
-                            if (GetOutput())
-                            {
-                                foreach (var child in NetworkGridContainer.Children)
-                                {
-                                    if (child is ComboBox comboBox)
-                                    {
-                                        comboBox.Items.Remove(ManualAddedNetworks[1].Item4);
-                                    }
-                                }
-                            }
-                        }
+                        boxnumber = Route_1;
                         break;
                     case 2:
-                        if (!string.IsNullOrWhiteSpace(Route_2.Text))
-                        {
-                            Route_2.Text = "";
-                            if (GetOutput())
-                            {
-                                foreach (var child in NetworkGridContainer.Children)
-                                {
-                                    if (child is ComboBox comboBox)
-                                    {
-                                        comboBox.Items.Remove(ManualAddedNetworks[2].Item4);
-                                    }
-                                }
-                            }
-                        }
+                        boxnumber = Route_2;
                         break;
                     case 3:
-                        if (!string.IsNullOrWhiteSpace(Route_3.Text))
-                        {
-                            Route_3.Text = "";
-                            if (GetOutput())
-                            {
-                                foreach (var child in NetworkGridContainer.Children)
-                                {
-                                    if (child is ComboBox comboBox)
-                                    {
-                                        comboBox.Items.Remove(ManualAddedNetworks[3].Item4);
-                                    }
-                                }
-                            }
-                        }
+                        boxnumber = Route_3;
                         break;
                     case 4:
-                        if (!string.IsNullOrWhiteSpace(Route_4.Text))
-                        {
-                            Route_4.Text = "";
-                            if (GetOutput())
-                            {
-                                foreach (var child in NetworkGridContainer.Children)
-                                {
-                                    if (child is ComboBox comboBox)
-                                    {
-                                        comboBox.Items.Remove(ManualAddedNetworks[4].Item4);
-                                    }
-                                }
-                            }
-                        }
+                        boxnumber = Route_4;
                         break;
                     default:
                         break;
                 }
+
+                boxnumber.Text = "";
+                if (GetOutput())
+                {
+                    output.Text = "Route Gelöscht";
+
+                    foreach (var child in NetworkGridContainer.Children)
+                    {
+                        if (child is ComboBox comboBox)
+                        {
+                            comboBox.Items.Remove(ManualAddedNetworks[index].Item4);
+                        }
+                    }
+                }
+                AddedRouteNames.Remove(ManualAddedNetworks[index].Item4);
                 ManualAddedNetworks[index] = Tuple.Create("", "", "", "");
                 Counter = index;
             }
